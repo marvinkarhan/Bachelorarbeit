@@ -1,1 +1,0 @@
-C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/./training_data_loader.dll
