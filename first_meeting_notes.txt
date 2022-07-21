@@ -1,0 +1,17 @@
+tikz für graphen in latex
+tikz für schachbretter & bäume
+
+tutorium:
+automatisiertes tool als tutorium beim fischer zur prüfung korrektur
+
+
+ieee zitate in IEEE form
+
+nature paper als beispiel
+
+seperates online verzeichnis
+
+
+wenn alles gut läuft schreibt er mir eine empfehlung
+
+abgrenzen von anderen arbeiten

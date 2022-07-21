@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Marvin\Documents\Bachelorarbeit\nnue-trainer\training_data_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Marvin\Documents\Bachelorarbeit\nnue-trainer\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D029320D-15B7-3C3F-A218-8CF1C1EDACCF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

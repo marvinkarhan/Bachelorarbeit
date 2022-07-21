@@ -1,0 +1,139 @@
+Determining if the include file pthread.h exists failed with the following output:
+Change Dir: C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe cmTC_ab456.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:m && Microsoft (R)-Build-Engine, Version 16.9.0+5e4b48a27 für .NET Framework
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+  Microsoft (R) C/C++-Optimierungscompiler Version 19.28.29915 für x64
+  Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+  CheckIncludeFile.c
+  cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_ab456.dir\Debug\\" /Fd"cmTC_ab456.dir\Debug\vc142.pdb" /Gd /TC /errorReport:queue "C:\Users\Marvin\Documents\Bachelorarbeit\nnue-trainer\build\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+C:\Users\Marvin\Documents\Bachelorarbeit\nnue-trainer\build\CMakeFiles\CMakeTmp\CheckIncludeFile.c(1,10): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "pthread.h": No such file or directory [C:\Users\Marvin\Documents\Bachelorarbeit\nnue-trainer\build\CMakeFiles\CMakeTmp\cmTC_ab456.vcxproj]
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -c 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -c 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+Zugriff verweigert
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/cygwin64/bin/cc 
+Build flags: 
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+Zugriff verweigert
+
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Strawberry/c/bin/gmake.exe -f Makefile cmTC_7000e/fast && C:/Strawberry/c/bin/gmake.exe  -f CMakeFiles/cmTC_7000e.dir/build.make CMakeFiles/cmTC_7000e.dir/build
+gmake.exe[1]: Entering directory 'C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7000e.dir/CMakeCCompilerABI.c.obj
+C:/cygwin64/bin/cc    -o CMakeFiles/cmTC_7000e.dir/CMakeCCompilerABI.c.obj -c "C:/Program Files/CMake/share/cmake-3.20/Modules/CMakeCCompilerABI.c"
+cc: warning: C:/Program: linker input file unused because linking not done
+cc: error: C:/Program: linker input file not found: No such file or directory
+cc: warning: Files/CMake/share/cmake-3.20/Modules/CMakeCCompilerABI.c\: linker input file unused because linking not done
+cc: error: Files/CMake/share/cmake-3.20/Modules/CMakeCCompilerABI.c\: linker input file not found: No such file or directory
+gmake.exe[1]: *** [CMakeFiles/cmTC_7000e.dir/build.make:78: CMakeFiles/cmTC_7000e.dir/CMakeCCompilerABI.c.obj] Error 1
+gmake.exe[1]: Leaving directory 'C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp'
+gmake.exe: *** [Makefile:127: cmTC_7000e/fast] Error 2
+
+
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Strawberry/c/bin/gmake.exe -f Makefile cmTC_18eea/fast && C:/Strawberry/c/bin/gmake.exe  -f CMakeFiles/cmTC_18eea.dir/build.make CMakeFiles/cmTC_18eea.dir/build
+gmake.exe[1]: Entering directory 'C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_18eea.dir/testCCompiler.c.obj
+C:/cygwin64/bin/cc    -o CMakeFiles/cmTC_18eea.dir/testCCompiler.c.obj -c C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp/testCCompiler.c
+process_begin: CreateProcess(C:\cygwin64\bin\cc, C:/cygwin64/bin/cc -o CMakeFiles/cmTC_18eea.dir/testCCompiler.c.obj -c C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp/testCCompiler.c, ...) failed.
+make (e=5): Zugriff verweigert
+gmake.exe[1]: *** [CMakeFiles/cmTC_18eea.dir/build.make:78: CMakeFiles/cmTC_18eea.dir/testCCompiler.c.obj] Error 5
+gmake.exe[1]: Leaving directory 'C:/Users/Marvin/Documents/Bachelorarbeit/nnue-trainer/build/CMakeFiles/CMakeTmp'
+gmake.exe: *** [Makefile:127: cmTC_18eea/fast] Error 2
+
+
+
