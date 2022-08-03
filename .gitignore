@@ -1,3 +1,5 @@
 /.vscode
-nnue-trainer\training_data_loader.dll
-nnue-trainer\build
+nnue-trainer/training_data_loader.dll
+nnue-trainer/build/
+nnue-trainer/logs
+nnue-trainer/__pycache__/
