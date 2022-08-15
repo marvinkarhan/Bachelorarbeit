@@ -3,3 +3,6 @@ nnue-trainer/training_data_loader.dll
 nnue-trainer/build/
 nnue-trainer/logs
 nnue-trainer/__pycache__/
+latex/tex/kapitel/notes.txt
+latex/tex/result/thesis.ilg
+latex/tex/result/thesis.lol
