@@ -12,6 +12,15 @@
       "console": "integratedTerminal",
       "justMyCode": true,
       "args": ["data_gen/data_100_d9/gensfen.bin", "data_gen/data_100_d9/gensfen.bin"]
+    },
+    {
+      "name": "debug save.py",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/save.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["./logs/lightning_logs/version_13/checkpoints/epoch=9-step=122080.ckpt", "default.nnue"]
     }
   ]
 }
