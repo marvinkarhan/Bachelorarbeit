@@ -75,7 +75,7 @@
                                   %      inline: Zitat in Klammern (\parancite)
                                   %      footnote: Zitat in Fußnoten (\footcite)
                                   %      plain: Zitat direkt ohne Klammern (\cite)
-  style=authoryear,               % Legt den Stil für die Zitate fest
+  style=ieee,                     % Legt den Stil für die Zitate fest
                                   %      ieee: Zitate als Zahlen [1]
                                   %      alphabetic: Zitate als Kürzel und Jahr [Ein05]
                                   %      authoryear: Zitate Author und Jahr [Einstein (1905)]
@@ -88,6 +88,7 @@
 \usepackage{harveyballs}          % Harveyballs
 \usepackage{chngcntr}             % Counter (Zähler) ändern können - für Fußnotennummern
 \usepackage{longtable}            % Tabellen, die mehr als eine Seite umfassen
+\usepackage{tikz}                 % tikz für graphiken (neuronale netze oder schachfelder)
 
 % Einstellungen zu den Fußnoten
 \renewcommand{\footnotesize}{\fontsize{9}{10}\selectfont} % Größe der Fußnoten
@@ -239,3 +240,6 @@
 % Checklisten mit zwei Ebenen
 \newlist{checklist}{itemize}{2}
 \setlist[checklist]{label=$\square$}
+
+% tikz setup
+\usetikzlibrary{positioning}

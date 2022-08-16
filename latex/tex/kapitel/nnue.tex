@@ -1,0 +1,35 @@
+\chapter{NNUE}
+
+Ziel dies Kapitels ist es, 
+
+Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Nach kurzer Überlegung wird aber klar, dass die \ac{HCE} nur so gut sein kann wie die Schachspieler die sie Entwickeln. Natürlich können die darin verwendeten Parameter durch Optimierungsalgorithmen wie genetische Algorithmen oder Simulated Annealing maximiert werden, letztendlich bleibt der limitierende Faktor das Spielverständnis der Entwickler.
+
+
+\section{Architektur}
+
+\subsection{Feature Set}
+
+\subsection{Eingabeschicht}
+
+- sparse inputs -> little changes
+- max 32 inputs setboolean
+- input either 0 or 1
+
+\subsection{Versteckte Schicht}
+\subsection{Ausgabeschicht}
+
+\section{Training}
+
+\subsection{Eingabedaten}
+
+Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewesNetJul04}. Sie 
+
+\section{Integration in einen Schachcomputer}
+
+\subsection{Eingabeschicht}
+% quantization?
+
+
+\subsection{Versteckte Schicht}
+% quantization?
+- simple -> quantization

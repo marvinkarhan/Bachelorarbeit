@@ -88,7 +88,7 @@
 % Abgabeform festlegen
 % Bei einer digitalen Abgabe, wird das Dokument einseitig erzeugt und der Titel wird
 % zentriert.
-\newcommand{\hsmaabgabe}{papier} % Wie erfolgt die Abgabe: "papier" oder "digital"?
+\newcommand{\hsmaabgabe}{digital} % Wie erfolgt die Abgabe: "papier" oder "digital"?
 
 % Preambel mit Einstellungen importieren
 \input{preambel}
@@ -133,10 +133,16 @@
 
 % ------------------------------------------------------------------
 % Hauptteil der Arbeit
-\input{kapitel/kapitel1} % Externe Datei einbinden
-\input{kapitel/kapitel2} % Externe Datei einbinden
-\input{kapitel/kapitel3} % Externe Datei einbinden
-\input{kapitel/kapitel4} % Externe Datei einbinden
+% \input{kapitel/kapitel1} % Externe Datei einbinden
+% \input{kapitel/kapitel2} % Externe Datei einbinden
+% \input{kapitel/kapitel3} % Externe Datei einbinden
+% \input{kapitel/kapitel4} % Externe Datei einbinden
+\input{kapitel/einleitung.tex}
+\input{kapitel/grundlagen.tex}
+\input{kapitel/verwante_arbeiten.tex}
+\input{kapitel/nnue.tex}
+\input{kapitel/ergebnisse.tex}
+\input{kapitel/fazit_und_ausblick.tex}
 % ------------------------------------------------------------------
 
 \label{lastpage}
@@ -169,10 +175,10 @@
 
 % Listingverzeichnis erzeugen. Wenn Sie keine Listings haben,
 % entfernen Sie einfach diesen Teil.
-\cleardoublepage
-\phantomsection
-\addcontentsline{toc}{chapter}{\hsmalistings}
-\lstlistoflistings
+% \cleardoublepage
+% \phantomsection
+% \addcontentsline{toc}{chapter}{\hsmalistings}
+% \lstlistoflistings
 
 % Literaturverzeichnis erzeugen
 \begingroup
@@ -185,15 +191,15 @@
 
 % Index ausgeben. Wenn Sie keinen Index haben, entfernen Sie einfach
 % diesen Teil. Die meisten Abschlussarbeiten haben *keinen* Index.
-\cleardoublepage
-\phantomsection
-\addcontentsline{toc}{chapter}{\hsmaindex}
-\printindex
+% \cleardoublepage
+% \phantomsection
+% \addcontentsline{toc}{chapter}{\hsmaindex}
+% \printindex
 
 % Anhang. Wenn Sie keinen Anhang haben, entfernen Sie einfach
 % diesen Teil.
-\appendix
-\input{kapitel/anhang-a}
-\input{kapitel/anhang-b}
+% \appendix
+% \input{kapitel/anhang-a}
+% \input{kapitel/anhang-b}
 
 \end{document}
