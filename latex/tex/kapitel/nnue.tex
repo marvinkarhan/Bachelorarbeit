@@ -7,22 +7,42 @@ Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positio
 
 \section{Architektur}
 
+% the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
+% theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
+% because we are looking for regression we use a clipped relu
+
+% dropoutlayers are used in other chess engines and could be beneficial here
+
 \subsection{Feature Set}
+\label{chap:featureSet}
+
+% Input data could just be 32 -> position for each piece
+% small inputs make it mutch harder to learn (TODO: find citation)
+
+% HalfKP is derived from nnue of shogi, in shogi the games is mutch more king zentered so there a king zentered approch make sense, suprisingly it also works great for chess event tho the game is less interconected to the king but its similar in that sense that the ring moves rarely which means not many full refreshes are needed -> archiving our goal of high speed
 
 \subsection{Eingabeschicht}
 
-- sparse inputs -> little changes
-- max 32 inputs setboolean
-- input either 0 or 1
+% sparse inputs -> little changes
+% max 32 inputs setboolean
+% input either 0 or 1
 
 \subsection{Versteckte Schicht}
 \subsection{Ausgabeschicht}
+
+% the NN is a regressor becuase it only has one output note (cite?)
 
 \section{Training}
 
 \subsection{Eingabedaten}
 
-Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewesNetJul04}. Sie 
+Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie 
+
+% they are alerady normalized (siehe feature set)
+
+% grouping the inputdate to a batch size aims to use the time writing to the CPU more efficently (8192)
+
+% there is no great risk of overfitting to the training set because the input data is so large -> generalisation should be strong enogth so that training data acurracy and validation data accuracy cant diverge, and becuase we dont know what the "correct" input looks like any validation data set is usless (zitat dafür finden)
 
 \section{Integration in einen Schachcomputer}
 

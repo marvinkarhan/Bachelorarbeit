@@ -2,8 +2,17 @@
 
 Computer Schach ist ein viel betrachtetes Thema. Schon Alan Turing und Claude Shannon hab sich damit befasst \cite{Turing1953, Shannon1950}.
 
+% beschreiben was nnue eig ist
+Dieses Konzept wurde erstmals \citeyear{YNasu2018} von \citeauthor{YNasu2018} in seinem Japanischem paper vorgestellt \cite{YNasu2018}. Shogi ist die japanische Variante des Schachspiels. Shogi unterscheidet sich in einigen Punkten von herkömmlichem Schach, es hat unter anderem eine andere Spielfeldgröße und erlaubt es geschlagene Figuren wieder einzusetzen. Trotzdem eignet sich \citeauthor{YNasu2018}s Ansatz für traditionelles Schach, da die Zuggenerierung sowie die Evaluation ähnlich ist. Außerdem gibt es in beiden Varianten einen König was praktisch für die Auswahl eines passenden Feature Sets ist, wie in \autoref{chap:featureSet} genauer erläutert ist.
+
+\bild{stockfish-elo-progression}{6cm}{}
+
+Nur zwei Jahre später zeigte ein port des Konzepts starke Verbesserungen in dem Schachcomputer Stockfish, der sich durch \ac{NNUE} um mehr als 80 elo verbessern konnte \cite{StockfishIntroducingNNUE}. Die
+
 % motivation für schachcompute beschreiben:
 % warum ist schach eine gute spielweise für computer scientist (DeepMind)
 % warum werden normale schachspieler besser durch bessere/andere schach computer (besonderst welche mit neuronalem netz)
 
-Ein Schachcomputer kann
+Ein Schachcomputer besteht aus drei Teilen: Suche, Zuggenerierung (Boardrepräsentation) und Evaluation \cite{VazquezFernandez2013}. Als Basis für diese Arbeit wird ein simpler Schachcomputer, der in dem Modul \ac{KIS} entwickelt wurde, verwendet. Dieser Schachcomputer verfügt über eine simple Suche und eine \ac{HCE} \cite{nopy}. Gegenstand dieser Arbeit ist es die \ac{HCE} durch ein \ac{NNUE} zu ersetzen.
+
+Ziel dieser Arbeit ist es ein \ac{NNUE} zu trainieren und in einen bestehenden Schachcomputer, der 2021 im Modul \ac{KIS} entwickelt wurde, einzubinden. Die Erstellung neuer Eingabedaten für \acp{NNUE} ist nicht teil dieser Arbeit.
