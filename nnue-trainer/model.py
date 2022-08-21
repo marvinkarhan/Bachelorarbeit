@@ -57,7 +57,7 @@ class NNUE(pl.LightningModule):
 
   # Use simple Adadelta optimizer
   def configure_optimizers(self) -> torch.optim.Adadelta:
-    optimizer = torch.optim.Adadelta(self.parameters(), lr=1, weight_decay=1e-10)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=75, gamma=0.3)
-
-    return [optimizer], [scheduler]
+    optimizer = torch.optim.Adadelta(self.parameters(), lr=1)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=75, gamma=0.3)
+    # return [optimizer], [scheduler]
+    return optimizer

@@ -6,3 +6,8 @@ Die Implementierung des Netzes in dem Schachcomputer kann Fehler enthalten. Die 
 
 Ein weiter Grund für eine nicht vorhandene Steigerung der Spielstärke kann außerhalb der Evaluation liegen. Die zugrundeliegende Suche von des im Modul \ac{KIS} entwickelten Schachcomputers ist nur minimal optimiert. Sie besteht aus einem Negamax Depth-First Suchalgorithmus \cite{Campbell1983} mit Move Ordering, Transposition Tables, Quiescence Search und Iterative Deepening. Es fehlen viele weit verbreitete pruning Techniken wie unter anderem: razoring \cite[S. 123-128]{Levy1988}
 % also more pruning in searches leads to less "usless" information being stored in the hashtable, witch in turn leads to a higher number of tablebase hits
+
+% could also be the case that I didnt do quantization limits during training
+
+% ausblick: NNUE ist viel versprechend und es ist noch nicht ausgeschöpft, ebenfalls ineressant ist es anwendungen in der "realität zu finden"
+% spekulation: aufgund der hoch effizienten art und weise von NNUE eignet es sich möglicherweise für zeitkritische system mit nur wenigen Änderungen von einem zum nächsten zustand

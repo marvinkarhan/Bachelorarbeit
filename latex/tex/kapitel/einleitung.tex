@@ -1,18 +1,25 @@
 \chapter{Einleitung}
 
-Computer Schach ist ein viel betrachtetes Thema. Schon Alan Turing und Claude Shannon hab sich damit befasst \cite{Turing1953, Shannon1950}.
+Computer Schach ist ein viel betrachtetes Thema. Schon Alan Turing und Claude Shannon hab sich damit befasst \cite{Turing1953, Shannon1950}. In seinem \citeyear{Shannon1950} verfassten paper beschrieb \citeauthor{Shannon1950} \cite{Shannon1950} Funktion zu Evaluation einer Schachposition, ihm war jedoch auch klar, das es wahrscheinlich niemals eine exakte Evaluation für Schach geben wird. Deshalb liegt es nahe dafür ein \ac{NN} zu verwenden, denn dessen Aufgabe ist es solche Funktion zu Approximieren. Leider ist es für die Evaluation in einem Schachcomputer wichtig sowohl genau als auch schnell die Position zu bewerten. Je genauer die Stellung bewertet wird, desto stärker spielt das Programm. Je schneller die Bewertung stattfindet, desto weiter kann der Computer voraussehen, was ebenfalls zu einer höheren Spielstärke führt. Herkömmliche \acp{NN} Architekturen scheitern jedoch an einer zu lagen Berechnungszeit oder bei sehr kleinen Netzen an einer zu ungenauen Bewertung.
 
-% beschreiben was nnue eig ist
-Dieses Konzept wurde erstmals \citeyear{YNasu2018} von \citeauthor{YNasu2018} in seinem Japanischem paper vorgestellt \cite{YNasu2018}. Shogi ist die japanische Variante des Schachspiels. Shogi unterscheidet sich in einigen Punkten von herkömmlichem Schach, es hat unter anderem eine andere Spielfeldgröße und erlaubt es geschlagene Figuren wieder einzusetzen. Trotzdem eignet sich \citeauthor{YNasu2018}s Ansatz für traditionelles Schach, da die Zuggenerierung sowie die Evaluation ähnlich ist. Außerdem gibt es in beiden Varianten einen König was praktisch für die Auswahl eines passenden Feature Sets ist, wie in \autoref{chap:featureSet} genauer erläutert ist.
+Eine Lösung für die Probleme herkömmlicher \acp{NN}, wurde \citeyear{YNasu2018} von \citeauthor{YNasu2018} \cite{YNasu2018} in seinem Japanischem paper vorgestellt. Er erkannte das inkrementelle Aktualisierungen, wie sie bereits in \ac{HCE} verwendet wurden, in \acp{NN} verwendet werden kann. Der Schlüssel dafür ist ein binäres und dünn besetztes Feature Set, basierend auf den Figuren und ihren Positionen. Die Eingabeschicht, auch affine Transformer genannt, muss nicht bei jeder Aktivierung alle Elemente seines Ausgabevektors neu berechnet. Steht $q$ für die aktuelle Stellung, $p$ für die vorherige Stellung und $x$ als der Vektor Feature Sets wird $v^{(q)}$ konkret mit folgender Gleichung berechnet:
 
-\bild{stockfish-elo-progression}{6cm}{}
+\begin{equation}
+  \begin{split}
+    v^{(q)} = v^{(p)} 
+              - \sum_{j \in \left \{ k | x_{k}^{(p)}=1\wedge x_{k}^{(q)}=0 \right \}}^{} W_{1}(:,j) \\
+              + \sum_{j \in \left \{ k | x_{k}^{(p)}=0\wedge x_{k}^{(q)}=1 \right \}}^{} W_{1}(:,j)
+  \end{split}
+\end{equation}
 
-Nur zwei Jahre später zeigte ein port des Konzepts starke Verbesserungen in dem Schachcomputer Stockfish, der sich durch \ac{NNUE} um mehr als 80 elo verbessern konnte \cite{StockfishIntroducingNNUE}. Die
+Shogi ist die japanische Variante des Schachspiels. Shogi unterscheidet sich in einigen Punkten von herkömmlichem Schach, es hat unter anderem eine andere Spielfeldgröße und erlaubt es geschlagene Figuren wieder einzusetzen. Trotzdem eignet sich \citeauthor{YNasu2018}s \cite{YNasu2018} Ansatz für traditionelles Schach, da die Zuggenerierung sowie die Evaluation ähnlich ist. Außerdem gibt es in beiden Varianten einen König was praktisch für die Auswahl eines passenden Feature Sets ist, wie in \autoref{chap:featureSet} genauer erläutert ist.
+
+Nur zwei Jahre später zeigte ein Port des Konzepts starke Verbesserungen in dem Schachcomputer Stockfish, der sich durch \ac{NNUE} um mehr als 80 elo verbessern konnte \cite{StockfishIntroducingNNUE}. Die größte Verbesserung einer Stockfish-Version jemals.
+
+Als Ausnahme muss \enquote{AlphaZero} genannt werden, welche schon \citeyear{Silver2017} mit einem \ac{CNN} und reinforcement learning \enquote{übermenschliches Niveau} erreichte \cite{Silver2017}.
 
 % motivation für schachcompute beschreiben:
 % warum ist schach eine gute spielweise für computer scientist (DeepMind)
 % warum werden normale schachspieler besser durch bessere/andere schach computer (besonderst welche mit neuronalem netz)
 
-Ein Schachcomputer besteht aus drei Teilen: Suche, Zuggenerierung (Boardrepräsentation) und Evaluation \cite{VazquezFernandez2013}. Als Basis für diese Arbeit wird ein simpler Schachcomputer, der in dem Modul \ac{KIS} entwickelt wurde, verwendet. Dieser Schachcomputer verfügt über eine simple Suche und eine \ac{HCE} \cite{nopy}. Gegenstand dieser Arbeit ist es die \ac{HCE} durch ein \ac{NNUE} zu ersetzen.
-
-Ziel dieser Arbeit ist es ein \ac{NNUE} zu trainieren und in einen bestehenden Schachcomputer, der 2021 im Modul \ac{KIS} entwickelt wurde, einzubinden. Die Erstellung neuer Eingabedaten für \acp{NNUE} ist nicht teil dieser Arbeit.
+Ein Schachcomputer besteht aus drei Teilen: Suche, Zuggenerierung (Boardrepräsentation) und Evaluation \cite{VazquezFernandez2013}. Als Basis für diese Arbeit wird ein simpler Schachcomputer, der in dem Modul \ac{KIS} entwickelt wurde, verwendet. Dieser Schachcomputer verfügt über eine simple Suche und eine \ac{HCE} \cite{nopy}. Gegenstand dieser Arbeit ist es die \ac{HCE}, des 2021 im Modul \ac{KIS} entwickelten Schachcomputer, durch ein eigens trainiertes \ac{NNUE} zu ersetzen. Die Erstellung neuer Eingabedaten für \acp{NNUE} ist nicht teil dieser Arbeit.
