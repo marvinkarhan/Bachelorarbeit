@@ -1,6 +1,6 @@
 \chapter{Grundlagen}
 
-In diesem Kapitel wird das Wissen vermittelt, welches benötigt wird um zu Verstehen, wie \acp{NNUE} im Rahmen von Schachcomputern funktionieren. Zuerst wird die Evaluation, wie sie in herkömmlichen Schachcomputern funktioniert erklärt, auch \ac{HCE} genannt. Weiterhin werden die grundlegenden Bestandteile, die für überwacht lernende \acp{FNN} von Bedeutung sind, eingegangen. Zuletzt erläutert was \ac{SIMD} ist und wie diese Vektoroperationen in C/C++ verwendet werden können. 
+In diesem Kapitel wird das Wissen vermittelt, welches benötigt wird um zu Verstehen, wie \acp{NNUE} im Rahmen von Schachcomputern funktionieren. Zuerst wird die Evaluation, wie sie in herkömmlichen Schachcomputern funktioniert erklärt, auch \ac{HCE} genannt. Weiterhin werden die grundlegenden Bestandteile, die für überwacht lernende \acp{FNN} von Bedeutung sind, eingegangen. Zuletzt erläutert was \ac{SIMD} ist und wie diese Vektoroperationen in C/C++ verwendet werden können.
 
 \section{Hand-crafted Evaluation}
 \label{chap:HCE}
@@ -26,36 +26,36 @@ Wenn ein Mensch Schach spielen lernt, ist der Wert der Figuren eines der ersten 
     \tikzstyle{neuron}=[draw,shape=circle,minimum size=1.15cm]
     % draw nerons
     \foreach \m/\l [count=\y] in {1,2,3}
-      \node [neuron] (input-\m) at (0,2-\y) {};
-    
+    \node [neuron] (input-\m) at (0,2-\y) {};
+
     \foreach \m [count=\y] in {1,2,3,4}
-      \node [neuron] (hidden-\m) at (2,2.5-\y) {};
-    
+    \node [neuron] (hidden-\m) at (2,2.5-\y) {};
+
     \foreach \m [count=\y] in {1,2}
-      \node [neuron] (output-\m) at (4,1.5-\y) {};
+    \node [neuron] (output-\m) at (4,1.5-\y) {};
     % draw lines  
     \foreach \i in {1,2,3}
-      \foreach \j in {1,2,3,4}
-        \draw [->] (input-\i) -- (hidden-\j);
-    
+    \foreach \j in {1,2,3,4}
+    \draw [->] (input-\i) -- (hidden-\j);
+
     \foreach \i in {1,2,3,4}
-      \foreach \j in {1,2}
-        \draw [->] (hidden-\i) -- (output-\j);
-    
+    \foreach \j in {1,2}
+    \draw [->] (hidden-\i) -- (output-\j);
+
     \foreach \l [count=\x from 0] in {Eingabeschicht, Versteckte Schicht, Ausgabeschicht}
-      \node [align=center, above] at (\x*2,2) {\l};
+    \node [align=center, above] at (\x*2,2) {\l};
   \end{tikzpicture}
   \caption{Ein einfaches \acl{NN}}
-  \label{grundlagen:beispiel-nn}
+  \label{fig:beispiel-nn}
 \end{figure}
 
 \Acp{KNN} oder einfach \acp{NN} genannt, sind Computer Systeme, die dem biologischen Vorbild des Gehirns nachempfunden sind. Analog zu seinem biologischen Vorbild besteht ein \ac{NN} aus Neuronen die miteinander Vernetzt sind. Jedes Neuron reagiert auf eingehende Signal mit einer bestimmten Reaktion. Diese Reaktion kann sich durch neu gewonnene Erfahrungen anpassen, das ermöglicht es zu lernen und zukünftig besser zu reagieren.
 
 % erklären wie der generelle aufbau ist
-In Abbildung \autoref{grundlagen:beispiel-nn} ist ein einfaches \acl{NN} zu sehen. Es besteht aus drei Schichten. Die erste Schicht, die Eingabeschicht, nimmt Eingabedaten entgegen. Eingabedaten können ganz unterschiedliche daten Repräsentieren, ist der Eingabedatensatz beispielsweise ein 100×100 Schwarzweiß-Bild, bestände die Eingabeschicht aus 1000 Neuronen die pro Neuron den Zustand eines Pixels (0 = weiß, 1 = Schwarz) des Bildes gefüttert bekommen. Die zweite Schicht heißt versteckte Schicht, weil von außen nur die Eingabedaten und das Ergebnis sichtbar ist. Sie empfängt die Informationen der Eingabeschicht, gewichtet sie und gibt sie an der Ausgabeschicht weiter. Die versteckte Schicht kann aus mehreren Schichten bestehen. Ein \ac{NN} mit mehreren versteckten Schichten heißt \ac{DNN}. Die letzte Sicht, die Ausgabeschicht, spiegelt das Ergebnis des \acp{NN} dar. Ein Netz, das versucht Bilder zwischen Hunden und Katzen zu unterscheiden kann zwei Ausgabeneuronen enthalten, eins für die Wahrscheinlichkeit das auf dem gegebenen Bild ein Hund ist und eins für die Wahrscheinlichkeit das es eine Katze ist. Ein \ac{NN} kann auch nur ein Ausgabeneuron besitzen, wie \zb{} bei der Evaluation einer Schachposition nötig ist. Die Verbindungen der einzelnen Neuronen stellen deren Zusammenhang dar. Wie stark dieser Abhängigkeit ist, wird durch Gewichte definiert \cite[S. 2--7]{krawczak2013multilayer}.
+In Abbildung \autoref{fig:beispiel-nn} ist ein einfaches \acl{NN} zu sehen. Es besteht aus drei Schichten. Die erste Schicht, die Eingabeschicht, nimmt Eingabedaten entgegen. Eingabedaten können ganz unterschiedliche daten Repräsentieren, ist der Eingabedatensatz beispielsweise ein 100×100 Schwarzweiß-Bild, bestände die Eingabeschicht aus 1000 Neuronen die pro Neuron den Zustand eines Pixels (0 = weiß, 1 = Schwarz) des Bildes gefüttert bekommen. Die zweite Schicht heißt versteckte Schicht, weil von außen nur die Eingabedaten und das Ergebnis sichtbar ist. Sie empfängt die Informationen der Eingabeschicht, gewichtet sie und gibt sie an der Ausgabeschicht weiter. Die versteckte Schicht kann aus mehreren Schichten bestehen. Ein \ac{NN} mit mehreren versteckten Schichten heißt \ac{DNN}. Die letzte Sicht, die Ausgabeschicht, spiegelt das Ergebnis des \acp{NN} dar. Ein Netz, das versucht Bilder zwischen Hunden und Katzen zu unterscheiden kann zwei Ausgabeneuronen enthalten, eins für die Wahrscheinlichkeit das auf dem gegebenen Bild ein Hund ist und eins für die Wahrscheinlichkeit das es eine Katze ist. Ein \ac{NN} kann auch nur ein Ausgabeneuron besitzen, wie \zb{} bei der Evaluation einer Schachposition nötig ist. Die Verbindungen der einzelnen Neuronen stellen deren Zusammenhang dar. Wie stark dieser Abhängigkeit ist, wird durch Gewichte definiert \cite[S. 2--7]{krawczak2013multilayer}.
 % auswahl der Input daten spalten gibt an wieviele input neuronen es gibt, die anzal der hidden neuronen ist "egal" je mehr -> desto besser kann das neuronale netz lernen kinda, output neuronen gibt die anzahl der klassifikationen an, kann auch nur eins sein (regession)
 
-Es gibt verschiedene Modelle \aclp{NN}, für diese Thesis sind lediglich \acp{FNN} relevant. \acp{FNN} basieren auf dem von \citeauthor{rosenblatt1958perceptron} \cite{rosenblatt1958perceptron} beschriebenen mehrlagigen Perzeptron. Das \ac{FNN} zeichnet sich durch seinen Zyklen freien Aufbau aus. Der Datenfluss führt immer von der Eingabeschicht zu Ausgabeschicht.
+Es gibt verschiedene Modelle \aclp{NN}, für diese Thesis sind lediglich \acp{FNN} relevant. \acp{FNN} basieren auf dem von \citeauthor{rosenblatt1958perceptron} \cite{rosenblatt1958perceptron} beschriebenen mehrlagigen Perzeptron. Das \ac{FNN} zeichnet sich durch seinen Zyklen freien Aufbau aus. Der Datenfluss führt immer von der Eingabeschicht zu Ausgabeschicht. Das \ac{FNN} gilt als die einfachste Netzwerkarchitektur \cite{Schmidhuber2015}.
 
 In den folgenden Unterabschnitten wird Grundlegend auf die Einzelteile neuronaler Netze eingegangen. To-do.
 
@@ -76,13 +76,11 @@ In den folgenden Unterabschnitten wird Grundlegend auf die Einzelteile neuronale
     \draw (p) -- (3,1) node[xshift=30]{$y := f(\varphi)$};
   \end{tikzpicture}
   \caption{Ein einzelnes Neuron mit seinen eingabe- und Ausgabekomponenten}
-  % Single processing unit and its components. The activation function is denoted by $f$ and applied on the actual input $z$ of the unit to form its output $y = f(z)$. $x_1, \ldots, x_D$ represent input from other units within the network; $w_0$ is called bias and represents an external input to the unit. All inputs are mapped onto the actual input $z$ using the propagation rule.
-
-  \label{grundlagen:neuron}
+  \label{fig:neuron}
 \end{figure}
 
 % neuronen wie sie im nerfen systems eines menschen vorhanden sind
-Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{grundlagen:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$, werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert und aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ wird die Ausgabe des Neurons. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet das es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
+Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{fig:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$, werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert und aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ wird die Ausgabe des Neurons. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet, dass es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
 
 \begin{equation}
   f(\varphi) = \varphi(\sum_{i=0}^{n}w_{j}x_{j})
@@ -94,9 +92,62 @@ Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McC
   \label{equation:NeuronOutput}
 \end{equation}
 
-Die Aktivierungsfunktion eines Neurons
+\begin{figure}
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \resizebox{.9\textwidth}{!}{%
+      \begin{tikzpicture}[declare function={sigma(\x)=1/(1+exp(-\x));}]
+        \begin{axis}%
+          [
+            grid=none,
+            xmin=-6,
+            xmax=6,
+            axis x line=bottom,
+            ytick={0,.5,1},
+            ymax=1,
+            axis y line=middle,
+            samples=100,
+            domain=-6:6,
+            legend style={at={(1,0.9)}}
+          ]
+          \addplot[blue,mark=none]   (x,{sigma(x)});
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \caption{Standardsigmoide Aktivierungsfunktion}
+    \label{fig:sigmoid}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \resizebox{.9\textwidth}{!}{%
+      \begin{tikzpicture}[declare function={relu(\x)=max(0,\x);}]
+        \begin{axis}%
+          [
+            grid=none,
+            xmin=-3,
+            xmax=3,
+            axis x line=bottom,
+            ytick={0,1,2,3},
+            ymax=3,
+            axis y line=middle,
+            samples=1000,
+            domain=-3:3,
+            legend style={at={(1,0.9)}}
+          ]
+          \addplot[blue,mark=none]   (x,{relu(x)});
+        \end{axis}
+      \end{tikzpicture}
+    }
+    \caption{Rectified Linear Aktivierungsfunktion}
+    \label{fig:ClippedRelu}
+  \end{subfigure}
+  \caption{Beispiele für Aktivierungsfunktionen}
+  \label{fig:activationfunction}
+\end{figure}
+
+Die Aktivierungsfunktion, oder auch Transferfunktion, eines Neurons kann linear oder nicht linear sein. Ist die Transferfunktion linear, ergibt ein mehrschichtiges \ac{NN} keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Lineare \acp{NN} sind nicht in der Lage, nicht lineare Probleme zu lösten \cite{minsky1969perceptron}. Nicht lineare Transferfunktionen sind interessanter, da sie für nicht lineare Probleme antworten liefern können. In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. In \autoref{fig:sigmoid}
 % activation functions: linear vs non linear -> linear functions sorgen dafür das nur ein hidden layer sinnvoll ist, mehrere hidden layer mit linearen Aktivierungs Funktionen geben keinen sinn, da sie zu einer Schicht vereinfacht werden können. Deshalb sind nicht-lineare Transferfunktionen interessant, sie ermöglichen es komplexere Funktionen zu lernen
-% 
 
 % eingehen auf Clipped relu und sigmoid aktivation functions
 % mathe matische grundlage für das neuron und neuronale netz
