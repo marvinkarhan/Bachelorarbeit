@@ -50,11 +50,19 @@ def main():
 
   # visualize.visualize_data_loader(train)
 
-  nnue = model.NNUE()
+  # continue from ckpt
+  if os.path.exists(sys.argv[3]):
+    nnue = model.NNUE.load_from_checkpoint(sys.argv[3])
+    ckpt_path = sys.argv[3]
+  else:
+    nnue = model.NNUE()
 
   logger = loggers.TensorBoardLogger('logs/')
   trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1)
-  trainer.fit(nnue, train, val)
+  if ckpt_path:
+    trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
+  else:
+    trainer.fit(nnue, train, val)
 
 if __name__ == '__main__':
   main()
