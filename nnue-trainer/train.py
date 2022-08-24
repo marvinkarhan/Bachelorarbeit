@@ -7,6 +7,7 @@ import os
 import torch
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
+from torch import set_num_threads as t_set_num_threads
 import model
 
 
@@ -57,6 +58,7 @@ def main():
   else:
     nnue = model.NNUE()
 
+  t_set_num_threads(8)
   logger = loggers.TensorBoardLogger('logs/')
   trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1)
   if ckpt_path:

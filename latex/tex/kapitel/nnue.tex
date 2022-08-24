@@ -1,4 +1,4 @@
-\chapter{NNUE}
+\chapter{NNUE Implementierung}
 
 Ziel dies Kapitels ist es, 
 
@@ -10,6 +10,8 @@ Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positio
 % the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
+
+Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlich werden bei einer aktivierung Maximal 
 
 % dropoutlayers are used in other chess engines and could be beneficial here
 
