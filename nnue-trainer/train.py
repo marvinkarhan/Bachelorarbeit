@@ -24,7 +24,6 @@ MAX_EPOCHS = 800
 def last_ckpt() -> str:
   list_of_files = glob.glob('./logs/lightning_logs/*/checkpoints/*.ckpt')
   latest_file = max(list_of_files, key=os.path.getctime)
-  print(latest_file)
 
 # using data loader from the Gary Linscott (SF NNUE) https://github.com/glinscott/nnue-pytorch/blob/master/train.py
 def make_data_loaders(train_filename, val_filename, feature_set_name, num_workers, batch_size, filtered, random_fen_skipping, main_device, epoch_size, val_size):
