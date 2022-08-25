@@ -9,6 +9,7 @@ import pytorch_lightning as pl
 from pytorch_lightning import loggers
 from torch import set_num_threads as t_set_num_threads
 import model
+import glob
 
 
 FEATURE_SET_NAME = 'HalfKP'
@@ -20,6 +21,10 @@ EPOCH_SIZE = 100000000
 VAL_SIZE = 1000000
 MAX_EPOCHS = 800
 
+def last_ckpt() -> str:
+  list_of_files = glob.glob('./logs/lightning_logs/*/checkpoints/*.ckpt')
+  latest_file = max(list_of_files, key=os.path.getctime)
+  print(latest_file)
 
 # using data loader from the Gary Linscott (SF NNUE) https://github.com/glinscott/nnue-pytorch/blob/master/train.py
 def make_data_loaders(train_filename, val_filename, feature_set_name, num_workers, batch_size, filtered, random_fen_skipping, main_device, epoch_size, val_size):
@@ -52,9 +57,11 @@ def main():
   # visualize.visualize_data_loader(train)
 
   # continue from ckpt
-  if os.path.exists(sys.argv[3]):
-    nnue = model.NNUE.load_from_checkpoint(sys.argv[3])
-    ckpt_path = sys.argv[3]
+  ckpt_path = None
+  if len(sys.argv) > 3:
+    ckpt_path = sys.argv[3] if os.path.exists(sys.argv[3]) else last_ckpt()
+    nnue = model.NNUE.load_from_checkpoint(ckpt_path)
+    print(f'Loading ckpt: {ckpt_path}')
   else:
     nnue = model.NNUE()
 
