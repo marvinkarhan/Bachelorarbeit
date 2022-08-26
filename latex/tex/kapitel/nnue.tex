@@ -1,8 +1,8 @@
 \chapter{NNUE Implementierung}
 
-Ziel dies Kapitels ist es, 
+Ziel dies Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE} Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturendscheidungen eingegangen. Danach wird geklärt wie diese Entscheidungen 
 
-Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Nach kurzer Überlegung wird aber klar, dass die \ac{HCE} nur so gut sein kann wie die Schachspieler die sie Entwickeln. Natürlich können die darin verwendeten Parameter durch Optimierungsalgorithmen wie genetische Algorithmen oder Simulated Annealing maximiert werden, letztendlich bleibt der limitierende Faktor das Spielverständnis der Entwickler. Die \ac{NNUE} Evaluation ist ein \ac{NN} basierte 
+Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Nach kurzer Überlegung wird aber klar, dass die \ac{HCE} nur so gut sein kann wie die Schachspieler die sie Entwickeln. Natürlich können die darin verwendeten Parameter durch Optimierungsalgorithmen wie genetische Algorithmen oder Simulated Annealing maximiert werden, letztendlich bleibt der limitierende Faktor das Spielverständnis der Entwickler. Die \ac{NNUE} Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, das diese Herangehensweise der \ac{HCE} überlegen ist.
 
 
 \section{Architektur}
@@ -10,6 +10,8 @@ Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positio
 % the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
+
+Aufgrund des zeitlich begrenzten Rahmen dieser Arbeit, ist die verwendete Architektur keine neue 
 
 Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlich werden bei einer aktivierung Maximal 
 

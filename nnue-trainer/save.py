@@ -3,6 +3,7 @@ import os
 import model
 import torch
 import numpy
+import util
 from torch import Tensor, nn
 
 
@@ -73,13 +74,14 @@ def main():
   if len(sys.argv) < 3:
     raise Exception('Input input .ckpt file and output .nnue filename.')
   else:
-    if not os.path.exists(sys.argv[1]):
-      raise Exception(f'{sys.argv[1]}  does not exist')
-    if not sys.argv[1].endswith('.ckpt'):
-      raise Exception(f'{sys.argv[1]} does not end with .ckpt')
+    if not os.path.exists(sys.argv[1]) and sys.argv[1] != 'latest':
+      raise Exception('{0} does not exist'.format(sys.argv[1]))
+    if not sys.argv[1].endswith('.ckpt') and sys.argv[1] != 'latest':
+      raise Exception('{0} does not end with .ckpt'.format(sys.argv[1]))
     if not sys.argv[2].endswith('.nnue'):
       raise Exception(f'{sys.argv[2]} does not end with .nnue')
-  input, output = sys.argv[1], sys.argv[2]
+  input = util.last_ckpt() if sys.argv[1] == 'latest' else sys.argv[1]
+  output = sys.argv[2]
   # load file and convert to binary
   nnue = model.NNUE.load_from_checkpoint(input)
   cwd = os.path.dirname(os.path.realpath(__file__))

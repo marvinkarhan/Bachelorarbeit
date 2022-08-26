@@ -1,29 +1,23 @@
-import chess
-from torch.utils.data import DataLoader
 import nnue_dataset
-import visualize
 import sys
 import os
 import torch
+import model
+import util
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
-from torch import set_num_threads as t_set_num_threads
-import model
-import glob
+from torch.utils.data import DataLoader
 
 
 FEATURE_SET_NAME = 'HalfKP'
-BATCH_SIZE = 2**13
-NUM_WORKERS = 12
+BATCH_SIZE = 2**14
+NUM_WORKERS = 8
 SMART_FEN_SKIPPING = True
-RANDOM_FEN_SKIPPING = 3
+RANDOM_FEN_SKIPPING = 10
 EPOCH_SIZE = 100000000
 VAL_SIZE = 1000000
 MAX_EPOCHS = 800
 
-def last_ckpt() -> str:
-  list_of_files = glob.glob('./logs/lightning_logs/*/checkpoints/*.ckpt')
-  latest_file = max(list_of_files, key=os.path.getctime)
 
 # using data loader from the Gary Linscott (SF NNUE) https://github.com/glinscott/nnue-pytorch/blob/master/train.py
 def make_data_loaders(train_filename, val_filename, feature_set_name, num_workers, batch_size, filtered, random_fen_skipping, main_device, epoch_size, val_size):
@@ -38,7 +32,7 @@ def make_data_loaders(train_filename, val_filename, feature_set_name, num_worker
   val = DataLoader(nnue_dataset.FixedNumBatchesDataset(val_infinite, (val_size + batch_size - 1) // batch_size), batch_size=None, batch_sampler=None)
   return train, val
 
-def main():
+def main():  
   # read data inputs
   if len(sys.argv) < 3:
     raise Exception('Input training and validation datasets.')
@@ -47,24 +41,22 @@ def main():
       raise Exception('{0} does not exist'.format(sys.argv[1]))
     if not os.path.exists(sys.argv[2]):
       raise Exception('{0} does not exist'.format(sys.argv[2]))
+    if len(sys.argv) > 3 and sys.argv[3] != 'latest' and not os.path.exists(sys.argv[3]):
+      raise Exception('{0} does not exist or ist named wrong'.format(sys.argv[3]))
   train_filename, val_filename = sys.argv[1], sys.argv[2]
 
   device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
   train, val = make_data_loaders(train_filename, val_filename, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
 
-  # visualize.visualize_data_loader(train)
-
   # continue from ckpt
   ckpt_path = None
   if len(sys.argv) > 3:
-    ckpt_path = sys.argv[3] if os.path.exists(sys.argv[3]) else last_ckpt()
+    ckpt_path = util.last_ckpt() if sys.argv[3] == 'latest' else sys.argv[3]
     nnue = model.NNUE.load_from_checkpoint(ckpt_path)
-    print(f'Loading ckpt: {ckpt_path}')
   else:
     nnue = model.NNUE()
 
-  t_set_num_threads(8)
   logger = loggers.TensorBoardLogger('logs/')
   trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1)
   if ckpt_path:
