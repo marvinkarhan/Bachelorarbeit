@@ -1,10 +1,12 @@
 \chapter{Fazit und Ausblick}
 
-Wie in \autoref{chap:Ergebnisse} festgestellt, hat das \ac{NNUE} hat nicht die erwarteten Ergebnisse geliefert. Dafür kann es mehrere Gründe geben:
+Die Verwendung des \ac{UHO} Eröffnungsbuch ergibt normalerweise bei dem Computer gegen Computer Vergleich sinn, da die hier getesteten Schachcomputer aufgrund fehlender Tiefe und Tablebase Schwierigkeiten im Endspiel haben, ist es vermutlich von kleiner Bedeutung welche Eröffnungen gewählt worden.
 
-Die Implementierung des Netzes in dem Schachcomputer kann Fehler enthalten. Die rekursive Art und Weise, der Zugsuche macht es nicht einfach mögliche Fehlerquellen zu identifizieren. In einer zeitlich limitierten Anstrengung Fehler in der Implementierung zu finden, wurde das Einlesen der Gewichte und Bias, sowie das Verhältnis zwischen updates und refreshes des Akkumulators überprüft. Es konnten keine Unregelmäßigkeiten festgestellt werden. Fehler an anderen stellen der Implementierung sind wahrscheinlich und können ausschlaggebend für die vorzufindenden Ergebnisse sein. Leider waren weitere Tests im Rahmen dieser Arbeit nicht möglich.
+% Wie in \autoref{chap:Ergebnisse} festgestellt, hat das \ac{NNUE} hat nicht die erwarteten Ergebnisse geliefert. Dafür kann es mehrere Gründe geben:
 
-Ein weiter Grund für eine nicht vorhandene Steigerung der Spielstärke kann außerhalb der Evaluation liegen. Die zugrundeliegende Suche von des im Modul \ac{KIS} entwickelten Schachcomputers ist nur minimal optimiert. Sie besteht aus einem Negamax Depth-First Suchalgorithmus \cite{Campbell1983} mit Move Ordering, Transposition Tables, Quiescence Search und Iterative Deepening. Es fehlen viele weit verbreitete pruning Techniken wie unter anderem: razoring \cite[S. 123-128]{Levy1988}
+% Die Implementierung des Netzes in dem Schachcomputer kann Fehler enthalten. Die rekursive Art und Weise, der Zugsuche macht es nicht einfach mögliche Fehlerquellen zu identifizieren. In einer zeitlich limitierten Anstrengung Fehler in der Implementierung zu finden, wurde das Einlesen der Gewichte und Bias, sowie das Verhältnis zwischen updates und refreshes des Akkumulators überprüft. Es konnten keine Unregelmäßigkeiten festgestellt werden. Fehler an anderen stellen der Implementierung sind wahrscheinlich und können ausschlaggebend für die vorzufindenden Ergebnisse sein. Leider waren weitere Tests im Rahmen dieser Arbeit nicht möglich.
+
+% Ein weiter Grund für eine nicht vorhandene Steigerung der Spielstärke kann außerhalb der Evaluation liegen. Die zugrundeliegende Suche von des im Modul \ac{KIS} entwickelten Schachcomputers ist nur minimal optimiert. Sie besteht aus einem Negamax Depth-First Suchalgorithmus \cite{Campbell1983} mit Move Ordering, Transposition Tables, Quiescence Search und Iterative Deepening. Es fehlen viele weit verbreitete pruning Techniken wie unter anderem: razoring \cite[S. 123-128]{Levy1988}
 % also more pruning in searches leads to less "usless" information being stored in the hashtable, witch in turn leads to a higher number of tablebase hits
 
 % could also be the case that I didnt do quantization limits during training
