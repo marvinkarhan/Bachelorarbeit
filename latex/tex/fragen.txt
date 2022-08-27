@@ -1,5 +1,0 @@
-- Da für die Bachelorarbeit der Schachcomputer den ich in KIS entwickelt habe als basis genutzt wird, soll ich die dazugehörige, in KIS verfasste, wissenschatliche arbeit als pdf anhang hinzufügen. Oder soll ich in github hochladen und dann als online link zitieren wenn ich auf diese in der Einleitung eingehe?
-
-- soll ich im Grundlagen kapitel schon darauf ein gehen wie NNUEs funktionieren oder reicht es wenn im Grundlagen Kapitel nur auf das wirkliche basis wissen eingegenagen wird und dann im NNUE Kapitel auf die Theroie und implementierung eingegenagen wird?
-
-- Was muss ich alles mit Quellen belegen? Muss ich beispielswiese grundlegegende Themen wie Backpropagation belegen?

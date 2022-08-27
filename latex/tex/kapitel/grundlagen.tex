@@ -1,6 +1,6 @@
 \chapter{Grundlagen}
 
-In diesem Kapitel wird das Wissen vermittelt, welches benötigt wird um zu Verstehen, wie \acp{NNUE} im Rahmen von Schachcomputern funktionieren. Zuerst wird die Evaluation, wie sie in herkömmlichen Schachcomputern funktioniert erklärt, auch \ac{HCE} genannt. Weiterhin werden die grundlegenden Bestandteile, die für überwacht lernende \acp{FNN} von Bedeutung sind, eingegangen. Zuletzt erläutert was \ac{SIMD} ist und wie diese Vektoroperationen in C/C++ verwendet werden können.
+In diesem Kapitel wird das Wissen vermittelt, welches benötigt wird um zu Verstehen, wie \acp{NNUE} im Rahmen von Schachcomputern funktionieren. Zuerst wird die Evaluation, wie sie in herkömmlichen Schachcomputern funktioniert erklärt, auch \ac{HCE} genannt. Weiterhin werden die grundlegenden Bestandteile, die für überwacht lernende \acp{FNN} von Bedeutung sind, eingegangen. Außerdem wird erläutert was \ac{SIMD} ist und wie diese Vektoroperationen in C/C++ verwendet werden können. Zuletzt wird die grundlegende Funktionsweise von \acp{NNUE} vermittelt, die auf den davor gelegten Grundsteinen aufbaut.
 
 \section{Hand-crafted Evaluation}
 \label{chap:HCE}
@@ -59,7 +59,7 @@ In Abbildung \autoref{fig:beispiel-nn} ist ein einfaches \acl{NN} zu sehen. Es b
 
 Es gibt verschiedene Modelle \aclp{NN}, für diese Thesis sind lediglich \acp{FNN} relevant. \acp{FNN} basieren auf dem von \citeauthor{rosenblatt1958perceptron} \cite{rosenblatt1958perceptron} beschriebenen mehrlagigen Perzeptron. Das \ac{FNN} zeichnet sich durch seinen Zyklen freien Aufbau aus. Der Datenfluss führt immer von der Eingabeschicht zu Ausgabeschicht. Das \ac{FNN} gilt als die einfachste Netzwerkarchitektur \cite{Schmidhuber2015}.
 
-In den folgenden Unterabschnitten wird Grundlegend auf die Einzelteile neuronaler Netze eingegangen. To-do.
+In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung neuronaler Netze Frameworks verwendet. Sie abstrahieren große Teile der Komplexität. Trotzdem ist es wichtig ihre Funktionsweise zu kennen, um Entscheidungen zu treffen und Probleme zu beheben. In den folgenden Unterabschnitten wird Grundlegend auf die Einzelteile neuronaler Netze eingegangen. Erst wird das Neuron beschrieben und wie sich seine Aktivität berechnen lässt. Das Unterkapitel Backpropagation beschreibt, wie \acp{NN} lernen können.
 
 \subsection{Das Neuron}
 
@@ -170,6 +170,8 @@ Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es g
 
 \subsection{Loss Functions}
 
+% Adadelta: https://arxiv.org/abs/1212.5701 - seems to work good for sparse inputs as the parameters are tuned individually not thru a global lerning rate like in regular stochastic gradient descent using a time/step/exponent based learning rate decay
+
 \subsection{Optimierer}
 
 % versucht probleme der backpropagation zu mitigieren
@@ -204,5 +206,37 @@ Die \ac{NNUE} Evaluationsfunktion evaluiert eine Schachposition auf einer CPU oh
 
 \bild{Original_NNUE_Eval}{14cm}{\ac{NNUE} Evaluationsfunktion für die Evaluation von Position $q$, dabei unterscheidet sich $q$ von $p$ nur um einen Zug. Abbildung für die Evaluation des Shogicomputers \enquote{the end of genesis T.N.K.evolution turbo type D} \cite{YNasu2018}}
 
-In \autoref{Original_NNUE_Eval} ist der Aufbau der \ac{NNUE} Evaluationsfunktion, wie sie von \citeauthor{YNasu2018} \cite{YNasu2018} entwickelt wurde und auch in dieser Arbeit verwendet wird, gezeigt. Sie eignet sich für die schnelle Berechnung auf einer CPU. In den folgenden Unterkapiteln wird genauer darauf eingegangen, warum das der Fall ist.
+In \autoref{Original_NNUE_Eval} ist der Aufbau der \ac{NNUE} Evaluationsfunktion, wie sie von \citeauthor{YNasu2018} \cite{YNasu2018} entwickelt wurde, gezeigt. Sie eignet sich für die schnelle Berechnung auf einer CPU. In den folgenden Unterkapiteln wird genauer darauf eingegangen, warum das der Fall ist.
 
+\subsection{Feature Set}
+\label{chap:featureSet}
+
+\begin{figure}
+  \centering
+  \chessboard[setfen={8/4k3/8/4P3/2n5/1K6/8/8}]
+  \caption{Exemplarische Schachposition. Weiß am Zug}
+  \label{fig:chessboard}
+\end{figure}
+
+Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{NN} gegeben wird. Ein simples Feature Set setzt sich aus der Position, dem Figurentyp und seiner Farbe zusammen, mit 64 Feldern, sechs verschiedenen Figurentypen und zwei Farben, gibt es $64*6*2=768$ Merkmale. Ein Merkmal ist entweder 0 oder 1, je nachdem ob es für auf dem Feld eine Figur mit der Endsprechenden Farbe steht. Da im Schach maximal 32 Figuren im Spiel sind, kann es nur 32 gleichzeitig aktive Merkmale geben. In \autoref{fig:chessboard} gibt es vier aktive Features: (B3, König, Weiß), (C4, Springer, Schwarz), (E5, Bauer, Weiß), (E7, König, Schwarz). Wenn der weiße König den Springer schlägt, ändern sich drei Features. Die Features (B3, König, Weiß) sowie (C4, Springer, Schwarz) werden inaktiv und ein neues Feature (C4, König, Weiß) wird aktiv. Bei diesem Feature Set ändern sich von einer Position $p$ zu einer Position $q$ vier Features (Rochade) maximal und im Durchschnitt drei Features \cite{StockfishNNUE}. Das Feature Set erfüllt die zwei Voraussetzungen, die für ein \ac{NNUE} gelten:
+
+\begin{enumerate}
+  \item Die Anzahl der aktiven Merkmale ist klein.
+  \item Die Anzahl der unterschiedlichen Merkmale von Position $p$ nach Position $q$ ist minimal.
+\end{enumerate}
+
+Anhand dieser zwei Regeln lässt sich auch die Frage, warum sind nicht Elemente, die schon in der \ac{HCE} verwendet werden (wie \zb{} Rochade-Rechte) Teil des Feature Sets, beantworten. Es erhöht die Anzahl aktiver Merkmale und die Anzahl durchschnittlicher Änderungen. Der Gewinn an Evaluationsgenauigkeit rechtfertigt nicht die Geschwindigkeitseinbußen \cite{StockfishNNUE}.
+
+In der Praxis bessere Feature Sets, als das eingangs erklärte Beispiel. Das am weitesten verbreitete Feature Set ist das sogenannte HalfKP Feature Set \cite{YNasu2018,StockfishNNUE}. Es besteht aus dem Tupel (Feld des eigenen Königs, Feld der Figur, Figurentyp, Farbe der Figur), wobei der Figurentyp kein König sein kann. Die Anzahl aktiver Merkmale ist hier ebenfalls maximal 32. Die gesamte Anzahl der Merkmale ist $64*64*5*2=40960$. Von einer zu der anderen Position ändert sich im Schnitt öfter etwas, da bei einem Zug des Königs alle aktiven geändert werden. Das ist eine bessere Aufteilung der Merkmale, da sich im Schach der König selten bewegt und durch dieses Feature Set das \ac{NN} besser versteht wie die Figuren in Relation zum König stehen \cite{StockfishNNUE}. Es ist bekannt, dass überparametrisierte Netze, als Netze mit mehr Parametern als theoretisch nötig, besser lernen und gut generalisieren. Normalerweise sorgen mehr versteckte Schichten oder größere versteckte Schichten für die Überparametrisierung \cite{Du2018, allen2019learning}. In dem fall Schach Evaluation, ist das aufgrund der nötigen Geschwindigkeit nicht möglich.
+
+HalfKP alleine spiegelt nicht die gesamte Position wider, wie der Name impliziert, fehlt der gegnerische König. Deshalb werden die zwei Seiten separat behandelt, es gibt einen Vektor pro Seite. Das bedeutet es gibt doppelt so viele aktive Merkmale und doppelt so viele Änderungen, insgesamt zahlt sich der Kompromiss immer noch aus \cite{StockfishNNUE}. Wie die zwei Vektoren kombiniert werden, ist in im nächsten Unterkapitel erläutert.
+
+HalfKP stammt aus der Shogi Welt, in der es keine Rochade gibt und somit die Relation der Figuren zum König wichtiger ist. Für Schach gibt es keine logische Begründung warum, HalfKP eine gute Repräsentation ist. HalfKP ist nur empirisch zu rechtfertigen und bildet die Grundlage für alle anderen verwendeten Feature Sets \cite{StockfishNNUE}.
+% HalfKP is derived from nnue of shogi, in shogi the games is mutch more king zentered so there a king zentered approch make sense, suprisingly it also works great for chess event tho the game is less interconected to the king but its similar in that sense that the ring moves rarely which means not many full refreshes are needed -> archiving our goal of high speed
+
+\subsection{Akkumulator}
+
+Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren gebraucht. Ein Vektor $v^{(p,white)}$ für Weiß und einer für $v^{(p,black)}$ für Schwarz. Die zwei Vektoren müssen kombiniert werden, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht, der Seite die gerade am Zug ist an. Deshalb konkatenieren wir $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist.
+
+Es gibt verschiedene Wege für die zwei Eingabevektoren gehandhabt werden können \cite{StockfishNNUE}. Entweder beide Seiten verwenden die gleichen Gewichte oder die Gewichte sind Seiten spezifisch. Für den ersten Ansatz muss das Brett für Schwarz (kann auch Weiß sein) gespiegelt werden, weil ein weißer König auf E1 anders als ein schwarzer König auf E1 zu deuten ist. Alternativ sind die Gewichte Seiten spezifisch. Dieser Ansatz, scheint logischer, da Weiß und Schwarz nicht gleich Spielen. Die Nachteile ist ein größeres \ac{NN} und eine längere Trainingszeit.
+% column major layout

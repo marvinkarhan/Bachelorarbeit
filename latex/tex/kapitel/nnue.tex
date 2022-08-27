@@ -17,14 +17,6 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 
 % dropoutlayers are used in other chess engines and could be beneficial here
 
-\subsection{Feature Set}
-\label{chap:featureSet}
-
-% Input data could just be 32 -> position for each piece
-% small inputs make it mutch harder to learn (TODO: find citation)
-
-% HalfKP is derived from nnue of shogi, in shogi the games is mutch more king zentered so there a king zentered approch make sense, suprisingly it also works great for chess event tho the game is less interconected to the king but its similar in that sense that the ring moves rarely which means not many full refreshes are needed -> archiving our goal of high speed
-
 \subsection{Eingabeschicht}
 
 % sparse inputs -> little changes
@@ -42,7 +34,10 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 
 Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie 
 
+% wenn eingabe daten mit einer tieferen suche verwendet werden, sind die Konzepte hinter den zügen/der evaluation schwerer zu verstehen und somit auch schwiriger zu lernen
+
 % they are alerady normalized (siehe feature set)
+% labeling is easy as the set is automatically generated data with labels (cp score) automatically generated
 
 % grouping the inputdate to a batch size aims to use the time writing to the CPU more efficently (8192)
 
