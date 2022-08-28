@@ -85,7 +85,7 @@ In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung neuronaler 
 Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{fig:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$, werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert und aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ wird die Ausgabe des Neurons. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet, dass es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
 
 \begin{equation}
-  f(\varphi) = \varphi(\sum_{i=0}^{n}w_{j}x_{j})
+  f(\varphi) = \varphi(\sum_{i=0}^{n}w_{i}x_{i})
   \label{equation:NeuronActivation}
 \end{equation}
 
@@ -184,7 +184,6 @@ Quantisierung ist ein Signalverarbeitungsverfahren, bei welchem Eingabewerte auf
 Dieses Verfahren eignet sich gut für Anwendungsgebiete mit wenig Speicher- und Rechenkapazität, wie beispielsweise der Einsatz von \acp{NN} bei Mobilgeräten \cite{MaQuantization2019, Gysel2016}. Der Grund dafür ist zweierlei. Erstens sorgt Quantisierung dafür, dass weniger Platz im cache der CPU gebraucht wird, wodurch weniger Schreib- und Lesezugriffe ausgeführt werden und somit die Berechnung schneller ist. Zweitens ermöglicht die Abbildung auf kleinere Datentypen einen Performance-Gewinn, durch die effizientere Verwendung von Prozessor internen Recheneinheiten die beispielsweise \ac{SIMD} unterstützen. Zudem ermöglicht die Abbildung auf Ganzzahl Typen die Nutzung von CPU internen Ganzzahl-Recheneinheiten, die effizienter als die Gleitkommazahl äquivalente Funktionieren, falls überhaupt vorhanden \cite{Jacob2017}.
 
 Das Problem der Quantisierung ist das Einbauen von \enquote{Fehlern}. Bei \acp{NN} wird oft von Fehler-Kumulierung gesprochen, da bei der Aktivierung eines \acp{NN} in jedem Quantisierten Neuron der Fehler wächst \cite{Park2018}.
-% es muss immer für jeden einzelnen anwendungs fall überlegt werden ob es sich lohnt, für nnue 
 
 \section{Training}
 
@@ -227,16 +226,75 @@ Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{N
 
 Anhand dieser zwei Regeln lässt sich auch die Frage, warum sind nicht Elemente, die schon in der \ac{HCE} verwendet werden (wie \zb{} Rochade-Rechte) Teil des Feature Sets, beantworten. Es erhöht die Anzahl aktiver Merkmale und die Anzahl durchschnittlicher Änderungen. Der Gewinn an Evaluationsgenauigkeit rechtfertigt nicht die Geschwindigkeitseinbußen \cite{StockfishNNUE}.
 
-In der Praxis bessere Feature Sets, als das eingangs erklärte Beispiel. Das am weitesten verbreitete Feature Set ist das sogenannte HalfKP Feature Set \cite{YNasu2018,StockfishNNUE}. Es besteht aus dem Tupel (Feld des eigenen Königs, Feld der Figur, Figurentyp, Farbe der Figur), wobei der Figurentyp kein König sein kann. Die Anzahl aktiver Merkmale ist hier ebenfalls maximal 32. Die gesamte Anzahl der Merkmale ist $64*64*5*2=40960$. Von einer zu der anderen Position ändert sich im Schnitt öfter etwas, da bei einem Zug des Königs alle aktiven geändert werden. Das ist eine bessere Aufteilung der Merkmale, da sich im Schach der König selten bewegt und durch dieses Feature Set das \ac{NN} besser versteht wie die Figuren in Relation zum König stehen \cite{StockfishNNUE}. Es ist bekannt, dass überparametrisierte Netze, als Netze mit mehr Parametern als theoretisch nötig, besser lernen und gut generalisieren. Normalerweise sorgen mehr versteckte Schichten oder größere versteckte Schichten für die Überparametrisierung \cite{Du2018, allen2019learning}. In dem fall Schach Evaluation, ist das aufgrund der nötigen Geschwindigkeit nicht möglich.
+In der Praxis bessere Feature Sets, als das eingangs erklärte Beispiel. Das am weitesten verbreitete Feature Set ist das sogenannte HalfKP Feature Set \cite{YNasu2018,StockfishNNUE}. Es besteht aus dem Tupel (Feld des eigenen Königs, Feld der Figur, Figurentyp, Farbe der Figur), wobei der Figurentyp kein König sein kann. Die Anzahl aktiver Merkmale ist hier maximal 30, da die Könige nicht mit enthalten sind. Die gesamte Anzahl der Merkmale ist $64*64*5*2=40960$. Von einer zu der anderen Position ändert sich im Schnitt öfter etwas, da bei einem Zug des Königs alle aktiven geändert werden. Das ist eine bessere Aufteilung der Merkmale, da sich im Schach der König selten bewegt und durch dieses Feature Set das \ac{NN} besser versteht wie die Figuren in Relation zum König stehen \cite{StockfishNNUE}. Es ist bekannt, dass überparametrisierte Netze, als Netze mit mehr Parametern als theoretisch nötig, besser lernen und gut generalisieren. Normalerweise sorgen mehr versteckte Schichten oder größere versteckte Schichten für die Überparametrisierung \cite{Du2018, allen2019learning}. In dem fall Schach Evaluation, ist das aufgrund der nötigen Geschwindigkeit nicht möglich.
 
 HalfKP alleine spiegelt nicht die gesamte Position wider, wie der Name impliziert, fehlt der gegnerische König. Deshalb werden die zwei Seiten separat behandelt, es gibt einen Vektor pro Seite. Das bedeutet es gibt doppelt so viele aktive Merkmale und doppelt so viele Änderungen, insgesamt zahlt sich der Kompromiss immer noch aus \cite{StockfishNNUE}. Wie die zwei Vektoren kombiniert werden, ist in im nächsten Unterkapitel erläutert.
 
 HalfKP stammt aus der Shogi Welt, in der es keine Rochade gibt und somit die Relation der Figuren zum König wichtiger ist. Für Schach gibt es keine logische Begründung warum, HalfKP eine gute Repräsentation ist. HalfKP ist nur empirisch zu rechtfertigen und bildet die Grundlage für alle anderen verwendeten Feature Sets \cite{StockfishNNUE}.
-% HalfKP is derived from nnue of shogi, in shogi the games is mutch more king zentered so there a king zentered approch make sense, suprisingly it also works great for chess event tho the game is less interconected to the king but its similar in that sense that the ring moves rarely which means not many full refreshes are needed -> archiving our goal of high speed
 
 \subsection{Akkumulator}
 
 Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren gebraucht. Ein Vektor $v^{(p,white)}$ für Weiß und einer für $v^{(p,black)}$ für Schwarz. Die zwei Vektoren müssen kombiniert werden, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht, der Seite die gerade am Zug ist an. Deshalb konkatenieren wir $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist.
 
-Es gibt verschiedene Wege für die zwei Eingabevektoren gehandhabt werden können \cite{StockfishNNUE}. Entweder beide Seiten verwenden die gleichen Gewichte oder die Gewichte sind Seiten spezifisch. Für den ersten Ansatz muss das Brett für Schwarz (kann auch Weiß sein) gespiegelt werden, weil ein weißer König auf E1 anders als ein schwarzer König auf E1 zu deuten ist. Alternativ sind die Gewichte Seiten spezifisch. Dieser Ansatz, scheint logischer, da Weiß und Schwarz nicht gleich Spielen. Die Nachteile ist ein größeres \ac{NN} und eine längere Trainingszeit.
-% column major layout
+Es gibt verschiedene Wege für die zwei Eingabevektoren gehandhabt werden können \cite{StockfishNNUE}. Entweder beide Seiten verwenden die gleichen Gewichte oder die Gewichte sind Seiten spezifisch. Für den ersten Ansatz muss das Brett für Schwarz (kann auch Weiß sein) gespiegelt werden, weil ein weißer König auf E1 anders als ein schwarzer König auf E1 zu deuten ist. Alternativ sind die Gewichte Seiten spezifisch. Dieser Ansatz, scheint logischer, da Weiß und Schwarz nicht gleich Spielen. Die Nachteile sind, ein größeres \ac{NN} und eine längere Trainingszeit.
+
+Bisher wurde besprochen, dass wir den dünnbesetzten Vektor des HalfKP Feature Sets ausnutzen können. Wie das funktioniert lässt sich am besten durch eine Betrachtung des Matrixprodukts der Gewichtsmatrix mit dem Eingabevektor veranschaulichen. Zur Anschaulichkeit wird die Berechnung nur für eine Seite betrachtet, der Bias wir ebenfalls nicht beachtet, da er nur einer simplen Addition bedarf, die nicht wichtig für den Zusammenhang ist. Angenommen $w_{i}^{j}$ ist das Gewicht für den Eingabewert $i$ mit dem Neuronen $j$ der Ersten versteckten Schicht und $x_{i}$ die Eingabe für den Eingabewert $i$, erhalten wir die \autoref{equation:l0WeightInputMatrix}, für das Matrixprodukt der aktuellen Stellung $v^{(p)}$:
+
+\begin{equation}
+  v^{(p)}=\begin{bmatrix}
+    w_{0}^{0}   & w_{1}^{0}   & \cdots & w_{40959}^{0}   \\
+    w_{0}^{1}   & w_{1}^{1}   & \cdots & w_{40959}^{1}   \\
+    \vdots      & \vdots      & \ddots & \vdots          \\
+    w_{0}^{255} & w_{1}^{255} & \cdots & w_{40959}^{255}
+  \end{bmatrix} \begin{bmatrix}
+    x_{0}  \\
+    x_{1}  \\
+    \vdots \\
+    x_{40959}
+  \end{bmatrix}
+  \label{equation:l0WeightInputMatrix}
+\end{equation}
+
+Betrachten wir jedoch den Fakt, dass ein Großteil der $x_{i}$ Eingabewerte 0 ist lässt sich die \autoref{equation:l0WeightInputMatrix} deutlich Vereinfachen. Angenommen nur ein Eingabewert ist 1 und der Rest 0, lässt sich $v^{(p)}$ mit \autoref{equation:ithl0WeightInputMatrix} berechnen und allgemein mit \autoref{equation:generall0WeightInputMatrix}.
+
+\begin{equation}
+  v^{(p)}=\begin{bmatrix}
+    w_{i}^{0} \\
+    w_{i}^{1} \\
+    \vdots    \\
+    w_{i}^{255}
+  \end{bmatrix} x_{i}
+  \label{equation:ithl0WeightInputMatrix}
+\end{equation}
+
+\begin{equation}
+  v^{(p)}= \sum_{i\in\left \{  k|x_{k}\neq 0\right \}} \begin{bmatrix}
+    w_{i}^{0} \\
+    w_{i}^{1} \\
+    \vdots    \\
+    w_{i}^{255}
+  \end{bmatrix} x_{i}
+  \label{equation:generall0WeightInputMatrix}
+\end{equation}
+
+Da $x_{i}$, im fall von \autoref{equation:generall0WeightInputMatrix} $x_{i}$ immer 1 ist, kann es weg gelassen werden und $w_{i}^{0}$ bis $w_{i}^{255}$ kann mit $W$ zusammengefasst werden:
+
+\begin{equation}
+  v^{(p)}= \sum_{i\in\left \{  k|x_{k}\neq 0\right \}} W(:,i)
+  \label{equation:generall0WeightInputMatrixNoX}
+\end{equation}
+
+\autoref{equation:generall0WeightInputMatrix} beschreibt einen Refresh des Akkumulators, der initial und bei einem Zug des Königs durchgeführt wird. Bei einem regulären Zug muss der gespeicherte Vektor $v^{(p)}$ jedoch nur aktualisiert werden. Nehmen wir $v^{(p)}$ und die Eingabewerte $x_{i}$ die sich geändert haben, erhalten wir den Vektor $v^{(q)}$, der den Akkumulator der nächsten Position symbolisiert. Konkret durch die folgende Gleichung bestimmt:
+
+\begin{equation}
+  \begin{split}
+    v^{(q)} = v^{(p)}
+    - \sum_{i \in \left \{ k | x_{k}^{(p)}=1\wedge x_{k}^{(q)}=0 \right \}}^{} W(:,i) \\
+    + \sum_{i \in \left \{ k | x_{k}^{(p)}=0\wedge x_{k}^{(q)}=1 \right \}}^{} W(:,i)
+  \end{split}
+  \label{equation:akkumulatoreAktualisierung}
+\end{equation}
+
+Wird diese Berechnung für beide Seiten durchgeführt, der Bias addiert, die Vektoren konkateniert und mit einer Aktivierungsfunktion aktiviert, ist das Ergebnis, der Vektor, der an die erste versteckte Schicht weiter gegeben wird.
+
+Normalerweise werden Gewichtsmatrizen reihe für reihe im Sequentiellen speicher abgelegt. Im fall des Akkumulators wäre das ein Nachteil, da wie beschreiben immer Spalten der Gewichtsmatrix addiert/subtrahiert werden. Deshalb wird die Gewichtsmatrix vor dem Speichern transponiert, auch Column-Major Order genannt. Das ermöglicht leichter \ac{SIMD} Anweisungen zu nutzen, da sie auf zusammenhängenden Speicherzugriffen basieren.

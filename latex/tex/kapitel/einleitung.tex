@@ -2,15 +2,7 @@
 
 Computer Schach ist ein viel betrachtetes Thema. Schon Alan Turing und Claude Shannon hab sich damit befasst \cite{Turing1953, Shannon1950}. In seinem \citeyear{Shannon1950} verfassten paper beschrieb \citeauthor{Shannon1950} \cite{Shannon1950} Funktion zu Evaluation einer Schachposition, ihm war jedoch auch klar, das es wahrscheinlich niemals eine exakte Evaluation für Schach geben wird. Deshalb liegt es nahe dafür ein \ac{NN} zu verwenden, denn dessen Aufgabe ist es solche Funktion zu Approximieren. Leider ist es für die Evaluation in einem Schachcomputer wichtig sowohl genau als auch schnell die Position zu bewerten. Je genauer die Stellung bewertet wird, desto stärker spielt das Programm. Je schneller die Bewertung stattfindet, desto weiter kann der Computer voraussehen, was ebenfalls zu einer höheren Spielstärke führt. Herkömmliche \acp{NN} Architekturen scheitern jedoch an einer zu lagen Berechnungszeit oder bei sehr kleinen Netzen an einer zu ungenauen Bewertung.
 
-Eine Lösung für die Probleme herkömmlicher \acp{NN}, wurde \citeyear{YNasu2018} von \citeauthor{YNasu2018} \cite{YNasu2018} in seinem Japanischem paper vorgestellt. Er erkannte das inkrementelle Aktualisierungen, wie sie bereits in \ac{HCE} verwendet wurden, in \acp{NN} verwendet werden kann. Der Schlüssel dafür ist ein binäres und dünn besetztes Feature Set, basierend auf den Figuren und ihren Positionen. Die Eingabeschicht, auch affine Transformer genannt, muss nicht bei jeder Aktivierung alle Elemente seines Ausgabevektors neu berechnet. Steht $q$ für die aktuelle Stellung, $p$ für die vorherige Stellung und $x$ als der Vektor Feature Sets wird $v^{(q)}$ konkret mit folgender Gleichung berechnet:
-
-\begin{equation}
-  \begin{split}
-    v^{(q)} = v^{(p)} 
-              - \sum_{j \in \left \{ k | x_{k}^{(p)}=1\wedge x_{k}^{(q)}=0 \right \}}^{} W_{1}(:,j) \\
-              + \sum_{j \in \left \{ k | x_{k}^{(p)}=0\wedge x_{k}^{(q)}=1 \right \}}^{} W_{1}(:,j)
-  \end{split}
-\end{equation}
+Eine Lösung für die Probleme herkömmlicher \acp{NN}, wurde \citeyear{YNasu2018} von \citeauthor{YNasu2018} \cite{YNasu2018} in seinem Japanischem paper vorgestellt. Er erkannte das inkrementelle Aktualisierungen, wie sie bereits in \ac{HCE} verwendet wurden, in \acp{NN} verwendet werden kann. Der Schlüssel dafür ist ein binäres und dünn besetztes Feature Set, basierend auf den Figuren und ihren Positionen. Die Eingabeschicht, auch affine Transformer genannt, muss nicht bei jeder Aktivierung alle Elemente seines Ausgabevektors neu berechnet.
 
 Die \ac{NNUE} Architektur ist darauf ausgelegt schnell auf einer CPU zu laufen. Sie nutzt CPU basierte Optimierungs-Möglichkeiten wie \ac{SIMD} und die im letzten Absatz genannte inkrementellen Aktualisierungen, um die Geschwindigkeit zu erlangen, die für ihre Nutzung als Evaluationsfunktion zu rechtfertigen.
 

@@ -1,6 +1,6 @@
 \chapter{NNUE Implementierung}
 
-Ziel dies Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE} Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturendscheidungen eingegangen. Danach wird geklärt wie diese Entscheidungen 
+Ziel dies Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE} Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturendscheidungen eingegangen. Danach wird geklärt wie diese Entscheidungen
 
 Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Nach kurzer Überlegung wird aber klar, dass die \ac{HCE} nur so gut sein kann wie die Schachspieler die sie Entwickeln. Natürlich können die darin verwendeten Parameter durch Optimierungsalgorithmen wie genetische Algorithmen oder Simulated Annealing maximiert werden, letztendlich bleibt der limitierende Faktor das Spielverständnis der Entwickler. Die \ac{NNUE} Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, das diese Herangehensweise der \ac{HCE} überlegen ist.
 
@@ -11,19 +11,22 @@ Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positio
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
 
-Aufgrund des zeitlich begrenzten Rahmen dieser Arbeit, ist die verwendete Architektur keine neue 
+Aufgrund des zeitlich begrenzten Rahmen dieser Arbeit, ist die verwendete Architektur keine neue
 
-Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlich werden bei einer aktivierung Maximal 
+Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlich werden bei einer aktivierung Maximal
 
 % dropoutlayers are used in other chess engines and could be beneficial here
 
-\subsection{Eingabeschicht}
+\subsection{Akkumulator}
+
 
 % sparse inputs -> little changes
 % max 32 inputs setboolean
 % input either 0 or 1
+Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wurde, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
 \subsection{Versteckte Schicht}
+
 \subsection{Ausgabeschicht}
 
 % the NN is a regressor becuase it only has one output note (cite?)
@@ -32,7 +35,7 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 
 \subsection{Eingabedaten}
 
-Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie 
+Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie
 
 % wenn eingabe daten mit einer tieferen suche verwendet werden, sind die Konzepte hinter den zügen/der evaluation schwerer zu verstehen und somit auch schwiriger zu lernen
 
@@ -45,10 +48,34 @@ Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wicht
 
 \section{Integration in einen Schachcomputer}
 
+\subsection{Quantisierungsschema}
+
+Quantisierung ist nötig, um CPU Optimierungen zu ermöglichen. Die als float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer Proprietären binären \emph{.nnue} Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet die kleinstmöglichen Integer Typen zu verwenden. Aufgrund der Clipped \ac{ReLU} Transferfunktion sind die gewichte, bereits sehr klein, deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. Der Bereich der  In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben, die zwei versteckten Sichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet, er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis.
+
+\begin{table}[h]
+  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE}, sowie Ausgabetyp der Schichten}
+  \label{table:netQuantization}
+  \renewcommand{\arraystretch}{1.2}
+  \centering
+  \sffamily
+  \begin{footnotesize}
+    \begin{tabular}{l l l l l l}
+      \toprule
+      \textbf{Schicht}            & \textbf{Gewicht Skalierfaktor} & \textbf{Gewichtstyp} & \textbf{Bias Skalierfaktor} & \textbf{Biastyp} & \textbf{Ausgabetyp} \\
+      \midrule
+      \emph{Eingabeschicht}       & 127                            & int16                & 127                         & int16            & int8                \\
+      \emph{versteckte Schichten} & 64                             & int8                 & 8128                        & int32            & int8                \\
+      \emph{Ausgabeschicht}       & \textasciitilde75,59           & int8                 & 9600                        & int32            & int32               \\
+      \bottomrule
+    \end{tabular}
+  \end{footnotesize}
+  \rmfamily
+\end{table}
+
+Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127, dadurch kann der Ausgabetyp int8 sein. Der Gewichtstyp der Eingabeschicht muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features Überlaufen kann. Das Problem stellt sich, bei den versteckten Schichten nicht, da durch \ac{SIMD} Instruktionen, bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das bei den versteckten Schichten auftreten kann, ist das Überlaufen der int8 werte, deshalb werden sie vor der Multiplikation mit in beide Richtungen durch $127/64$ begrenzt. Der Bias in den versteckten Schichten und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias Skalierfaktor, weil die Ausgabe der \ac{NNUE} Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Der Gewicht Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht Ganzzahlig ist, das liegt daran, dass er sich an dem Bias Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
+% warum ist der bias faktor so hoch?
+
 \subsection{Eingabeschicht}
-% quantization?
 
 
 \subsection{Versteckte Schicht}
-% quantization?
-- simple -> quantization
