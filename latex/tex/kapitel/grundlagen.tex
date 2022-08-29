@@ -176,6 +176,7 @@ Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es g
 
 % versucht probleme der backpropagation zu mitigieren
 % exemplarisch auf den Adadelta optimirer eingehen, da der in dieser arbeit verwendet wurde
+% vl mal: https://github.com/lucidrains/Adan-pytorch probieren
 
 \subsection{Quantisierung}
 
@@ -185,19 +186,39 @@ Dieses Verfahren eignet sich gut für Anwendungsgebiete mit wenig Speicher- und 
 
 Das Problem der Quantisierung ist das Einbauen von \enquote{Fehlern}. Bei \acp{NN} wird oft von Fehler-Kumulierung gesprochen, da bei der Aktivierung eines \acp{NN} in jedem Quantisierten Neuron der Fehler wächst \cite{Park2018}.
 
-\section{Training}
-
 \section{SIMD}
+
+In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht in einem Prozessor Befehlszyklus, eine Instruktion auf mehrere Elemente eines Vektors gleichzeitig durchzuführen. Es gibt je nach Mikroprozessor-Architektur, verschiedene Erweiterungen, um \ac{SIMD} zu implementieren. In dieser Arbeit sind alle Beispiele mit dem \ac{AVX2} Befehlssatz geschrieben. Der Grund dafür ist, dass \ac{AVX2} von Modernen Intel und AMD Mikroprozessoren unterstützt werden.
 
 Der Begriff \ac{SIMD} kommt von der flynnschen Klassifikation, die Rechnerarchitekturen in vier gebiete aufteilt \cite{Flynn1972}. Die Aufteilung orientiert sich an der Anzahl vorhandener Befehls- und Datenströme. Es gibt Single und Multiple Instructions, sowie Single und Multiple Data. Die daraus entstehenden Klassen heißen: \ac{SIMD}, \ac{SISD}, \ac{MIMD} und \ac{MISD}.
 
-In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht in einem Prozessor Befehlszyklus, eine Instruktion auf mehere Elemente eines Vektors gleichzeitig durchzuführen. Es gibt je nach Mikroprozessor-Architektur, verschiedene Erweiterungen, um \ac{SIMD} zu implementieren. In dieser Arbeit sind alle Beispiele mit dem \ac{AVX2} Befehlssatz geschrieben. Der Grund dafür ist, dass \ac{AVX2} von Modernen Intel und AMD Mikroprozessoren unterstützt werden.
+\ac{SIMD} kann über drei Wege realisiert werden. Auf der tiefsten Ebene in Assemblersprache, dabei hat er Programmierer die Verantwortung die Vektorisierung, die Registerzuweisung und das Befehls Scheduling. Das Problem hierbei ist leider, dass Menschen nicht perfekt sind und der, darin bessere, Compiler teile dieser Aufgaben übernehmen kann. Dafür gibt es intrinsische Funktionen die wir in Programmiersprachen wie C++ nutzen können. Sie kapseln Prozessorspezifische Operationen in Funktionsaufrufe. Für den \ac{AVX2} Befehlssatz gibt es in C++ das \emph{immintrin.h} Header-File. Mit der Verwendung von intrinsischen Funktionen, muss der Programmierer nur die Vektorisierung des Codes übernehmen, die Registerzuweisung und das Befehls Scheduling werden vom Compiler übernommen. Die dritte Möglichkeit ist die automatische Vektorisierung, dabei Übernimmt der Compiler alle Aufgaben. Die Limitierungen für den Compiler sind dabei groß \cite{ren2003preliminary}. Der Compiler kann nicht sicherstellen, dass die zu Vektorisierenden Daten in einem zusammenhängenden Speicherbereich sind oder entsprechenden aligned sind. Die beste Variante ist die Verwendung der intrinsischen Funktionen, die ein Maximum an Flexibilität und Compiler-Optimierungen bietet.
 
-% chosing what SIMD instruction set to use:
-% depends on the hardware ur using, some SIMD is only present in server grade cpus
-% vl arbeit raussuchen die einen vergleich zwischen den SIMD instruction sets macht und zitieren
+In den folgenden Unterkapiteln wird erläutert, warum Memory Alignment wichtig ist und wie die für \ac{NNUE} wichtigen intrinsischen Funktionen in C++ funktionieren.
 
-\subsection{Memory Alignment}
+\subsection{Speicher Verwaltung}
+
+% how do they have to be aigned 
+Das \ac{SIMD} Befehle effizient ausgeführt werden, müssen die Variablen, die in \ac{SIMD} Registern verwendet werden sollen, der Registergröße entsprechenden abgelegt sein, auch Alignment genannt. Dafür gibt es zwei Möglichkeiten, entweder die Werte sind bei der Definition bereits Aligned oder sie werden bei dem Laden in das Register Aligned. Für beide Varianten gibt es Anweisungen \cite{intelIntrinsics}. Die Anweisungen für Unaligned Variablen sind deutlich langsamer. Das Alignment zur Definition ist deshalb präferiert und kann in C++ sehr einfach über den Spezifizierer \emph{alignas} implementiert werden. \emph{Alignas} nimmt einen integer der das geforderte Alignment in Byte spezifiziert.
+
+% what kind of registers are there
+Je nach Befehlssatz gibt es unterschiedlich große Register. Die in \ac{AVX2} verwendeten Register heißen \emph{ymm} und haben eine Registerbreite von 256 Bit \cite{intelIntrinsics}. Bei der Unterstützung mehrerer Befehlssätze mit unterschiedlich großen Registern ist es zu empfehlenswert, die Variablen auf an die größtmögliche Registergröße anzupassen. Der Schachcomputer der im Rahmen unterstützt bis zu \ac{AVX512}, also 64 Byte Registerbreite.
+
+% what is saturation
+Bei integern kann es passieren, dass es zu einem Überlauf kommt, wird auf ein acht Bit integer mit dem wert 127 um eins erhöht, läuft sie über und enthält statt 128 den Wert -128. In dem meisten \ac{SIMD} Befehlssätzen gibt es zu den Befehlen die überlaufen können zusätzliche Befehle die nicht Überlaufen \cite{intelIntrinsics}. Die sogenannte Saturation Deckelt die Werte in dem Minimum/Maximum. In dem gerade genannten Beispiel ist das Saturated Ergebnis 127.
+
+% pack und unpacking operations (converting from one to another data type)
+% spezifische pack/unpack operationen werden im nachfolgenden kapitel genauer erläutert
+% avoid conversion where you can (madd als beispiel)
+% Aus Performance gründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen 
+% Bei der Arbeit mit \ac{SIMD} Registern darf
+
+\subsection{Intrinsische Funktionen für NNUE}
+
+% how to define a variable
+% how to load a pointer (array) of data into a SIMD (ymm) Register - aligned an unaligned
+% how to save contents of a ymm register to int pointer (array)
+% pack und unpack operations hi/lo
 
 \section{NNUE}
 

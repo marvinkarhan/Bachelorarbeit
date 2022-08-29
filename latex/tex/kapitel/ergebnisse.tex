@@ -8,11 +8,9 @@ Der Testaufbau soll dafür sorgen, dass die hier erreichten Ergebnisse reproduzi
 
 Schachcomputer sind von Natur aus deterministisch, deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen eine Analyse durch KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger remis gespielt werden, als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
-\section{Verbesserungen}
+\subsection{Elo Entwicklung}
+% erklären was Elo ist
 
+% Tunier mit den getesteten schach engines
 
-\section{Probleme}
-
-% probleme in der entwicklung:
-% mapping from my engine to the uses dateloader was wrong resulting in the input data i gave the net where completly diffrent moves essentaly making the engine blind
-% as i was used to in hce i oriented the engine output to the active side, but that already happens by design in the net so essentally it was like the engine playing only for one side giving up all his pieces as white
+% die differenzen der getesteten versionen auf zeigen (vl lieber im kapitel diskussion)

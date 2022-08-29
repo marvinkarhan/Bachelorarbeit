@@ -9,58 +9,74 @@ Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positio
 
 \begin{figure}
   \centering
+  \resizebox{\textwidth}{!}{%
   \begin{tikzpicture}[x=2cm, y=1.5cm, >=stealth]
     \tikzstyle{neuron}=[draw,shape=circle,minimum size=1.15cm]
     % draw nerons
-    \foreach \m/\l [count=\y] in {1,3}
-    \node [neuron] (input1-\m) at (0,2.5-\y*2) {};
-    \node [scale=4] (dots) at (0,-0.2){\vdots};
 
-    \foreach \m/\l [count=\y] in {1,3}
-    \node [neuron] (input2-\m) at (0,-1.5-\y*2) {};
-    \node [scale=4] (dots) at (0,-4.2){\vdots};
+    \foreach \m/\l [count=\y] in {0,1,0}
+    \node [neuron] (input1-\y) at (0,2.5-\y*1.5) {\m};
 
-    \foreach \m [count=\y] in {1,2,3,4,5,6,7,8}
-    \node [neuron] (hidden1-\m) at (2,2-\y) {};
+    \foreach \m/\l [count=\y] in {0,0,1}
+    \node [neuron] (input2-\y) at (0,-1.5-\y*1.5) {\m};
 
-    \foreach \m/\l [count=\y] in {1,2,3,4,5,6,7,8}
-    \node [neuron] (hidden2-\m) at (4,2-\y) {};
+    \foreach \m [count=\y] in {1,2}
+    \node [neuron] (inputL11-\m) at (2,2.5-\y*2) {};
+
+    \foreach \m/\l [count=\y] in {1,2}
+    \node [neuron] (inputL12-\m) at (2,-1.5-\y*2) {};
+
+    \foreach \m/\l [count=\y] in {1,2,3}
+    \node [neuron] (hidden1-\m) at (4,1.5-\y*2) {};
+
+    \foreach \m/\l [count=\y] in {1,2,3}
+    \node [neuron] (hidden2-\m) at (6,1.5-\y*2) {};
 
     \foreach \m [count=\y] in {1}
-    \node [neuron] (output-\m) at (6,-1.5-\y) {};
+    \node [neuron] (output-\m) at (8,-1.5-\y) {};
 
-    % draw text
+    % draw text  
 
-    %\draw [<-] (input1-1) -- ++(-1,0) node [above, midway] {(king)}
-    %\draw [<-] (input1-2) -- ++(-1,0) node [above, midway] {$2$}
-    %\draw [<-] (input2-3) -- ++(-1,0) node [above, midway] {3}
-    %\draw [<-] (input2-4) -- ++(-1,0) node [above, midway] {4}
-
-    \node [below, yshift=-20] at (hidden1-8) {$512 Neuronen$};
-    \node [below, yshift=-20] at (hidden2-8) {$32 Neuronen$};
+    \foreach \l [count=\x from 0] in {2x41024, 2x256, 32, 32, 1}
+    \node [align=center] at (\x*2,-7) {\l};
   
     \draw [->] (output-1) -- ++(1,0) node [above, midway] {$Output$};
 
+    \foreach \l [count=\x from 0] in {Eingabedaten, Eingabeschicht, Versteckte Schicht 1, Versteckte Schicht 2, Ausgabeschicht}
+    \node [align=center, above] at (\x*2,2) {\l};
     % draw lines  
-    \foreach \i in {1,3}
-    \foreach \j in {1,2,3,4}
-    \draw [->] (input1-\i) -- (hidden1-\j);
-    
-   \foreach \i in {1,3}
-   \foreach \j in {5,6,7,8}
-   \draw [->] (input2-\i) -- (hidden1-\j);
 
-    \foreach \i in {1,2,3,4,5,6,7,8}
-    \foreach \j in {1,2,3,4,5,6,7,8}
+    \draw [->] (-2.2,1) node {} -- node [midway,above] {(g1, d2, Bauer, Weiß)} (input1-1);
+    \draw [->] (-2.2,-0.5) node {} -- node [midway,above] {(b3, e5, Bauer, Weiß)} (input1-2);
+    \draw [->] (-2.2,-2) node {} -- node [midway,above] {(h6, c8, Turm, Schwarz)} (input1-3);
+
+    \draw [->] (-2.2,-3) node {} -- node [midway,above] {(b1, d2, Läufer, Weiß)} (input2-1);
+    \draw [->] (-2.2,-4.5) node {} -- node [midway,above] {(a3, e5, Dame, Weiß)} (input2-2);
+    \draw [->] (-2.2,-6) node {} -- node [midway,above] {(e7, c4, Springer, Schwarz)} (input2-3);
+
+    \foreach \i in {1,2,3}
+    \foreach \j in {1,2}
+    \draw [->] (input1-\i) -- (inputL11-\j);
+    
+   \foreach \i in {1,2,3}
+   \foreach \j in {1,2}
+   \draw [->] (input2-\i) -- (inputL12-\j);
+
+    \foreach \i in {1,2}
+    \foreach \j in {1,2,3} {
+    \draw [->] (inputL11-\i) -- (hidden1-\j);
+    \draw [->] (inputL12-\i) -- (hidden1-\j);};
+
+    \foreach \i in {1,2,3}
+    \foreach \j in {1,2,3}
     \draw [->] (hidden1-\i) -- (hidden2-\j);
 
-    \foreach \i in {1,2,3,4,5,6,7,8}
+    \foreach \i in {1,2,3}
     \foreach \j in {1}
     \draw [->] (hidden2-\i) -- (output-\j);
 
-    \foreach \l [count=\x from 0] in {Eingabeschicht, Versteckte Schicht, Ausgabeschicht}
-    \node [align=center, above] at (\x*2,2) {\l};
   \end{tikzpicture}
+  }%
   \caption{Ein einfaches \acl{NN}}
   \label{fig:own-nn}
 \end{figure}
@@ -83,7 +99,7 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 % input either 0 or 1
 Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wurde, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
-\subsection{Versteckte Schicht}
+\subsection{Versteckte Schichten}
 
 \subsection{Ausgabeschicht}
 
@@ -96,6 +112,9 @@ Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierun
 Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie
 
 % wenn eingabe daten mit einer tieferen suche verwendet werden, sind die Konzepte hinter den zügen/der evaluation schwerer zu verstehen und somit auch schwiriger zu lernen
+
+% normalerweise ist wird pro epoche das gesamte datenset verarbeitet, hier ist das nicht der fall, wir verarbeiten 100M Positionen pro zug, wichtig ist das die daten nicht sequentiell gelesen werden, deshalb werden zufällig positionen übersprungen -> würden die daten gesuffelt sein wären die eingabedaten sehr viel größer, da ihr encoding auf sich wenig änderden positionen basiert
+% Letztendlich werden alle Positionen gleichoft trainiert, die verteilung ist jedoch besser zum lernen.
 
 % they are alerady normalized (siehe feature set)
 % labeling is easy as the set is automatically generated data with labels (cp score) automatically generated
