@@ -43,7 +43,7 @@ def main():
 
   logger = loggers.TensorBoardLogger('logs/')
   ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
-  trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1,callbacks=[ckpt_callback, ModelCheckpoint()])
+  trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1, callbacks=[ckpt_callback, ModelCheckpoint()])
   if ckpt_path:
     trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
   else:
