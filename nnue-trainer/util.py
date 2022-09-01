@@ -9,6 +9,14 @@ def last_ckpt() -> str:
   print(f'Loading ckpt: {ckpt_path}')
   return ckpt_path
 
+def ckpt_paths(run = -1) -> str:
+  ckpt_dir_glob = f'./logs/lightning_logs/{"*" if int(run) < 0 else "version_" + run}/checkpoints/'
+  list_run_ckpt_path = glob.glob(ckpt_dir_glob)
+  ckpt_paths = glob.glob(f'{max(list_run_ckpt_path, key=os.path.getctime)}*.ckpt')
+  if len(ckpt_paths) <= 0:
+    raise Exception('No ckpts found!')
+  return ckpt_paths
+
 # using data loader from the Gary Linscott (SF NNUE) https://github.com/glinscott/nnue-pytorch/blob/master/train.py
 def make_data_loaders(train_filename, val_filename, feature_set_name, num_workers, batch_size, filtered, random_fen_skipping, main_device, epoch_size, val_size):
   # Epoch and validation sizes are arbitrary

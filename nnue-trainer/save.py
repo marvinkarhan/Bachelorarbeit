@@ -2,22 +2,9 @@ import sys
 import os
 import model
 import torch
-import numpy
 import util
-from torch import Tensor, nn
+from torch import nn
 
-
-def ascii_hist(name, x, bins=6):
-  N,X = numpy.histogram(x, bins=bins)
-  total = 1.0*len(x)
-  width = 50
-  nmax = N.max()
-
-  print(name)
-  for (xi, n) in zip(X,N):
-    bar = '#'*int(n*1.0*width/nmax)
-    xi = '{0: <8.4g}'.format(xi).ljust(10)
-    print('{0}| {1}'.format(xi,bar))
 
 # returns a bytearray with the model coalesced in it
 # and the weights/bias quantized
@@ -38,13 +25,11 @@ def input_to_buffer(buffer: bytearray, input: nn.Linear):
   bias = input.bias.data
   bias = bias.mul(127).round().to(torch.int16)
   buffer.extend(bias.flatten().numpy().tobytes())
-  ascii_hist('input bias:', bias.numpy())
 
   # transpose data to fit nnue model
   weight = input.weight.data.t()
   weight = weight.mul(127).round().to(torch.int16)
   buffer.extend(weight.flatten().numpy())
-  ascii_hist('input weight:', weight.numpy())
 
 def layer_to_buffer(buffer: bytearray, layer: nn.Linear, is_output=False):
   # following scales discoverd by stockfish
@@ -61,13 +46,18 @@ def layer_to_buffer(buffer: bytearray, layer: nn.Linear, is_output=False):
   bias = layer.bias.data
   bias = bias.mul(kBiasScale).round().to(torch.int32)
   buffer.extend(bias.flatten().numpy().tobytes())
-  ascii_hist('layer bias:', bias.numpy())
 
   weight = layer.weight.data
   weight = weight.clamp(-kMaxWeight, kMaxWeight).mul(kWeightScale).round().to(torch.int8)
   buffer.extend(weight.flatten().numpy().tobytes())
-  ascii_hist('layer weight:', weight.numpy())
 
+  # load file and convert to binary
+def save_ckpt(ckpt_path: str, output: str, full_path = False):
+  nnue = model.NNUE.load_from_checkpoint(ckpt_path)
+  cwd = os.path.dirname(os.path.realpath(__file__))
+  out_path = output if full_path else f'{cwd}/{output}'
+  with open(out_path, 'wb') as f:
+    f.write(model_to_bin(nnue))
 
 def main():
   # read data inputs
@@ -82,12 +72,7 @@ def main():
       raise Exception(f'{sys.argv[2]} does not end with .nnue')
   input = util.last_ckpt() if sys.argv[1] == 'latest' else sys.argv[1]
   output = sys.argv[2]
-  # load file and convert to binary
-  nnue = model.NNUE.load_from_checkpoint(input)
-  cwd = os.path.dirname(os.path.realpath(__file__))
-  # nnue.join_layers().tofile(f'{cwd}/{output}')
-  with open(f'{cwd}/{output}', 'wb') as f:
-    f.write(model_to_bin(nnue))
+  save_ckpt(input, output)
 
 if __name__ == '__main__':
   main()

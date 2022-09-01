@@ -1,6 +1,3 @@
-import chess
-import torch
-
 # halfkp represents (piece_square, piece_type, piece_color)
 # allows the understanding of the pieces in relation to the king
 

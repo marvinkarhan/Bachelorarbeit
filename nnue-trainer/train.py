@@ -5,6 +5,7 @@ import model
 import util
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 FEATURE_SET_NAME = 'HalfKP'
 BATCH_SIZE = 2**14
@@ -41,7 +42,8 @@ def main():
     nnue = model.NNUE()
 
   logger = loggers.TensorBoardLogger('logs/')
-  trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1)
+  ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
+  trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1,callbacks=[ckpt_callback, ModelCheckpoint()])
   if ckpt_path:
     trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
   else:
