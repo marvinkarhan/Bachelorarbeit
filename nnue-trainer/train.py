@@ -1,5 +1,6 @@
 import sys
 import os
+import torch
 import warnings
 import model
 import util
@@ -44,7 +45,7 @@ def main():
   ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
   trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1, callbacks=[ckpt_callback, ModelCheckpoint()])
 
-  device = trainer.root_device if trainer.root_gpu is None else 'cuda:' + str(trainer.root_gpu)
+  device = torch.device('cpu') if trainer.strategy.root_device.index is None else 'cuda:' + str(trainer.strategy.root_device.index)
 
   train, val = util.make_data_loaders(train_filename, val_filename, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
 
