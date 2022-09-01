@@ -1,11 +1,14 @@
 import sys
 import os
-import torch
+import warnings
 import model
 import util
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
+
+# disable dataloader warning
+warnings.filterwarnings("ignore", ".*does not have many workers.*")
 
 FEATURE_SET_NAME = 'HalfKP'
 BATCH_SIZE = 2**14
@@ -29,10 +32,6 @@ def main():
       raise Exception('{0} does not exist or ist named wrong'.format(sys.argv[3]))
   train_filename, val_filename = sys.argv[1], sys.argv[2]
 
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-  train, val = util.make_data_loaders(train_filename, val_filename, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
-
   # continue from ckpt
   ckpt_path = None
   if len(sys.argv) > 3:
@@ -44,6 +43,11 @@ def main():
   logger = loggers.TensorBoardLogger('logs/')
   ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
   trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1, callbacks=[ckpt_callback, ModelCheckpoint()])
+
+  device = trainer.root_device if trainer.root_gpu is None else 'cuda:' + str(trainer.root_gpu)
+
+  train, val = util.make_data_loaders(train_filename, val_filename, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
+
   if ckpt_path:
     trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
   else:
