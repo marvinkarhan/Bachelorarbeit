@@ -3,6 +3,7 @@ import os
 import model
 import torch
 import util
+import argparse
 from torch import nn
 
 
@@ -60,19 +61,19 @@ def save_ckpt(ckpt_path: str, output: str, full_path = False):
     f.write(model_to_bin(nnue))
 
 def main():
+  parser = argparse.ArgumentParser(description='Parse ckpt to nnue.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument('input', nargs='?', default='last', help='Checkpoint path to a .ckpt file. Can be either a path to a ckpt or "last".')
+  parser.add_argument('output', nargs='?', default='default.nnue', help='Name of output .nnue file.')
+  args = parser.parse_args()
+  if args.input == 'last':
+    args.input = util.last_ckpt()
   # read data inputs
-  if len(sys.argv) < 3:
-    raise Exception('Input input .ckpt file and output .nnue filename.')
-  else:
-    if not os.path.exists(sys.argv[1]) and sys.argv[1] != 'latest':
-      raise Exception('{0} does not exist'.format(sys.argv[1]))
-    if not sys.argv[1].endswith('.ckpt') and sys.argv[1] != 'latest':
-      raise Exception('{0} does not end with .ckpt'.format(sys.argv[1]))
-    if not sys.argv[2].endswith('.nnue'):
-      raise Exception(f'{sys.argv[2]} does not end with .nnue')
-  input = util.last_ckpt() if sys.argv[1] == 'latest' else sys.argv[1]
-  output = sys.argv[2]
-  save_ckpt(input, output)
+  if not args.input.endswith('.ckpt'):
+    raise Exception(f'{args.input} does not end with .ckpt')
+  if not args.output.endswith('.nnue'):
+    raise Exception(f'{args.output} does not end with .nnue')
+  util.validate_path(args.input)
+  save_ckpt(args.input, args.output)
 
 if __name__ == '__main__':
   main()

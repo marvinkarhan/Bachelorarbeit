@@ -1,9 +1,9 @@
 import os
 import util
 import save
-import sys
+import shutil
 import re
-from datetime import datetime
+import argparse
 from typing import List
 
 RELATIVE_DEFAULT_ENGINE = '../../../../uci-engine'
@@ -12,8 +12,6 @@ CUTECHESS_CLI = './lib/cutechess-cli/cutechess-cli'
 ORDO = './lib/ordo/ordo-linux64'
 
 DIR = 'estimate_elo'
-
-CONCURRENCY_DEFAULT = 50
 
 # using cutechess (cli): https://github.com/cutechess/cutechess
 
@@ -44,7 +42,7 @@ class Tournament:
     cmd = (
       f'{CUTECHESS_CLI} -each proto=uci tc={self.tc} dir={out_dir} restart=on '
       f'{"".join([e.to_string() for e in self.engines])} '
-      f'-event {"_vs_".join(["_".join(e.name.split()) for e in self.engines])} '
+      f'-event Estimate_Elo_on_run_{self.run} '
       f'-tournament gauntlet '
       f'-games {self.games} '
       f'-rounds 1 '
@@ -101,18 +99,30 @@ def estimate_elo_with_ordo(run: int, concurrency: int):
   print(cmd)
   return os.system(cmd)
 
+def clean_out_dir(run: int):
+  out_dir = get_out_dir(run)
+  if os.path.exists(out_dir):
+    shutil.rmtree(out_dir)
+
 def main():
-  # 1. get path to run from input, if none is given use last
-  run = sys.argv[1] if len(sys.argv) > 1 else -1
-  # # 2. convert ckpts of specified run
-  nets = convert_ckpts(run)
-  # # 3. get list of Engines
+  parser = argparse.ArgumentParser(description='Plays a gauntlet tournament comparing a runs nets to master.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument('--run', default=-1, type=int, help='Specify which run to test. If none is omitted, it defaults to the last run.')
+  parser.add_argument('--rounds', default=200, type=int, help='Rounds in gauntlet tournament against master.')
+  parser.add_argument('--concurrency', default=6, type=int, help='Number of Threads for running the tournament.')
+  parser.add_argument('--clean', action='store_true', help='Clean previous elo estimation files, if there are any.')
+  args = parser.parse_args()
+  # clean up if requested
+  if args.clean:
+    clean_out_dir(args.run)
+  # convert ckpts of specified run
+  nets = convert_ckpts(args.run)
+  # get list of Engines
   engines = setup_engines(nets)
-  # # 4. run a gauntlet tournament against master
-  tournament = Tournament(run, engines, CONCURRENCY_DEFAULT, 50, 300, 0.05)
+  # run a gauntlet tournament against master
+  tournament = Tournament(args.run, engines, args.concurrency, args.rounds, 300, 0.05)
   tournament.start()
   # estimate the elo with ordo
-  estimate_elo_with_ordo(run, CONCURRENCY_DEFAULT)
+  estimate_elo_with_ordo(args.run, args.concurrency)
 
 if __name__ == '__main__':
   main()

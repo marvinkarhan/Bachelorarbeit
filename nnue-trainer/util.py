@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 def last_ckpt() -> str:
   list_ckpt_paths = glob.glob('./logs/lightning_logs/*/checkpoints/*.ckpt')
   ckpt_path = max(list_ckpt_paths, key=os.path.getctime)
-  print(f'Loading ckpt: {ckpt_path}')
   return ckpt_path
 
 def ckpt_paths(run = -1) -> str:
@@ -16,6 +15,11 @@ def ckpt_paths(run = -1) -> str:
   if len(ckpt_paths) <= 0:
     raise Exception('No ckpts found!')
   return ckpt_paths
+
+def validate_path(*paths: str):
+  for path in paths:
+    if not os.path.exists(path):
+      raise Exception('{0} does not exist'.format(path))
 
 # using data loader from the Gary Linscott (SF NNUE) https://github.com/glinscott/nnue-pytorch/blob/master/train.py
 def make_data_loaders(train_filename, val_filename, feature_set_name, num_workers, batch_size, filtered, random_fen_skipping, main_device, epoch_size, val_size):

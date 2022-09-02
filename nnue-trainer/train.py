@@ -4,6 +4,7 @@ import torch
 import warnings
 import model
 import util
+import argparse
 import pytorch_lightning as pl
 from pytorch_lightning import loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -18,36 +19,36 @@ SMART_FEN_SKIPPING = True
 RANDOM_FEN_SKIPPING = 10
 EPOCH_SIZE = 100000000
 VAL_SIZE = 1000000
-MAX_EPOCHS = 800
 
 def main():
-  # read data inputs
-  if len(sys.argv) < 3:
-    raise Exception('Input training and validation datasets.')
-  else:
-    if not os.path.exists(sys.argv[1]):
-      raise Exception('{0} does not exist'.format(sys.argv[1]))
-    if not os.path.exists(sys.argv[2]):
-      raise Exception('{0} does not exist'.format(sys.argv[2]))
-    if len(sys.argv) > 3 and sys.argv[3] != 'latest' and not os.path.exists(sys.argv[3]):
-      raise Exception('{0} does not exist or ist named wrong'.format(sys.argv[3]))
-  train_filename, val_filename = sys.argv[1], sys.argv[2]
+  parser = argparse.ArgumentParser(description='Train NNUE.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument('train_file', help='Training data path in .binpack format.')
+  parser.add_argument('val_file', help='Validation data path in .binpack format.')
+  parser.add_argument('--resume', type=str, dest='ckpt_path', help='Resume from a checkpoint (.ckpt). Can be either a path to a ckpt or "last".')
+  parser.add_argument('--epochs', default=800, dest='max_epochs', type=int, help='Max Epochs.')
+  parser.add_argument('--device', default=0, dest='device_index', type=int, help='Specify which gpu to use.')
+  args = parser.parse_args()
+  # validate path inputs
+  util.validate_path(args.train_file, args.val_file)
 
   # continue from ckpt
-  ckpt_path = None
-  if len(sys.argv) > 3:
-    ckpt_path = util.last_ckpt() if sys.argv[3] == 'latest' else sys.argv[3]
+  ckpt_path = args.ckpt_path
+  if ckpt_path:
+    if ckpt_path == 'last':
+      ckpt_path = util.last_ckpt()
+    util.validate_path(ckpt_path)
     nnue = model.NNUE.load_from_checkpoint(ckpt_path)
   else:
     nnue = model.NNUE()
 
   logger = loggers.TensorBoardLogger('logs/')
   ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
-  trainer = pl.Trainer(logger=logger, max_epochs=MAX_EPOCHS, accelerator='gpu', devices=1, callbacks=[ckpt_callback, ModelCheckpoint()])
+  trainer = pl.Trainer(logger=logger, max_epochs=args.max_epochs, accelerator='gpu', devices=1, callbacks=[ckpt_callback, ModelCheckpoint()])
 
-  device = torch.device('cpu') if trainer.strategy.root_device.index is None else 'cuda:' + str(trainer.strategy.root_device.index)
+  device_index = args.device_index if args.device_index else str(trainer.strategy.root_device.index)
+  device = torch.device('cpu') if trainer.strategy.root_device.index is None else f'cuda:{device_index}'
 
-  train, val = util.make_data_loaders(train_filename, val_filename, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
+  train, val = util.make_data_loaders(args.train_file, args.val_file, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
 
   if ckpt_path:
     trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
