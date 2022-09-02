@@ -106,8 +106,9 @@ def clean_out_dir(run: int):
 def main():
   parser = argparse.ArgumentParser(description='Plays a gauntlet tournament comparing a runs nets to master.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument('--run', default=-1, type=int, help='Specify which run to test. If none is omitted, it defaults to the last run.')
-  parser.add_argument('--rounds', default=200, type=int, help='Rounds in gauntlet tournament against master.')
+  parser.add_argument('--games', default=200, type=int, help='Games in gauntlet tournament per engine, against master.')
   parser.add_argument('--concurrency', default=6, type=int, help='Number of Threads for running the tournament.')
+  parser.add_argument('--tc', default=10, type=int, help='Number of Seconds for each Game.')
   parser.add_argument('--clean', action='store_true', help='Clean previous elo estimation files, if there are any.')
   args = parser.parse_args()
   # clean up if requested
@@ -118,7 +119,7 @@ def main():
   # get list of Engines
   engines = setup_engines(nets)
   # run a gauntlet tournament against master
-  tournament = Tournament(args.run, engines, args.concurrency, args.rounds, 300, 0.05)
+  tournament = Tournament(args.run, engines, args.concurrency, args.games, args.tc, 0.05)
   tournament.start()
   # estimate the elo with ordo
   estimate_elo_with_ordo(args.run, args.concurrency)
