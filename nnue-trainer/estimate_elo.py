@@ -84,7 +84,6 @@ def estimate_elo_with_ordo(run: int, concurrency: int):
   out_dir = get_out_dir(run)
   pgn_file = f'{out_dir}/out.pgn'
   ordo_file = f'{out_dir}/ordo_rating.txt'
-  group_file = f'{out_dir}/ordo_groups.txt'
   cmd = (
     f'{ORDO} '
     f'-q ' # quiet
