@@ -13,7 +13,7 @@ ORDO = './lib/ordo/ordo-linux64'
 
 DIR = 'estimate_elo'
 
-CONCURRENCY_DEFAULT = 6
+CONCURRENCY_DEFAULT = 50
 
 # using cutechess (cli): https://github.com/cutechess/cutechess
 
@@ -42,7 +42,7 @@ class Tournament:
   def start(self):
     out_dir = get_out_dir(self.run).replace('./', '')
     cmd = (
-      f'{CUTECHESS_CLI} -each proto=uci tc={self.tc} dir={out_dir} '
+      f'{CUTECHESS_CLI} -each proto=uci tc={self.tc} dir={out_dir} restart=on '
       f'{"".join([e.to_string() for e in self.engines])} '
       f'-event {"_vs_".join(["_".join(e.name.split()) for e in self.engines])} '
       f'-tournament gauntlet '
@@ -109,7 +109,7 @@ def main():
   # # 3. get list of Engines
   engines = setup_engines(nets)
   # # 4. run a gauntlet tournament against master
-  tournament = Tournament(run, engines, CONCURRENCY_DEFAULT, 10, 60, 0.05)
+  tournament = Tournament(run, engines, CONCURRENCY_DEFAULT, 50, 300, 0.05)
   tournament.start()
   # estimate the elo with ordo
   estimate_elo_with_ordo(run, CONCURRENCY_DEFAULT)
