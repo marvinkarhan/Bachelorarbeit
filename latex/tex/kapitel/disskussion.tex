@@ -7,3 +7,11 @@
 % probleme in der entwicklung:
 % mapping from my engine to the uses dateloader was wrong resulting in the input data i gave the net where completly diffrent moves essentaly making the engine blind
 % as i was used to in hce i oriented the engine output to the active side, but that already happens by design in the net so essentally it was like the engine playing only for one side giving up all his pieces as white
+
+% vanishing graident untersuchen
+% schichten ausgaben 0 oder 1
+
+% overfitting ist unwarscheinlich, da nur ein kleiner teil der paramterer gleichzeitig verwendet werden und die hinteren layer sehr klein sind. Außerdem hilft das sehr große daten set dagegen, positionen sollten unterschieldich genug sein, vorallem da dfrc data verwendet wird, die noch mehr diversifität bringt
+% weight decay wurde verwendet, ist aber nicht sinnvoll, da overfitting sehr unwarscheinlich ist
+% Dropout Schichten sind aus dem selben grund nicht sinvoll, sie versuchen ebenfalls verhintern Overfitting zu verhindern 
+% kann aber trozdem vorkommen, deshalb wurde das netz an verschiedenen zeitpunkten getested
