@@ -41,25 +41,26 @@ class NNUE(pl.LightningModule):
     # calculate the win draw loss by forward activation of the net and scale it to levels adjusted to normal cp value/scores provided by the training data
     # use sigmoid to convert centipawn to 1, 0, -1 values (wdl)
     # could use a lambda to increase/decrease the influence of net evaluation and score given by the input data 
-    # wdl_eval = (self(us, them, white, black) * net2score / out_scaling).sigmoid()
+    wdl_eval = (self(us, them, white, black) * net2score / out_scaling).sigmoid()
     # also scale the score of the input data to wdl
-    # wdl_score = (score / in_scaling).sigmoid()
+    wdl_score = (score / in_scaling).sigmoid()
     
-    # wdl_target = wdl_score + wdl_outcome
+    wdl_target = self.lambda_ * wdl_score + self.lambda_ * wdl_outcome
     # exponent tuning from stockfish, values >2 choosing more precision over accuracy
-    # loss = torch.pow(torch.abs(wdl_target - wdl_eval), 2.6).mean()
-    q = self(us, them, white, black) * net2score / scaling
-    t = wdl_outcome
-    p = (score / scaling).sigmoid()
+    loss = torch.pow(torch.abs(wdl_target - wdl_eval), 2.6).mean()
 
-    epsilon = 1e-12
-    teacher_entropy = -(p * (p + epsilon).log() + (1.0 - p) * (1.0 - p + epsilon).log())
-    outcome_entropy = -(t * (t + epsilon).log() + (1.0 - t) * (1.0 - t + epsilon).log())
-    teacher_loss = -(p * F.logsigmoid(q) + (1.0 - p) * F.logsigmoid(-q))
-    outcome_loss = -(t * F.logsigmoid(q) + (1.0 - t) * F.logsigmoid(-q))
-    result  = self.lambda_ * teacher_loss    + (1.0 - self.lambda_) * outcome_loss
-    entropy = self.lambda_ * teacher_entropy + (1.0 - self.lambda_) * outcome_entropy
-    loss = result.mean() - entropy.mean()
+    # q = self(us, them, white, black) * net2score / scaling
+    # t = wdl_outcome
+    # p = (score / scaling).sigmoid()
+
+    # epsilon = 1e-12
+    # teacher_entropy = -(p * (p + epsilon).log() + (1.0 - p) * (1.0 - p + epsilon).log())
+    # outcome_entropy = -(t * (t + epsilon).log() + (1.0 - t) * (1.0 - t + epsilon).log())
+    # teacher_loss = -(p * F.logsigmoid(q) + (1.0 - p) * F.logsigmoid(-q))
+    # outcome_loss = -(t * F.logsigmoid(q) + (1.0 - t) * F.logsigmoid(-q))
+    # result  = self.lambda_ * teacher_loss    + (1.0 - self.lambda_) * outcome_loss
+    # entropy = self.lambda_ * teacher_entropy + (1.0 - self.lambda_) * outcome_entropy
+    # loss = result.mean() - entropy.mean()
 
 
     self.log(loss_type, loss)
