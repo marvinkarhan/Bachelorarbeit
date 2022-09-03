@@ -40,7 +40,7 @@ class Tournament:
   def start(self):
     out_dir = get_out_dir(self.run).replace('./', '')
     cmd = (
-      f'{CUTECHESS_CLI} -each proto=uci tc={self.tc} dir={out_dir} restart=on '
+      f'{CUTECHESS_CLI} -each proto=uci tc={self.tc} dir={out_dir} '
       f'{"".join([e.to_string() for e in self.engines])} '
       f'-event Estimate_Elo_on_run_{self.run} '
       f'-tournament gauntlet '
@@ -51,6 +51,7 @@ class Tournament:
       f'-concurrency {self.concurrency} '
       f'-resign movecount=3 score=1000 '
       f'-draw movenumber=40 movecount=8 score=10 '
+      f'-recover '
     )
     print(cmd)
     return os.system(cmd)
@@ -119,7 +120,7 @@ def main():
   # get list of Engines
   engines = setup_engines(nets)
   # run a gauntlet tournament against master
-  tournament = Tournament(args.run, engines, args.concurrency, args.games, args.tc, 0.05)
+  tournament = Tournament(args.run, engines, args.concurrency, args.games, args.tc, 0.1)
   tournament.start()
   # estimate the elo with ordo
   estimate_elo_with_ordo(args.run, args.concurrency)
