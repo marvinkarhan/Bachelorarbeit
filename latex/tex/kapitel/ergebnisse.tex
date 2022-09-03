@@ -8,6 +8,8 @@ Der Testaufbau soll dafür sorgen, dass die hier erreichten Ergebnisse reproduzi
 
 Schachcomputer sind von Natur aus deterministisch, deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen eine Analyse durch KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger remis gespielt werden, als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
+Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen Anwendung durchgeführt. Die Elo wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen wird ein Error berechnet, der in folgenden Graphen mithilfe von Error Balken angegeben ist.
+
 \section{Elo Entwicklung}
 % erklären was Elo ist
 

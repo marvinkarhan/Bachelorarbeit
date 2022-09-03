@@ -1,0 +1,1 @@
+alignas(32) int aligned[64];
