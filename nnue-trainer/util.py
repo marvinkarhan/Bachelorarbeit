@@ -9,7 +9,7 @@ def last_ckpt() -> str:
   return ckpt_path
 
 def ckpt_paths(run = -1) -> str:
-  ckpt_dir_glob = f'./logs/lightning_logs/{"*" if int(run) < 0 else "version_" + run}/checkpoints/'
+  ckpt_dir_glob = f'./logs/lightning_logs/{"*" if int(run) < 0 else "version_" + str(run)}/checkpoints/'
   list_run_ckpt_path = glob.glob(ckpt_dir_glob)
   ckpt_paths = glob.glob(f'{max(list_run_ckpt_path, key=os.path.getctime)}*.ckpt')
   if len(ckpt_paths) <= 0:
