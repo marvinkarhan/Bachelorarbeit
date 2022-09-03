@@ -4,6 +4,11 @@
 
 \section{Probleme}
 
+Das Validieren des Trainingsfortschritts mithilfe eines Validierung Datensatzes ist nicht möglich, da der Loss auf dem Datensatz basiert und zwischen unterschiedlichen Datensätzen nicht vergleichbar ist. Deshalb ist die Validierung durch das Durchführen von Turnieren der verschiedenen Netze im Vergleich zu dem aktuell stärksten Netz wichtig. Der Nachteil dabei ist, dass die Durchführung der benötigten Spiele für ein verwertbares Ergebnis hoch ist und somit viel Rechenleistung benötigt.
+% probleme bei der elo bestimming weil kurze zeitkontrolle nicht funktioniert
+
+Die Angaben der berechneten Elo durch Self-Play Tourniere ist nicht übertragbar in tatsächliche Elo gegen andere Computer, aber sehr gut für den Vergleich verschiedener Versionen eines Schachcomputers.
+
 % probleme in der entwicklung:
 % mapping from my engine to the uses dateloader was wrong resulting in the input data i gave the net where completly diffrent moves essentaly making the engine blind
 % as i was used to in hce i oriented the engine output to the active side, but that already happens by design in the net so essentally it was like the engine playing only for one side giving up all his pieces as white

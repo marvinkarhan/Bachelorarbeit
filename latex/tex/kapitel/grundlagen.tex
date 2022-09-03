@@ -5,7 +5,7 @@ In diesem Kapitel wird das Wissen vermittelt, welches benötigt wird um zu Verst
 \section{Hand-crafted Evaluation}
 \label{chap:HCE}
 
-Es ist wichtig zu wissen wie die \ac{HCE} eines Schachcomputers funktioniert, da sie nicht nur die Variante die in jedem starken Schachcomputer vor 2017 eingesetzt wurde, sondern auch heute noch in Kombination mit \ac{NNUE} eingesetzt wird. Bei \ac{NNUE} Schachcomputern wird sie oft in Kombination mit der \ac{NN} evaluation genutzt, weil sie besser in extremen Stellungen funktioniert. Besitzt beispielsweise Weiß in einer Position eine Dame mehr, muss nicht die teurere Berechnung des \acp{NNUE} durchgeführt werden, um zu entscheiden, dass Weiß im Vorteil ist. 
+Es ist wichtig zu wissen wie die \ac{HCE} eines Schachcomputers funktioniert, da sie nicht nur die Variante die in jedem starken Schachcomputer vor 2017 eingesetzt wurde, sondern auch heute noch in Kombination mit \ac{NNUE} eingesetzt wird. Bei \ac{NNUE} Schachcomputern wird sie oft in Kombination mit der \ac{NN} evaluation genutzt, weil sie besser in extremen Stellungen funktioniert. Besitzt beispielsweise Weiß in einer Position eine Dame mehr, muss nicht die teurere Berechnung des \acp{NNUE} durchgeführt werden, um zu entscheiden, dass Weiß im Vorteil ist.
 
 Die \ac{HCE} einer Schachposition ist eine heuristische Methode der Position einen numerischen Wert zuzuordnen. Vor der Verbreitung von \acp{NN}, war \ac{HCE} die einzige Form der Positions-Evaluation. Gäbe es unendliche Ressourcen könnten aus jeder Position alle mögliche Zugfolgen per Brute-Force bestimmen und der Positionen einer der drei Werte: -1 (Verlust), 0 (remis), 1 (Gewinn) geben. In der Realität ist es nicht möglich den exakten Wert der Stellung zu kennen, deshalb wird in der \ac{HCE} versucht anhand von Menschen festgelegten Kriterien einen Wert der Position zuzuordnen. Die so gewonnene Bewertung wird in der Zugsuche verwendet, um den besten Zug, abhängig von den per Hand gewählten Kriterien, zu finden. Die Evaluation wird aus Sicht der Seite, die gerade am Zug ist angegeben. Das ist wichtig für den verwendeten Suchalgorithmus (Alpha-Beta-Suche) \cite{Slagle1969}.
 
@@ -188,7 +188,7 @@ Das Problem der Quantisierung ist das Einbauen von \enquote{Fehlern}. Bei \acp{N
 
 \section{SIMD}
 
-In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht in einem Prozessor Befehlszyklus, eine Instruktion auf mehrere Elemente eines Vektors gleichzeitig durchzuführen. Es gibt je nach Mikroprozessor-Architektur, verschiedene Erweiterungen, um \ac{SIMD} zu implementieren. In dieser Arbeit sind alle Beispiele mit dem \ac{AVX2} Befehlssatz geschrieben. Der Grund dafür ist, dass \ac{AVX2} von Modernen Intel und AMD Mikroprozessoren unterstützt werden.
+In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht Prozessor Anweisungen, die eine Instruktion auf mehrere Elemente eines Vektors gleichzeitig durchzuführen. Es gibt je nach Mikroprozessor-Architektur, verschiedene Erweiterungen, um \ac{SIMD} zu implementieren. In dieser Arbeit sind alle Beispiele mit dem \ac{AVX2} Befehlssatz, welcher auf \ac{AVX} aufbaut, geschrieben. Der Grund dafür ist, dass \ac{AVX2} von Modernen Intel und AMD Mikroprozessoren unterstützt werden.
 
 Der Begriff \ac{SIMD} kommt von der flynnschen Klassifikation, die Rechnerarchitekturen in vier gebiete aufteilt \cite{Flynn1972}. Die Aufteilung orientiert sich an der Anzahl vorhandener Befehls- und Datenströme. Es gibt Single und Multiple Instructions, sowie Single und Multiple Data. Die daraus entstehenden Klassen heißen: \ac{SIMD}, \ac{SISD}, \ac{MIMD} und \ac{MISD}.
 
@@ -196,10 +196,15 @@ Der Begriff \ac{SIMD} kommt von der flynnschen Klassifikation, die Rechnerarchit
 
 In den folgenden Unterkapiteln wird erläutert, warum Memory Alignment wichtig ist und wie die für \ac{NNUE} wichtigen intrinsischen Funktionen in C++ funktionieren.
 
-\subsection{Speicher Verwaltung}
+\subsection{Register Verwaltung}
 
 % how do they have to be aigned 
-Das \ac{SIMD} Befehle effizient ausgeführt werden, müssen die Variablen, die in \ac{SIMD} Registern verwendet werden sollen, der Registergröße entsprechenden abgelegt sein, auch Alignment genannt. Dafür gibt es zwei Möglichkeiten, entweder die Werte sind bei der Definition bereits Aligned oder sie werden bei dem Laden in das Register Aligned. Für beide Varianten gibt es Anweisungen \cite{intelIntrinsics}. Die Anweisungen für Unaligned Variablen sind deutlich langsamer. Das Alignment zur Definition ist deshalb präferiert und kann in C++ sehr einfach über den Spezifizierer \emph{alignas} implementiert werden. \emph{Alignas} nimmt einen integer der das geforderte Alignment in Byte spezifiziert.
+Das \ac{SIMD} Befehle effizient ausgeführt werden, müssen die Variablen, die in den Erweisung spezifischen Registern verwendet werden sollen, der Registergröße entsprechenden abgelegt sein, auch Alignment genannt. Dafür gibt es zwei Möglichkeiten, entweder die Werte sind bei der Definition bereits Aligned oder sie werden bei dem Laden in das Register Aligned. Für beide Varianten gibt es Anweisungen \cite{intelIntrinsics}. Die Anweisungen für Unaligned Variablen, Aligned die Daten zuerst und sind deshalb deutlich langsamer. Das Alignment zur Definition ist deshalb präferiert und kann in C++ sehr einfach über den Spezifizierer \emph{alignas} implementiert werden. \emph{Alignas} nimmt einen integer der das geforderte Alignment in Byte spezifiziert. In \autoref{code:alignas} wird ein Array 32 Byte Aligned, passend für ein \ac{AVX2} Register.
+
+\lstinputlisting[language=C++,
+  caption={32 Byte Aligned Array.},
+  label=code:alignas]
+{\srcloc/alignas.h}
 
 % what kind of registers are there
 Je nach Befehlssatz gibt es unterschiedlich große Register. Die in \ac{AVX2} verwendeten Register heißen \emph{ymm} und haben eine Registerbreite von 256 Bit \cite{intelIntrinsics}. Bei der Unterstützung mehrerer Befehlssätze mit unterschiedlich großen Registern ist es zu empfehlenswert, die Variablen auf an die größtmögliche Registergröße anzupassen. Der Schachcomputer der im Rahmen unterstützt bis zu \ac{AVX512}, also 64 Byte Registerbreite.
@@ -207,18 +212,34 @@ Je nach Befehlssatz gibt es unterschiedlich große Register. Die in \ac{AVX2} ve
 % what is saturation
 Bei integern kann es passieren, dass es zu einem Überlauf kommt, wird auf ein acht Bit integer mit dem wert 127 um eins erhöht, läuft sie über und enthält statt 128 den Wert -128. In dem meisten \ac{SIMD} Befehlssätzen gibt es zu den Befehlen die überlaufen können zusätzliche Befehle die nicht Überlaufen \cite{intelIntrinsics}. Die sogenannte Saturation Deckelt die Werte in dem Minimum/Maximum. In dem gerade genannten Beispiel ist das Saturated Ergebnis 127.
 
-% pack und unpacking operations (converting from one to another data type)
-% spezifische pack/unpack operationen werden im nachfolgenden kapitel genauer erläutert
-% avoid conversion where you can (madd als beispiel)
-% Aus Performance gründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen 
-% Bei der Arbeit mit \ac{SIMD} Registern darf
-
 \subsection{Intrinsische Funktionen für NNUE}
 
+Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. Deshalb sind in diesem Unterkapitel die Wichtigsten für eine \ac{SIMD} Implementierung für NNUE angegeben. In \autoref{table:nnueInstructions} sind die wichtigen Befehle aufgelistet, sie werden in nachfolgenden Abschnitten genauer Erklärt.
+
+\begin{table}[h]
+  \caption{Liste der für \ac{NNUE} wichtigen \ac{AVX2} Befehle. In der Liste enthalten ist der Name des Befehls, die Intrinsische Methodensignatur und eine kurze Beschreibung \cite{intelIntrinsics}.}
+  \label{table:nnueInstructions}
+  \renewcommand{\arraystretch}{1.2}
+  \centering
+  \sffamily
+  \begin{footnotesize}
+    \begin{tabularx}{\textwidth}{l l X}
+      \toprule
+      \textbf{Befehl} & \textbf{Funktion}                                     & \textbf{kurze Beschreibung} \\
+      \midrule
+      vpxor           & \lstinline{__m256i _mm256_setzero_si256 (void)} & Gibt ein Vektor des Typen \lstinline{__m256i} mit nur nullen zurück.                               \\
+      \bottomrule
+    \end{tabularx}
+  \end{footnotesize}
+  \rmfamily
+\end{table}
 % how to define a variable
 % how to load a pointer (array) of data into a SIMD (ymm) Register - aligned an unaligned
 % how to save contents of a ymm register to int pointer (array)
+% pack und unpacking operations (converting from one to another data type)
 % pack und unpack operations hi/lo
+% avoid conversion where you can (madd als beispiel)
+% Aus Performance gründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen
 
 \section{NNUE}
 
