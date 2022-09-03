@@ -45,7 +45,7 @@ class NNUE(pl.LightningModule):
     # also scale the score of the input data to wdl
     wdl_score = (score / in_scaling).sigmoid()
     
-    wdl_target = self.lambda_ * wdl_score + self.lambda_ * wdl_outcome
+    wdl_target = self.lambda_ * wdl_score + (1.0 - self.lambda_) * wdl_outcome
     # exponent tuning from stockfish, values >2 choosing more precision over accuracy
     loss = torch.pow(torch.abs(wdl_target - wdl_eval), 2.6).mean()
 
