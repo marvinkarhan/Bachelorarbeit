@@ -271,10 +271,11 @@ Bevor eine \ac{AVX2} Operationen ausgeführt werden kann, müssen die zu verarbe
 Die \ac{SIMD} Operationen, welche in der \ac{NNUE} Evaluation gebraucht werden lassen sich in drei Teile untergliedern. Erstens die Clipped \ac{ReLU}, welches die Transferfunktion aller verwendeten Schichten ist und sich lediglich in der Größe der Integer der verschiedenen Schichten unterscheidet, abhängig durch das Quantisierungsschema. Zweitens der Akkumulator, der die Eingabewerte transformiert (siehe \autoref{chap:accumulator}). Drittens die affine Transformation der linearen Schichten bzw. das Matrixprodukt, also Gewichtsmatrix multipliziert mit dem Eingabevektor der jeweiligen Schicht.
 
 % relu, accumulator, affine transformation
-Für die Clipped \ac{ReLU} Transferfunktion sind die vier Befehle relevant: VPXOR, VPACKSSWB, VPMAXSB, VPERMQ. Die nächsten vier aufgelisteten Befehle in der \autoref{table:nnueInstructions}, sind Teil des Akkumulators.
+Für die Clipped \ac{ReLU} Transferfunktion sind die vier Befehle relevant: VPXOR, VPACKSSWB, VPMAXSB, VPERMQ. Die nächsten vier aufgelisteten Befehle in der \autoref{table:nnueInstructions} (VPADDW, VPSUBW), sind Teil des Akkumulators. VPSRAW und VPMADDUSBW sind Befehle, die in der affinen Transformation verwendet werden. VPSRAW ist nicht zwingend nötig, wird aber aufgrund des gewählten Quantisierungsschema benötigt. 
 
-% avoid conversion where you can (madd als beispiel)
-% Aus Performance gründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen
+% ? - avoid conversion where you can (madd als beispiel)
+% ? - Aus Performance gründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen
+
 
 \section{NNUE}
 

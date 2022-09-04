@@ -139,6 +139,7 @@ Theoretisch gibt es Daten die, \enquote{Perfekt} sind, denn Schach ist für Stel
 % 2. forward activation
   % die aktivierungs funktion is eine ClippedReLU
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
+  % convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große evalautionen sind nicht wichtig -> win more scenario
 % 4. backpropagation using the Adadelta optimization algorithm
   % benefits: no learning rate tuning needed is already implemented in pytorch
 \cite{Zeiler2012}
