@@ -101,7 +101,7 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 % input either 0 or 1
 Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wurde, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
-\subsection{Versteckte Schichten}
+\subsection{Lineare Schichten}
 
 \subsection{Ausgabeschicht}
 
@@ -111,7 +111,7 @@ Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierun
 
 \subsection{Eingabedaten}
 
-Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert worden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Sie
+Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert worden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden.
 
 % wenn eingabe daten mit einer tieferen suche verwendet werden, sind die Konzepte hinter den zügen/der evaluation schwerer zu verstehen und somit auch schwiriger zu lernen
 
@@ -148,6 +148,9 @@ Theoretisch gibt es Daten die, \enquote{Perfekt} sind, denn Schach ist für Stel
 % loging with tensorboard to save results to analyze later
 
 \section{Integration in einen Schachcomputer}
+\label{chap:integration}
+
+Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer, mit Fokus aus \ac{SIMD} Operationen. Die Implementierung ist, eine auf den verwendeten Schachcomputer angepasste, Kopie der Stockfish Implementierung, welches für die erste \ac{NNUE} Architektur von Stockfish verwendet wurde \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an diese Implementierung zu verwenden.
 
 \subsection{Quantisierungsschema}
 
@@ -176,7 +179,8 @@ Quantisierung ist nötig, um CPU Optimierungen zu ermöglichen. Die als float tr
 Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127, dadurch kann der Ausgabetyp int8 sein. Der Gewichtstyp der Eingabeschicht muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features Überlaufen kann. Das Problem stellt sich, bei den versteckten Schichten nicht, da durch \ac{SIMD} Instruktionen, bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das bei den versteckten Schichten auftreten kann, ist das Überlaufen der int8 werte, deshalb werden sie vor der Multiplikation mit in beide Richtungen durch $127/64$ begrenzt. Der Bias in den versteckten Schichten und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias Skalierfaktor, weil die Ausgabe der \ac{NNUE} Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Der Gewicht Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht Ganzzahlig ist, das liegt daran, dass er sich an dem Bias Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
 % warum ist der bias faktor so hoch? - Erklären
 
-\subsection{Eingabeschicht}
+\subsection{Feature Transformator}
 
 
-\subsection{Versteckte Schicht}
+\subsection{Affiner Transformator}
+% der transformator transformiert und der akkumulator akkumuliert und gibt weiter
