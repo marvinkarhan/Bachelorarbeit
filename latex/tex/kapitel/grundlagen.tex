@@ -165,15 +165,17 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
   \label{equation:ReLU}
 \end{equation}
 
-
 \begin{equation}
   ClippedReLU(x)=min(max(0,x),1)
   \label{equation:ClippedReLU}
 \end{equation}
 
-\subsection{Backpropagation}
+\subsection{Loss Functions}
+
+
+\subsection{Backpropagation und Gradientenabstieg}
 % viel muss man davon nicht kennen, da pytorch das übernimmt (automatic through automatic differentiation)
-Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es gehört zu der Familie der überwachten Lernverfahren
+Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es gehört zu der Familie der überwachten Lernverfahren. 
 
 % Die delta lern regel
 
@@ -184,12 +186,10 @@ Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es g
 % nur ein kurzer exkurs da es in andern neuronalen netzen für schach computer verwendet wird
 
 
-\subsection{Loss Functions}
-
-% Adadelta: https://arxiv.org/abs/1212.5701 - seems to work good for sparse inputs as the parameters are tuned individually not thru a global lerning rate like in regular stochastic gradient descent using a time/step/exponent based learning rate decay
 
 \subsection{Optimierer}
 
+% Adadelta: https://arxiv.org/abs/1212.5701 - seems to work good for sparse inputs as the parameters are tuned individually not thru a global lerning rate like in regular stochastic gradient descent using a time/step/exponent based learning rate decay
 % versucht probleme der backpropagation zu mitigieren
 % exemplarisch auf den Adadelta optimirer eingehen, da der in dieser arbeit verwendet wurde
 % vl mal: https://github.com/lucidrains/Adan-pytorch probieren
@@ -236,7 +236,7 @@ Bei integern kann es passieren, dass es zu einem Überlauf kommt, wird auf ein a
 
 Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. Deshalb sind in diesem Unterkapitel die Wichtigsten für eine \ac{SIMD} Implementierung für NNUE angegeben. In \autoref{table:nnueInstructions} sind die wichtigen Befehle aufgelistet, sie werden in nachfolgenden Absätzen genauer eingeordnet. Konkrete Implementierungen gibt es in \autoref{chap:integration}.
 
-\begin{table}[h]
+\begin{table}[ht]
   \caption{Liste der für \ac{NNUE} wichtigen \ac{AVX2} Befehle. In der Liste enthalten ist der Name des Befehls, die Intrinsische Methodensignatur und eine kurze Beschreibung \cite{intelIntrinsics}.}
   \label{table:nnueInstructions}
   \renewcommand{\arraystretch}{1.2}
