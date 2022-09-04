@@ -11,13 +11,13 @@ Die \ac{HCE} einer Schachposition ist eine heuristische Methode der Position ein
 
 Die \ac{HCE} eines Schachcomputers ähnelt in einigen Aspekten mehr eine Philosophie als eine Funktion. Schach ist ein Spiel, das es seit über 1000 Jahren gibt. In dieser Zeit haben Menschen regeln überlegt, um besser Schach zu spielen. All diese Regeln in die Evaluationsfunktion zu integrieren, ist nicht ratsam. Es ist ein Abwägen zwischen Wissen und Geschwindigkeit. Je mehr regeln dem Computer geben werden, umso weniger weit kann er Vorausschauen.
 
-Wenn ein Mensch Schach spielen lernt, ist der Wert der Figuren eines der ersten Erkenntnisse. Das ist ebenfalls der wichtigste Faktor für einen Schachcomputer \cite{Levy1988}. Die Angabe der Materialwertung wird bei Computern als Centipawn angegeben, um so mehr Spielraum für feingranulare Faktoren zu lassen. Figuren werden ebenfalls anhand ihrer Position bewertet. Dafür gibt es sogenannte Piece Square Tables, die jeder Figur abhängig von ihrer Position einen Wert zuordnen. Beispielsweise ist ein Springer am Rand des Brettes deutlich weniger Wert als einer im Zentrum, auch bekannt als \enquote{ein Springer am Rand bringt Kummer und Schand}. Weitere nennenswerte Aspekte der \ac{HCE} sind
+Wenn ein Mensch Schach spielen lernt, ist der Wert der Figuren eines der ersten Erkenntnisse. Das ist ebenfalls der wichtigste Faktor für einen Schachcomputer, wie schon \citeauthor{Shannon1950} \citeyear{Shannon1950} \cite{Shannon1950} erkannte. Die Angabe der Materialwertung wird bei Computern als Centipawn angegeben, um so mehr Spielraum für feingranulare Faktoren zu lassen. Figuren werden ebenfalls anhand ihrer Position bewertet. Dafür gibt es sogenannte Piece Square Tables, die jeder Figur abhängig von ihrer Position einen Wert zuordnen. Beispielsweise ist ein Springer am Rand des Brettes deutlich weniger Wert als einer im Zentrum, auch bekannt als \enquote{ein Springer am Rand bringt Kummer und Schand}. Weitere nennenswerte Aspekte der \ac{HCE} sind die Mobilität und Schwachstellen \cite[S. 228]{Levy1988}.
 
-% weitere evlauations aspekte
+% weitere evlauations aspekte: Mobilität und Schwachstellen
+Mobilität beschreibt die Beweglichkeit der Figuren. Sie kann aus der Anzahl der Felder, auf die eine Figur ziehen kann, berechnet werden. Das ist unbrauchbar, weil unbeschützte Felder und die Felder gefesselter Figuren nicht teil der Mobilität sein sollten \cite[S. 228]{Levy1988}. Mit Schwachstellen, sind ungeschützte Figuren, die Sicherheit des Königs, Probleme in der Bauernstruktur und Figuren die höherwertigere Figuren angreifen, gemeint \cite[S. 228]{Levy1988}.
 
 % erklären warum verschiedene Spielphasen eine rolle spielen
-
-% vl noch was zu NNs
+Viele der \ac{HCE} Aspekte profitieren von einer Differenzierung verschiedener Spielphasen. Schach lässt sich in drei Spielphasen teilen, die Eröffnung, das Mitellspiel und das Endspiel \cite[S. 8]{Levy1988}. Beispielsweise ist es sinvoll den wert der Figuren an die aktuelle Speilphase anzupassen. Ein Bauer im Endspiel ist mehr wert als in der Eröffnung. Zwischen den verschiedenen Phasen wird meist durch die Anzahl der Figuren unterschieden. Das zwischen zwei ähnlichen Stellungen die in zwei unterschiedlichen Phasen sind, kein großer unterschied durch den Phasen Wechsel endsteht, ist es sinvoll ein Wert für beid phasen zu berechnen und dazwischen zu interpolieren.
 
 \section{Neuronale Netze}
 
@@ -84,6 +84,7 @@ In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung neuronaler 
 % neuronen wie sie im nerfen systems eines menschen vorhanden sind
 Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{fig:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$, werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert und aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ wird die Ausgabe des Neurons. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet, dass es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
 
+% mathe matische grundlage für das neuron und neuronale netz
 \begin{equation}
   f(\varphi) = \varphi(\sum_{i=0}^{n}w_{i}x_{i})
   \label{equation:NeuronActivation}
@@ -141,19 +142,34 @@ Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McC
         \end{axis}
       \end{tikzpicture}
     }
-    \caption{Rectified Linear Aktivierungsfunktion}
-    \label{fig:ClippedRelu}
+    \caption{Rectified linear Aktivierungsfunktion}
+    \label{fig:Relu}
   \end{subfigure}
   \caption{Beispiele für Aktivierungsfunktionen}
   \label{fig:activationfunction}
 \end{figure}
 
-Die Aktivierungsfunktion, oder auch Transferfunktion, eines Neurons kann linear oder nicht linear sein. Ist die Transferfunktion linear, ergibt ein mehrschichtiges \ac{NN} keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Lineare \acp{NN} sind nicht in der Lage, nicht lineare Probleme zu lösten \cite{minsky1969perceptron}. Nicht lineare Transferfunktionen sind interessanter, da sie für nicht lineare Probleme antworten liefern können. In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. In \autoref{fig:sigmoid}
 % activation functions: linear vs non linear -> linear functions sorgen dafür das nur ein hidden layer sinnvoll ist, mehrere hidden layer mit linearen Aktivierungs Funktionen geben keinen sinn, da sie zu einer Schicht vereinfacht werden können. Deshalb sind nicht-lineare Transferfunktionen interessant, sie ermöglichen es komplexere Funktionen zu lernen
+Die Aktivierungsfunktion, oder auch Transferfunktion, eines Neurons kann linear oder nicht linear sein. Ist die Transferfunktion linear, ergibt ein mehrschichtiges \ac{NN} keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Außerdem sind lineare \acp{NN} nicht in der Lage, nicht lineare Probleme zu lösten \cite{minsky1969perceptron}. Nicht lineare Transferfunktionen sind interessanter, da sie für nicht lineare Probleme antworten liefern können.
 
 % eingehen auf Clipped relu und sigmoid aktivation functions
-% mathe matische grundlage für das neuron und neuronale netz
-\ac{ReLU}
+In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. In \autoref{fig:sigmoid} ist eine Standardsigmoide abgebildet. Sie sorgt dafür, dass die Ausgabe des Neurons immer zwischen null und eins ist. Berechnet wird sie mit \autoref{equation:sigmoid}. \autoref{fig:Relu} zeigt eine \ac{ReLU} Transferfunktion. Der niedrigste Wert ist mindestens null. Konkret ist die Berechnung in \autoref{equation:ReLU} angegeben. \ac{ReLU} geht bis ins Unendliche, wegen der aggressiven Quantisierung muss der Bereich der Aktivierungsfunktionen auch nach oben begrenzt werden, auch ClippedReLU (siehe \autoref{equation:ClippedReLU}) genannt \cite{StockfishNNUE}. 
+
+\begin{equation}
+  Sigmoid(x)=\frac{1}{(1+e^{-x})}
+  \label{equation:sigmoid}
+\end{equation}
+
+\begin{equation}
+  ReLU(x)=max(0,x)
+  \label{equation:ReLU}
+\end{equation}
+
+
+\begin{equation}
+  ClippedReLU(x)=min(max(0,x),1)
+  \label{equation:ClippedReLU}
+\end{equation}
 
 \subsection{Backpropagation}
 % viel muss man davon nicht kennen, da pytorch das übernimmt (automatic through automatic differentiation)
@@ -192,9 +208,9 @@ In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht Prozessor Anweis
 
 Der Begriff \ac{SIMD} kommt von der flynnschen Klassifikation, die Rechnerarchitekturen in vier gebiete aufteilt \cite{Flynn1972}. Die Aufteilung orientiert sich an der Anzahl vorhandener Befehls- und Datenströme. Es gibt Single und Multiple Instructions, sowie Single und Multiple Data. Die daraus entstehenden Klassen heißen: \ac{SIMD}, \ac{SISD}, \ac{MIMD} und \ac{MISD}.
 
-\ac{SIMD} kann über drei Wege realisiert werden. Auf der tiefsten Ebene in Assemblersprache, dabei hat er Programmierer die Verantwortung die Vektorisierung, die Registerzuweisung und das Befehls Scheduling. Das Problem hierbei ist leider, dass Menschen nicht perfekt sind und der, darin bessere, Compiler teile dieser Aufgaben übernehmen kann. Dafür gibt es intrinsische Funktionen die wir in Programmiersprachen wie C++ nutzen können. Sie kapseln Prozessorspezifische Operationen in Funktionsaufrufe. Für den \ac{AVX2} Befehlssatz gibt es in C++ das \emph{immintrin.h} Header-File. Mit der Verwendung von intrinsischen Funktionen, muss der Programmierer nur die Vektorisierung des Codes übernehmen, die Registerzuweisung und das Befehls Scheduling werden vom Compiler übernommen. Die dritte Möglichkeit ist die automatische Vektorisierung, dabei Übernimmt der Compiler alle Aufgaben. Die Limitierungen für den Compiler sind dabei groß \cite{ren2003preliminary}. Der Compiler kann nicht sicherstellen, dass die zu Vektorisierenden Daten in einem zusammenhängenden Speicherbereich sind oder entsprechenden aligned sind. Die beste Variante ist die Verwendung der intrinsischen Funktionen, die ein Maximum an Flexibilität und Compiler-Optimierungen bietet.
+\ac{SIMD} kann über drei Wege realisiert werden. Auf der tiefsten Ebene in Assemblersprache, dabei hat er Programmierer die Verantwortung die Vektorisierung, die Registerzuweisung und das Befehls Scheduling. Das Problem hierbei ist leider, dass Menschen nicht perfekt sind und der, darin bessere, Compiler teile dieser Aufgaben übernehmen kann. Dafür gibt es intrinsische Funktionen die wir in Programmiersprachen wie C/C++ nutzen können. Sie kapseln Prozessorspezifische Operationen in Funktionsaufrufe. Für den \ac{AVX2} Befehlssatz gibt es in C/C++ das \lstinline[language=C++]{immintrin.h} Header-File. Mit der Verwendung von intrinsischen Funktionen, muss der Programmierer nur die Vektorisierung des Codes übernehmen, die Registerzuweisung und das Befehls Scheduling werden vom Compiler übernommen. Die dritte Möglichkeit ist die automatische Vektorisierung, dabei Übernimmt der Compiler alle Aufgaben. Die Limitierungen für den Compiler sind dabei groß \cite{ren2003preliminary}. Der Compiler kann nicht sicherstellen, dass die zu Vektorisierenden Daten in einem zusammenhängenden Speicherbereich sind oder entsprechenden aligned sind. Die beste Variante ist die Verwendung der intrinsischen Funktionen, die ein Maximum an Flexibilität und Compiler-Optimierungen bietet.
 
-In den folgenden Unterkapiteln wird erläutert, warum Memory Alignment wichtig ist und wie die für \ac{NNUE} wichtigen intrinsischen Funktionen in C++ funktionieren.
+In den folgenden Unterkapiteln wird erläutert, warum Memory Alignment wichtig ist und wie die für \ac{NNUE} wichtigen intrinsischen Funktionen in C/C++ funktionieren.
 
 \subsection{Register Verwaltung}
 
@@ -209,12 +225,16 @@ Das \ac{SIMD} Befehle effizient ausgeführt werden, müssen die Variablen, die i
 % what kind of registers are there
 Je nach Befehlssatz gibt es unterschiedlich große Register. Die in \ac{AVX2} verwendeten Register heißen \emph{ymm} und haben eine Registerbreite von 256 Bit \cite{intelIntrinsics}. Bei der Unterstützung mehrerer Befehlssätze mit unterschiedlich großen Registern ist es zu empfehlenswert, die Variablen auf an die größtmögliche Registergröße anzupassen. Der Schachcomputer der im Rahmen unterstützt bis zu \ac{AVX512}, also 64 Byte Registerbreite.
 
+% you have to remember what type your are working with the ymm Register dosent know it just stores 256-Bits.
+\ac{AVX2} Befehle erwarten die Vektoren in einem \emph{ymm} Register, deshalb wird der Eingabevektor zuerst zu dem Typen \lstinline[language=C++]{__m256i} konvertiert und in ein Register geladen. Die Information, um welche Daten es sich handelt, geht dabei verloren. Für unterschiedliche Integer-Typen gibt es jeweils einen eigenen Befehl. Die Aufgabe des Entwicklers ist es, die Form seiner Daten zu kennen und die entsprechenden Operationen darauf auszuführen. Spezifische Beispiele enthält das \autoref{chap:intrinsicsForNNUE}.
+
 % what is saturation
 Bei integern kann es passieren, dass es zu einem Überlauf kommt, wird auf ein acht Bit integer mit dem wert 127 um eins erhöht, läuft sie über und enthält statt 128 den Wert -128. In dem meisten \ac{SIMD} Befehlssätzen gibt es zu den Befehlen die überlaufen können zusätzliche Befehle die nicht Überlaufen \cite{intelIntrinsics}. Die sogenannte Saturation Deckelt die Werte in dem Minimum/Maximum. In dem gerade genannten Beispiel ist das Saturated Ergebnis 127.
 
 \subsection{Intrinsische Funktionen für NNUE}
+\label{chap:intrinsicsForNNUE}
 
-Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. Deshalb sind in diesem Unterkapitel die Wichtigsten für eine \ac{SIMD} Implementierung für NNUE angegeben. In \autoref{table:nnueInstructions} sind die wichtigen Befehle aufgelistet, sie werden in nachfolgenden Abschnitten genauer Erklärt.
+Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. Deshalb sind in diesem Unterkapitel die Wichtigsten für eine \ac{SIMD} Implementierung für NNUE angegeben. In \autoref{table:nnueInstructions} sind die wichtigen Befehle aufgelistet, sie werden in nachfolgenden Abschnitten genauer erklärt.
 
 \begin{table}[h]
   \caption{Liste der für \ac{NNUE} wichtigen \ac{AVX2} Befehle. In der Liste enthalten ist der Name des Befehls, die Intrinsische Methodensignatur und eine kurze Beschreibung \cite{intelIntrinsics}.}
@@ -223,11 +243,13 @@ Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. 
   \centering
   \sffamily
   \begin{footnotesize}
-    \begin{tabularx}{\textwidth}{l l X}
+    \begin{tabularx}{\textwidth}{l X X}
       \toprule
-      \textbf{Befehl} & \textbf{Funktion}                                     & \textbf{kurze Beschreibung} \\
+      \textbf{Befehl} & \textbf{Funktion}                                                   & \textbf{kurze Beschreibung} \\
       \midrule
-      vpxor           & \lstinline{__m256i _mm256_setzero_si256 (void)} & Gibt ein Vektor des Typen \lstinline{__m256i} mit nur nullen zurück.                               \\
+      VPXOR           & \lstinline[language=C++]{__m256i _mm256_setzero_si256 (void)} & Gibt ein Vektor des Typen \lstinline[language=C++]{__m256i} mit nur nullen zurück.                                             \\
+      VMOVDQA          & \lstinline[language=C++]{__m256i _mm256_load_si256 (__m256i const * mem_addr)} & Lade 256-Aligned-Bits in ein \emph{ymm} Register.                                                              \\
+      VMOVDQA         & \lstinline[language=C++]{void _mm256_store_si256 (__m256i * mem_addr, __m256i a)} & Speichert 256-Bits aus einem \emph{ymm} Register in ein 32-Byte-Aligned Verktor.                               \\
       \bottomrule
     \end{tabularx}
   \end{footnotesize}
