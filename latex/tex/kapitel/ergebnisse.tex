@@ -1,18 +1,18 @@
 \chapter{Ergebnisse}
 \label{chap:Ergebnisse}
 
-% kapitel einleitung
+% Kapitel Einleitung
 \section{Testaufbau}
 
 Der Testaufbau soll dafür sorgen, dass die hier erreichten Ergebnisse reproduzierbar sind. Außerdem wird in diesem Kapitel die Auswahl der verwendeten Komponenten erläutert.
 
-Schachcomputer sind von Natur aus deterministisch, deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen eine Analyse durch KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger remis gespielt werden, als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
+Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen durch eine Analyse von KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
-Der Schachcomputer unterstützt den \ac{UCI} Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs, mithilfe deren das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer vereinfacht. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen Anwendung durchgeführt. Die Elo wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen wird ein Error berechnet, der in folgenden Graphen mithilfe von Error Balken angegeben ist.
+Der Schachcomputer unterstützt den \ac{UCI} Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen Anwendung durchgeführt. Die Elo wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen wird ein Error berechnet, der in folgenden Graphen mithilfe von Errorbalken angegeben ist.
 
 \section{Elo Entwicklung}
 % erklären was Elo ist
 
-% Tunier mit den getesteten schach engines
+% Turnier mit den getesteten Schachengines
 
-% die differenzen der getesteten versionen auf zeigen (vl lieber im kapitel diskussion)
+% die Differenzen der getesteten Versionen aufzeigen (vl lieber im Kapitel Diskussion)

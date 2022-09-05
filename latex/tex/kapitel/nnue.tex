@@ -1,8 +1,8 @@
 \chapter{NNUE Implementierung}
 
-Ziel dies Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE} Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturendscheidungen eingegangen. Danach wird geklärt wie diese Entscheidungen Einfluss auf die Implementierung des Trainers und der Integration in einem Schachcomputer beeinflussen.
+Ziel dieses Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE} Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturentscheidungen eingegangen. Danach wird geklärt, wie diese Entscheidungen Einfluss auf die Implementierung des Trainers und auf die Integration in einem Schachcomputer haben.
 
-Kapitel \autoref{chap:HCE} zeigt wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} ist nicht einfach, jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen wie \zb{} \ac{SPSA} angepasst werden \cite{spall1992multivariate}. Es ist sehr schwer eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE} Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, das diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE} Schachcomputer einen Hybriden Ansatz, in der Implementierung dieser Arbeit wird eine reine \ac{NNUE} Evaluation verwenden. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers.
+Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} sind nicht einfach. Jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen, wie \zb{} \ac{SPSA}, angepasst werden \cite{spall1992multivariate}. Es ist sehr schwierig, eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE} Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden, welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, dass diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE} Schachcomputer einen hybriden Ansatz in der Implementierung. In dieser Arbeit wird eine reine \ac{NNUE} Evaluation verwendet. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers.
 
 
 \section{Architektur}
@@ -89,7 +89,7 @@ Die Architektur ist in \autoref{fig:own-nn} zu sehen.
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
 
-Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlich werden bei einer Aktivierung Maximal
+Das resultierende \ac{NN} hat 10,5 Millionen trainierbare Parameter. Tatsächlich werden bei einer Aktivierung maximal
 
 % dropoutlayers are used in other chess engines and could be beneficial here
 
@@ -99,7 +99,7 @@ Das Resultierende \ac{NN} hat 10,5 Millionen Trainierbare Parameter. Tatsächlic
 % sparse inputs -> little changes
 % max 32 inputs setboolean
 % input either 0 or 1
-Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wurde, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
+Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wird, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
 \subsection{Lineare Schichten}
 
@@ -111,12 +111,12 @@ Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierun
 
 \subsection{Eingabedaten}
 
-Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wichtig zu wissen wie die Eingabedaten generiert worden und wie sie in den Trainer geladen werden, um zu verstehen, wie das neuronale Netz lernt. Im Training für diese Arbeit wurden drei verscheiden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neusten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden.
+Die Erzeugung der Eingabedaten ist nicht Teil dieser Arbeit. Jedoch ist es wichtig zu wissen, wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das Neuronale Netz lernt. Im Training für diese Arbeit wurden drei verschieden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neuesten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden.
 
-% wenn eingabe daten mit einer tieferen suche verwendet werden, sind die Konzepte hinter den zügen/der evaluation schwerer zu verstehen und somit auch schwiriger zu lernen
+% wenn Eingabedaten mit einer tieferen Suche verwendet werden, sind die Konzepte hinter den Zügen/der Evaluation schwerer zu verstehen und somit auch schwieriger zu lernen
 
-% normalerweise ist wird pro epoche das gesamte datenset verarbeitet, hier ist das nicht der fall, wir verarbeiten 100M Positionen pro zug, wichtig ist das die daten nicht sequentiell gelesen werden, deshalb werden zufällig positionen übersprungen -> würden die daten gesuffelt sein wären die eingabedaten sehr viel größer, da ihr encoding auf sich wenig änderden positionen basiert
-% Letztendlich werden alle Positionen gleichoft trainiert, die verteilung ist jedoch besser zum lernen.
+% normalerweise ist wird pro Epoche das gesamte Datenset verarbeitet, hier ist das nicht der Fall, wir verarbeiten 100M Positionen pro Zug, wichtig ist, dass die Daten nicht sequentiell gelesen werden, deshalb werden zufällige Positionen übersprungen -> würden die Daten gesuffelt sein, wären die Eingabedaten sehr viel größer, da ihr Encoding auf sich wenig ändernden Positionen basiert
+% Letztendlich werden alle Positionen gleich oft trainiert, die Verteilung ist jedoch besser zum Lernen.
 
 % they are alerady normalized (siehe feature set)
 % labeling is easy as the set is automatically generated data with labels (cp score) automatically generated
@@ -124,9 +124,9 @@ Die Erzeugung der Eingabedaten ist nicht teil dieser Arbeit. Jedoch ist es wicht
 % grouping the inputdate to a batch size aims to use the time writing to the CPU more efficently (16384)
 
 % there is no great risk of overfitting to the training set because the input data is so large -> generalisation should be strong enogth so that training data acurracy and validation data accuracy cant diverge, and becuase we dont know what the "correct" input looks like any validation data set is usless
-% ein Problem ist auch das die Eingabedaten nicht wirklich den tatsächlichen anwendungsfall representieren -> das netzwerk soll die akutelle stellung gut bewerten bekommt aber als eingabe die bewertung der stelltung in zb. 5 Zügen. 
+% ein Problem ist auch, dass die Eingabedaten nicht wirklich den tatsächlichen Anwendungsfall repräsentieren -> das Netzwerk soll die aktuelle Stellung gut bewerten, bekommt aber als Eingabe die Bewertung der Stellung in z. B. 5 Zügen. 
 
-Theoretisch gibt es Daten die, \enquote{Perfekt} sind, denn Schach ist für Stellungen mit 7 Figuren gelöst. Das heißt, es gibt eine Datenbank die das eindeutige Ergebnis (-1, 0, 1) für die Position mit perfektem Spiel kennt. Es ist jedoch nicht sinnvoll diese Informationen für das Training eines \acp{NNUE} zu verwenden. Das Netz ist nicht in der Lage zu verstehen, warum die Stellung gewonnen/verloren ist. Die Konzepte sind oft schwer zu verstehen und der Vorteil wird oft erst in weiter Zukunft realisiert.
+Theoretisch gibt es Daten, die \enquote{Perfekt} sind, denn Schach ist für Stellungen mit 7 Figuren gelöst. Das heißt, es gibt eine Datenbank, die das eindeutige Ergebnis (-1, 0, 1) für die Position mit perfektem Spiel kennt. Es ist jedoch nicht sinnvoll, diese Informationen für das Training eines \acp{NNUE} zu verwenden. Das Netz ist nicht in der Lage zu verstehen, warum die Stellung gewonnen/verloren ist. Die Konzepte sind oft schwer zu verstehen und der Vorteil wird oft erst in weiter Zukunft realisiert.
 
 % TODO: nicht zufrieden mit dem titel
 \subsection{Trainer}
@@ -139,7 +139,7 @@ Theoretisch gibt es Daten die, \enquote{Perfekt} sind, denn Schach ist für Stel
 % 2. forward activation
   % die aktivierungs funktion is eine ClippedReLU
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
-  % convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große evalautionen sind nicht wichtig -> win more scenario
+  % convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große Evaluationen sind nicht wichtig -> win more scenario
 % 4. backpropagation using the Adadelta optimization algorithm
   % benefits: no learning rate tuning needed is already implemented in pytorch
 \cite{Zeiler2012}
@@ -151,11 +151,11 @@ Theoretisch gibt es Daten die, \enquote{Perfekt} sind, denn Schach ist für Stel
 \section{Integration in einen Schachcomputer}
 \label{chap:integration}
 
-Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer, mit Fokus aus \ac{SIMD} Operationen. Die Implementierung ist, eine auf den verwendeten Schachcomputer angepasste, Kopie der Stockfish Implementierung, welches für die erste \ac{NNUE} Architektur von Stockfish verwendet wurde \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an diese Implementierung zu verwenden.
+Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer mit dem Fokus aus \ac{SIMD} Operationen. Die Implementierung ist eine auf den verwendeten Schachcomputer angepasste Kopie der Stockfish-Implementierung, welche für die erste \ac{NNUE} Architektur von Stockfish verwendet wurde \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an, diese Implementierung zu verwenden.
 
 \subsection{Quantisierungsschema}
 
-Quantisierung ist nötig, um CPU Optimierungen zu ermöglichen. Die als float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer Proprietären binären \emph{.nnue} Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet die kleinstmöglichen Integer Typen zu verwenden. Aufgrund der Clipped \ac{ReLU} Transferfunktion sind die gewichte, bereits sehr klein, deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. Der Bereich der  In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben, die zwei versteckten Sichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet, er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis.
+Eine Quantisierung ist nötig, um CPU-Optimierungen zu ermöglichen. Die als Float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer proprietären binären \emph{.nnue} Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet, die kleinstmöglichen Integer-Typen zu verwenden. Aufgrund der Clipped \ac{ReLU} Transferfunktion sind die Gewichte bereits sehr klein. Deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben. Die zwei versteckten Schichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet. Er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis.
 
 \begin{table}[h]
   \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE}, sowie Ausgabetyp der Schichten}
@@ -177,11 +177,11 @@ Quantisierung ist nötig, um CPU Optimierungen zu ermöglichen. Die als float tr
   \rmfamily
 \end{table}
 
-Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127, dadurch kann der Ausgabetyp int8 sein. Der Gewichtstyp der Eingabeschicht muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features Überlaufen kann. Das Problem stellt sich, bei den versteckten Schichten nicht, da durch \ac{SIMD} Instruktionen, bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das bei den versteckten Schichten auftreten kann, ist das Überlaufen der int8 werte, deshalb werden sie vor der Multiplikation mit in beide Richtungen durch $127/64$ begrenzt. Der Bias in den versteckten Schichten und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias Skalierfaktor, weil die Ausgabe der \ac{NNUE} Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Der Gewicht Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht Ganzzahlig ist, das liegt daran, dass er sich an dem Bias Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
-% warum ist der bias faktor so hoch? - Erklären
+Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127. Dadurch kann der Ausgabetyp int8 sein. Der Gewichtstyp der Eingabeschicht muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features überlaufen kann. Das Problem stellt sich bei den versteckten Schichten nicht, da durch \ac{SIMD} Instruktionen bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das bei den versteckten Schichten auftreten kann, ist das Überlaufen der int8 Werte. Deshalb werden sie vor der Multiplikation in beide Richtungen durch $127/64$ begrenzt. Der Bias in den versteckten Schichten und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias-Skalierfaktor, weil die Ausgabe der \ac{NNUE} Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Der Gewicht-Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht ganzzahlig ist. Das liegt daran, dass er sich an dem Bias-Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
+% warum ist der Bias-Faktor so hoch? - erklären
 
 \subsection{Feature Transformator}
 
 
 \subsection{Affiner Transformator}
-% der transformator transformiert und der akkumulator akkumuliert und gibt weiter
+% der Transformator transformiert und der Akkumulator akkumuliert und gibt weiter
