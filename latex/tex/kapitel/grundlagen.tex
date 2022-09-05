@@ -62,6 +62,7 @@ Es gibt verschiedene Modelle \aclp{NN}, für diese Thesis sind lediglich \acp{FN
 In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung neuronaler Netze Frameworks verwendet. Sie abstrahieren große Teile der Komplexität. Trotzdem ist es wichtig ihre Funktionsweise zu kennen, um Entscheidungen zu treffen und Probleme zu beheben. In den folgenden Unterabschnitten wird Grundlegend auf die Einzelteile neuronaler Netze eingegangen. Erst wird das Neuron beschrieben und wie sich seine Aktivität berechnen lässt. Das Unterkapitel Backpropagation beschreibt, wie \acp{NN} lernen können.
 
 \subsection{Das Neuron}
+\label{chap:neuron}
 
 \begin{figure}
   \centering
@@ -170,12 +171,27 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
   \label{equation:ClippedReLU}
 \end{equation}
 
-\subsection{Loss Functions}
-
 
 \subsection{Backpropagation und Gradientenabstieg}
+\label{chap:bpGradient}
 % viel muss man davon nicht kennen, da pytorch das übernimmt (automatic through automatic differentiation)
-Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es gehört zu der Familie der überwachten Lernverfahren. 
+Das Besondere an \acp{NN} ist, das sie lernen, also nach und nach besser werden. Für gewöhnlich wird erwartet, dass ein Programm auf eine Eingabe, immer dasselbe Ergebnis liefert. Ein \ac{NN} hingegen lernt, während seiner Trainingsphase aus Fehlern. Es gilt, den Fehler zu minimieren. Dabei handelt es sich um ein Optimierungsproblem. Als Lösung dafür wird der Gradientenabstieg verwendet, es gibt dafür auch andere Methoden auf die hier nicht weiter eingegangen werden \cite{StockfishNNUE}.
+
+Der Gradientenabstieg minimiert den Fehler, indem er den negativen Gradienten einer Verlustfunktion folgt \cite{Ruder2016}. Die Annahme ist, das die Richtungen Gradienten einer Funktion, diese maximiert, deshalb führt ein Schritt in die entgegen Gesetze Richtung zu einer Minimierung der Funktion, also eine Minimierung des Fehlers. Die Lernrate steuert die Schrittweite, der dem negativen Gradienten gefolgt wird. Sind die schritte zu Groß wird das (lokale) Minimum übersprungen, sind sie klein dauert die Konvertierung länger oder bleibt in einem lokalen Minimum hängen. Um beide dieser Probleme bestmöglich zu vermeiden, ist die Lernrate nicht Konstant, sondern ändert sich über den Trainingszeitraum.
+
+Die Lernrate kann entweder abhängig durch einen Festen plan oder durch ein adaptives Model angepasst werden. Ein Beispiel für eine fest geplante Änderung ist die Multiplikation der Lernrate mit einem Faktor $x$ alle $n$ Epochen. Eine Epoche ist normalerweise ein Durchgang des gesamten Eingabedatensatzes. Alternativ gibt es verschiedene adaptive Lernraten Modelle. In dieser Arbeit wird \zb{} Adadelta verwendet. Adadelta ist eine Adaption des Gradientenabstiegs. Diese Variante erweitert den Gradientenabstieg um eine dynamische Lernrate, die akkumulierende Gradienten durch ein Fenster löst. In dem Fenster wird nur die summe der letzten Gradienten, bestimmt durch eine Feste Größe akkumuliert \cite{Zeiler2012}. Adadelta zeigt gute Leistungen im Vergleich zu anderen Adaptiven Lern Modellen und eliminiert das Problem eine passende Lernrate zu finden.
+% vl mal: https://github.com/lucidrains/Adan-pytorch probieren
+
+Es gibt drei Varianten des Gradientenabstieg \cite{Ruder2016}:
+\begin{itemize}
+  \item \emph{Batch Gradientenabstieg}, berechnet den Gradienten der gesamten Verlustfunktion, über den gesamten Trainings-Datensatz. 
+  \item \emph{Stochastischer Gradientenabstieg}, berechnet den Gradienten, für jedes Trainingsbeispiel einzeln.
+  \item \emph{Mini-batch Gradientenabstieg}, berechnet den Gradienten, für jedes Subset der Größe $n$ der Trainingsbeispiele.
+\end{itemize}
+
+Die vorherigen Absätze erklären wie der Fehler durch Gradientenabstieg minimiert werden kann. In \autoref{chap:neuron} wird gezeigt, wie die Eingaben und Gewichte eines Neurons zu einem Ergebnis führen. Nun stellt sich die Frage: Welche Werte müssen die Gewichte haben, um den Fehler zu minimieren? Die Perfekten Gewichte eines \acp{NN} lassen sich nicht berechnen, dafür ist die Anzahl der Faktoren ist zu groß.
+
+Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es gehört zu der Familie der überwachten Lernverfahren. Damit wird der negative Gradient der Verlustfunktion rückwärts durch das Netz geführt. Dabei werden die Werte der Gewichte angepasst \cite{Wythoff1993}. Die Gewichte werden mithilfe der rekursiven Anwendung der Kettenregel aus der Infinitesimalrechnung, die zu der Berechnung einer Ableitung der Unterfunktion einer bekannten übergeordneten Funktion verwendet wird.
 
 % Die delta lern regel
 
@@ -185,14 +201,26 @@ Als Backpropagation wird das Verfahren der Fehlerrückführung beschrieben. Es g
 % kann vl entfernt werden (schau am ende ob man es noch braucht (seiten))
 % nur ein kurzer exkurs da es in andern neuronalen netzen für schach computer verwendet wird
 
+\subsection{Verlustfunktion}
 
+Das ein \ac{NN} aus seinen Fehlern lernen kann, muss ermittelt werden, ob das Netz mit seiner Vorhersage richtig liegt. Mit der Verlustfunktion wird der Fehler an einem bestimmten Punkt der zu bestimmenden Funktion ermittelt. Dafür wird ein Satz von Eingabedaten genommen und dem Netz gegeben, welches eine Vorhersage für eine Ausgabe abhängig von den Gewichten trifft. Diese Ausgabe wird mit dem vorher definierten zu erwartenden Ergebnis verglichen. Basieren darauf wird der Gradient der Verlustfunktion berechnet, der von den in \autoref{chap:bpGradient} beschriebenen Methoden zu Anpassung der Gewichte verwendet wird. In folgendem Text sind zwei Verlustfunktionen beschrieben die häufig in \acp{NN} eingesetzt werden.
 
-\subsection{Optimierer}
+% quadratischer fehler mit formel (squared error)
+Die Mittlere quadratische Fehler Verlustfunktion ist eine simple Verlustfunktion. Sie nimmt die Summe der quadratischen Differenz der vorhergesagten Werte $y$ und den Zielwerten $t$, über eine Menge von $n$ Eingabewerten. Das Ergebnis ist eine Quadratische Funktion, dessen Gradienten sich gut für Gradientenabstieg eignet. Die Endsprechende Funktion ist in \autoref{equation:mse} zu sehen.
 
-% Adadelta: https://arxiv.org/abs/1212.5701 - seems to work good for sparse inputs as the parameters are tuned individually not thru a global lerning rate like in regular stochastic gradient descent using a time/step/exponent based learning rate decay
-% versucht probleme der backpropagation zu mitigieren
-% exemplarisch auf den Adadelta optimirer eingehen, da der in dieser arbeit verwendet wurde
-% vl mal: https://github.com/lucidrains/Adan-pytorch probieren
+\begin{equation}
+  MSE(y, t)=\frac{1}{n}*\sum^{n}_{i=1}(y_{i}-t{i})^{2}
+  \label{equation:mse}
+\end{equation}
+
+% Kreuzentropie
+Die Kreuzentropie Verlustfunktion eignet sich für Klassifizierungsprobleme \cite{Kline2005}. Die Evaluation einer Schachposition kann als ein solches Problem behandelt werden \cite{StockfishNNUE}. Sie setzt sich aus der Summer der tatsächlichen Wahrscheinlichkeit $p$ und dem Logarithmus der vorhergesagten Wahrscheinlichkeit $q$, über alle Klassen $X$ der Verteilung zusammen. Für das Beispiel einer Schachevaluation wird statt der Wahrscheinlichkeit einer bestimmten Klasse, die Sigmoid der Centipawn Evaluation genommen. Die Stellung wird also anhand der Wahrscheinlichkeit auf Sieg/Remis/Verlust klassifiziert. Konkret lässt sich die Kreuzentropie mit der \autoref{equation:crossentropy} berechnen.
+
+\begin{equation}
+  H(p|q) = -\sum_{x \in X} p(x) * log(q(x))
+  \label{equation:crossentropy}
+\end{equation}
+
 
 \subsection{Quantisierung}
 
@@ -271,7 +299,7 @@ Bevor eine \ac{AVX2} Operation ausgeführt werden kann, müssen die zu verarbeit
 Die \ac{SIMD} Operationen, welche in der \ac{NNUE} Evaluation gebraucht werden, lassen sich in drei Teile untergliedern. Erstens die Clipped \ac{ReLU}, welches die Transferfunktion aller verwendeten Schichten ist und sich lediglich in der Größe der Integer der verschiedenen Schichten unterscheidet, abhängig durch das Quantisierungsschema. Zweitens der Akkumulator, der die Eingabewerte transformiert (siehe \autoref{chap:accumulator}). Drittens die affine Transformation der linearen Schichten bzw. das Matrixprodukt, also Gewichtsmatrix multipliziert mit dem Eingabevektor der jeweiligen Schicht.
 
 % relu, accumulator, affine transformation
-Für die Clipped \ac{ReLU} Transferfunktion sind die vier Befehle relevant: VPXOR, VPACKSSWB, VPMAXSB, VPERMQ. Die nächsten vier aufgelisteten Befehle in der \autoref{table:nnueInstructions} (VPADDW, VPSUBW) sind Teil des Akkumulators. VPSRAW und VPMADDUSBW sind Befehle, die in der affinen Transformation verwendet werden. VPSRAW ist nicht zwingend nötig, wird aber aufgrund des gewählten Quantisierungsschemas benötigt. 
+Für die Clipped \ac{ReLU} Transferfunktion sind die vier Befehle relevant: VPXOR, VPACKSSWB, VPMAXSB, VPERMQ. Die nächsten vier aufgelisteten Befehle in der \autoref{table:nnueInstructions} (VPADDW, VPSUBW) sind Teil des Akkumulators. VPSRAW und VPMADDUSBW sind Befehle, die in der affinen Transformation verwendet werden. VPSRAW ist nicht zwingend nötig, wird aber aufgrund des gewählten Quantisierungsschemas benötigt.
 
 % ? - avoid conversion where you can (madd als beispiel)
 % ? - Aus Performancegründen ist die Verwendung des kleinstmöglichen Datentypen gewünscht. Multiplikations-Operationen
