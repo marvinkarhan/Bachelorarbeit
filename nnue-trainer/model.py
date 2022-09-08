@@ -37,17 +37,23 @@ class NNUE(pl.LightningModule):
     in_scaling = 410
     out_scaling = 361
     scaling = 361
+    offset = 270
 
     # calculate the win draw loss by forward activation of the net and scale it to levels adjusted to normal cp value/scores provided by the training data
     # use sigmoid to convert centipawn to 1, 0, -1 values (wdl)
     # could use a lambda to increase/decrease the influence of net evaluation and score given by the input data 
-    wdl_eval = (self(us, them, white, black) * net2score / out_scaling).sigmoid()
+    scorenet = self(us, them, white, black) * net2score
+    q  = ( scorenet - offset) / in_scaling
+    qm = (-scorenet - offset) / in_scaling  # used to compute the chance of a loss
+    qf = 0.5 * (1.0 + q.sigmoid() - qm.sigmoid())  # estimated match result (using win, loss and draw probs).
     # also scale the score of the input data to wdl
-    wdl_score = (score / in_scaling).sigmoid()
+    p  = ( score - offset) / out_scaling
+    pm = (-score - offset) / out_scaling
+    pf = 0.5 * (1.0 + p.sigmoid() - pm.sigmoid())
     
-    wdl_target = self.lambda_ * wdl_score + (1.0 - self.lambda_) * wdl_outcome
+    pt = self.lambda_ * pf + (1.0 - self.lambda_) * wdl_outcome
     # exponent tuning from stockfish, values >2 choosing more precision over accuracy
-    loss = torch.pow(torch.abs(wdl_target - wdl_eval), 2.6).mean()
+    loss = torch.pow(torch.abs(pt - qf), 2.6).mean()
 
     # q = self(us, them, white, black) * net2score / scaling
     # t = wdl_outcome
