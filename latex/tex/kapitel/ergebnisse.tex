@@ -9,10 +9,40 @@ Der Testaufbau soll dafür sorgen, dass die hier erreichten Ergebnisse reproduzi
 Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen durch eine Analyse von KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
 Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Elo wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen wird ein Error berechnet, der in folgenden Graphen mithilfe von Errorbalken angegeben ist.
+% https://centaur.reading.ac.uk/23800/ <- how to estimate elo on chess engines
+% https://centaur.reading.ac.uk/4549/ <- self play results
 
 \section{Elo-Entwicklung}
+
+\begin{figure}
+  \centering
+  \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}
+      \begin{axis}[grid=both,
+          grid style={solid,gray!30!white},
+          axis lines=middle,
+          xlabel={step},
+          ylabel={value},
+          x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+          y label style={at={(axis description cs:-0.26,.5)},rotate=90,anchor=south},]
+        \addplot table [x=Step, y=Value, col sep=comma] {src/run-lightning_logs_version_21-tag-training_loss.csv};
+      \end{axis}
+    \end{tikzpicture}
+  }%
+  \caption{Verlust über Iterationen.}
+  \label{fig:loss}
+\end{figure}
+
 % erklären was Elo ist
 
 % Turnier mit den getesteten Schachengines
 
 % die Differenzen der getesteten Versionen aufzeigen (vl lieber im Kapitel Diskussion)
+
+% match vs marverick 10+0.1 10000 games Maveric (CCRL Rating: 2577)
+% Score of NNUE vs MAVERICK: 5265 - 3510 - 1225  [0.588] 10000
+% ...      NNUE playing White: 3044 - 1346 - 610  [0.670] 5000
+% ...      NNUE playing Black: 2221 - 2164 - 615  [0.506] 5000
+% ...      White vs Black: 5208 - 3567 - 1225  [0.582] 10000
+% Elo difference: 61.6 +/- 6.5, LOS: 100.0 %, DrawRatio: 12.3 %
+% Estimates elo for our engine is 2638,6 +/- 6.5

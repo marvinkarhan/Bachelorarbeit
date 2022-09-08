@@ -2,7 +2,7 @@
 
 Ziel dieses Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE}-Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturentscheidungen eingegangen. Danach wird geklärt, wie diese Entscheidungen Einfluss auf die Implementierung des Trainers und auf die Integration in einem Schachcomputer haben.
 
-Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} sind nicht einfach. Jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen, wie \zb{} \ac{SPSA}, angepasst werden \cite{spall1992multivariate}. Es ist sehr schwierig, eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE}-Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden, welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, dass diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE}-Schachcomputer einen hybriden Ansatz in der Implementierung. In dieser Arbeit wird eine reine \ac{NNUE}-Evaluation verwendet. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers.
+Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} sind nicht einfach. Jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen, wie \zb{} \ac{SPSA}, angepasst werden \cite{spall1992multivariate}. Es ist sehr schwierig, eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE}-Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden, welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, dass diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE}-Schachcomputer einen hybriden Ansatz in der Implementierung. In dieser Arbeit wird eine reine \ac{NNUE}-Evaluation verwendet. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers. Außerdem tritt dieser Fall bei Schachcomputer gegen Schachcomputer selten auf, da er Vorteil meist klein bleibt.
 
 
 \section{Architektur}
@@ -10,92 +10,95 @@ Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positi
 \begin{figure}
   \centering
   \resizebox{\textwidth}{!}{%
-  \begin{tikzpicture}[x=2cm, y=1.5cm, >=stealth]
-    \tikzstyle{neuron}=[draw,shape=circle,minimum size=1.15cm]
-    % draw nerons
+    \begin{tikzpicture}[x=2cm, y=1.5cm, >=stealth]
+      \tikzstyle{neuron}=[draw,shape=circle,minimum size=1.15cm]
+      % draw nerons
 
-    \foreach \m/\l [count=\y] in {0,1,0}
-    \node [neuron] (input1-\y) at (0,2.5-\y*1.5) {\m};
+      \foreach \m/\l [count=\y] in {0,1,0}
+      \node [neuron] (input1-\y) at (0,2.5-\y*1.5) {\m};
 
-    \foreach \m/\l [count=\y] in {0,0,1}
-    \node [neuron] (input2-\y) at (0,-1.5-\y*1.5) {\m};
+      \foreach \m/\l [count=\y] in {0,0,1}
+      \node [neuron] (input2-\y) at (0,-1.5-\y*1.5) {\m};
 
-    \foreach \m [count=\y] in {1,2}
-    \node [neuron] (inputL11-\m) at (2,2.5-\y*2) {};
+      \foreach \m [count=\y] in {1,2}
+      \node [neuron] (inputL11-\m) at (2,2.5-\y*2) {};
 
-    \foreach \m/\l [count=\y] in {1,2}
-    \node [neuron] (inputL12-\m) at (2,-1.5-\y*2) {};
+      \foreach \m/\l [count=\y] in {1,2}
+      \node [neuron] (inputL12-\m) at (2,-1.5-\y*2) {};
 
-    \foreach \m/\l [count=\y] in {1,2,3}
-    \node [neuron] (hidden1-\m) at (4,1.5-\y*2) {};
+      \foreach \m/\l [count=\y] in {1,2,3}
+      \node [neuron] (hidden1-\m) at (4,1.5-\y*2) {};
 
-    \foreach \m/\l [count=\y] in {1,2,3}
-    \node [neuron] (hidden2-\m) at (6,1.5-\y*2) {};
+      \foreach \m/\l [count=\y] in {1,2,3}
+      \node [neuron] (hidden2-\m) at (6,1.5-\y*2) {};
 
-    \foreach \m [count=\y] in {1}
-    \node [neuron] (output-\m) at (8,-1.5-\y) {};
+      \foreach \m [count=\y] in {1}
+      \node [neuron] (output-\m) at (8,-1.5-\y) {};
 
-    % draw text  
+      % draw text  
 
-    \foreach \l [count=\x from 0] in {2x41024, 2x256, 32, 32, 1}
-    \node [align=center] at (\x*2,-7) {\l};
-  
-    \draw [->] (output-1) -- ++(1,0) node [above, midway] {$Output$};
+      \foreach \l [count=\x from 0] in {2x41024, 2x256, 32, 32, 1}
+      \node [align=center] at (\x*2,-7) {\l};
 
-    \foreach \l [count=\x from 0] in {Eingabeschicht, Feature-Transformator, Affiner-Transformator 1, Affiner-Transformator 2, Ausgabeschicht}
-    \node [align=center, above] at (\x*2,2) {\l};
-    % draw lines  
+      \draw [->] (output-1) -- ++(1,0) node [above, midway] {$Output$};
 
-    \draw [->] (-2.2,1) node {} -- node [midway,above] {(g1, d2, Bauer, Weiß)} (input1-1);
-    \draw [->] (-2.2,-0.5) node {} -- node [midway,above] {(b3, e5, Bauer, Weiß)} (input1-2);
-    \draw [->] (-2.2,-2) node {} -- node [midway,above] {(h6, c8, Turm, Schwarz)} (input1-3);
+      \foreach \l [count=\x from 0] in {Eingabeschicht, Feature-\\Transformator, Affiner-\\Transformator 1, Affiner-\\Transformator 2, Ausgabeschicht}
+      \node [align=center, above] at (\x*2,2) {\l};
+      % draw lines  
 
-    \draw [->] (-2.2,-3) node {} -- node [midway,above] {(b1, d2, Läufer, Weiß)} (input2-1);
-    \draw [->] (-2.2,-4.5) node {} -- node [midway,above] {(a3, e5, Dame, Weiß)} (input2-2);
-    \draw [->] (-2.2,-6) node {} -- node [midway,above] {(e7, c4, Springer, Schwarz)} (input2-3);
+      \draw [->] (-2.2,1) node {} -- node [midway,above] {(g1, d2, Bauer, Weiß)} (input1-1);
+      \draw [->] (-2.2,-0.5) node {} -- node [midway,above] {(b3, e5, Bauer, Weiß)} (input1-2);
+      \draw [->] (-2.2,-2) node {} -- node [midway,above] {(h6, c8, Turm, Schwarz)} (input1-3);
 
-    \foreach \i in {1,2,3}
-    \foreach \j in {1,2}
-    \draw [->] (input1-\i) -- (inputL11-\j);
-    
-   \foreach \i in {1,2,3}
-   \foreach \j in {1,2}
-   \draw [->] (input2-\i) -- (inputL12-\j);
+      \draw [->] (-2.2,-3) node {} -- node [midway,above] {(b1, d2, Läufer, Weiß)} (input2-1);
+      \draw [->] (-2.2,-4.5) node {} -- node [midway,above] {(a3, e5, Dame, Weiß)} (input2-2);
+      \draw [->] (-2.2,-6) node {} -- node [midway,above] {(e7, c4, Springer, Schwarz)} (input2-3);
 
-    \foreach \i in {1,2}
-    \foreach \j in {1,2,3} {
-    \draw [->] (inputL11-\i) -- (hidden1-\j);
-    \draw [->] (inputL12-\i) -- (hidden1-\j);};
+      \foreach \i in {1,2,3}
+      \foreach \j in {1,2}
+      \draw [->] (input1-\i) -- (inputL11-\j);
 
-    \foreach \i in {1,2,3}
-    \foreach \j in {1,2,3}
-    \draw [->] (hidden1-\i) -- (hidden2-\j);
+      \foreach \i in {1,2,3}
+      \foreach \j in {1,2}
+      \draw [->] (input2-\i) -- (inputL12-\j);
 
-    \foreach \i in {1,2,3}
-    \foreach \j in {1}
-    \draw [->] (hidden2-\i) -- (output-\j);
+      \foreach \i in {1,2}
+      \foreach \j in {1,2,3} {
+          \draw [->] (inputL11-\i) -- (hidden1-\j);
+          \draw [->] (inputL12-\i) -- (hidden1-\j);};
 
-  \end{tikzpicture}
+      \foreach \i in {1,2,3}
+      \foreach \j in {1,2,3}
+      \draw [->] (hidden1-\i) -- (hidden2-\j);
+
+      \foreach \i in {1,2,3}
+      \foreach \j in {1}
+      \draw [->] (hidden2-\i) -- (output-\j);
+
+    \end{tikzpicture}
   }%
   \caption{Das verwendete \ac{NN} mit einer exemplarischen Eingabe, basierend auf der \autoref{fig:chessboard}. Die Bezeichnung der Schichten ist oberhalb und die Anzahl der dazugehörigen Neuronen unterhalb des Netzes zu sehen.}
   \label{fig:own-nn}
 \end{figure}
 
-Die in dieser Arbeit verwendete Architektur ist keine neue. Sie ist die von \citeauthor{YNasu2018} \cite{YNasu2018} vorgeschlagene Architektur, die ebenfalls in der ersten \ac{NNUE}-Version von Stockfish verwendet wurde.
+Die in dieser Arbeit verwendete Architektur ist keine neue. Sie ist die von \citeauthor{YNasu2018} \cite{YNasu2018} vorgeschlagene Architektur, die ebenfalls in der ersten \ac{NNUE}-Version von Stockfish verwendet wurde. Sie eignet sich für diesen Prototyp, da sie alle Elemente der \ac{NNUE} typischen Architektur enthält und die Grundlage für komplexere Architekturen wie die aktuelle von Stockfish (siehe \autoref{chap:relatedWork}) ist. Kleinere Architekturen wie anfangs in \autoref{chap:featureSet} mit $768$ Merkmalen zeigen Verbesserungen über \ac{HCE} in schwächeren Schachcomputer, wie der in dieser Arbeit verwendete. Jedoch nutzen sie nicht das Potenzial von \ac{NNUE} aus und tauschen Spielstärke gegen eine simplere Implementierung.
 
-Die Architektur ist in \autoref{fig:own-nn} zu sehen.
+Die Architektur welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-nn} zu sehen. Die Eingabeschicht stellt den dünnbesetzten binären Eingabevektor dar. Für das Laden der daten wird ein Datenlader von Stockfish verwendet, da die verwendeten Trainingsdaten auch von Stockfish sind. Dieser Datenlader hat als Relikt aus der Shogi Implementierung ein HalfKP Feature-Set mit $41024$ satt den für Schach nötigen $40960$ Merkmalen, $64$ mehr. Das hat aufgrund der Spaltenweisen Berechnung des Akkumulators keinen Einfluss auf die Performance. 
 
 % the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
 
-Das resultierende \ac{NN} hat 10,5 Millionen trainierbare Parameter.
+Das resultierende \ac{NN} hat 10,5 Millionen trainierbare Parameter. 10,5 Millionen, also fast alle, sind in der Feature-Transformator-Schicht. 
 % Tatsächlich werden bei einer Aktivierung maximal
 
 % dropoutlayers are used in other chess engines and could be beneficial here
 
-\subsection{Akkumulator}
+Auf der \autoref{fig:own-nn} ist die Aktivierungsfunktion nicht zu erkennen. Sie ist ein elementarer Bestandteil dafür, dass die Evaluation der Stellung schnell ist. Deshalb wird die Clipped\ac{ReLU} Transferfunktion verwendet, sie ist nicht linear und kann schnell berechnet werden. Eine Aktivierung mehrerer Neuronen ist mit \ac{SIMD} gleichzeitig berechenbar. Die Limitierung nach oben ermöglicht die Verwendung von int8 für die Vektoren, die innerhalb des Netzes weiter gegeben werden.
 
+\subsection{Feature-Transformator}
+
+Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. 
 
 % sparse inputs -> little changes
 % max 32 inputs setboolean
@@ -138,11 +141,11 @@ Theoretisch gibt es Daten, die \enquote{perfekt} sind, denn Schach ist für Stel
 % 1. initilize network
 % repeat folloing steps for each iteration
 % 2. forward activation
-  % die aktivierungs funktion is eine ClippedReLU
+% die aktivierungs funktion is eine ClippedReLU
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
-  % convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große Evaluationen sind nicht wichtig -> win more scenario
+% convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große Evaluationen sind nicht wichtig -> win more scenario
 % 4. backpropagation using the Adadelta optimization algorithm
-  % benefits: no learning rate tuning needed is already implemented in pytorch
+% benefits: no learning rate tuning needed is already implemented in pytorch
 \cite{Zeiler2012}
 
 % -- epoch is an arbirairy number because we are just continiusly looping thru the data in a "shuffeling" way skipping fens not suitable for learning -> dermined by stockfish data loader
@@ -156,29 +159,31 @@ Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE}-in einen Schac
 
 \subsection{Quantisierungsschema}
 
-Eine Quantisierung ist nötig, um CPU-Optimierungen zu ermöglichen. Die als Float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer proprietären binären \emph{.nnue}-Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet, die kleinstmöglichen Integer-Typen zu verwenden. Aufgrund der Clipped \ac{ReLU}-Transferfunktion sind die Gewichte bereits sehr klein. Deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben. Die zwei versteckten Schichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet. Er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis.
+Eine Quantisierung ist nötig, um CPU-Optimierungen zu ermöglichen. Die als Float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer proprietären binären \emph{.nnue}-Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet, die kleinstmöglichen Integer-Typen zu verwenden. Aufgrund der Clipped\ac{ReLU}-Transferfunktion sind die Gewichte bereits sehr klein. Deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben. Die zwei linearen Schichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet. Er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis. Die Werte müssen so gewählt werden, dass keine mögliche Kombination von aktiven Merkmalen den Akkumulator überlaufen lässt \cite{StockfishNNUE}.
 
 \begin{table}[h]
-  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten}
+  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten.}
   \label{table:netQuantization}
   \renewcommand{\arraystretch}{1.2}
   \centering
   \sffamily
   \begin{footnotesize}
-    \begin{tabular}{l l l l l l}
-      \toprule
-      \textbf{Schicht}            & \textbf{Gewicht Skalierfaktor} & \textbf{Gewichtstyp} & \textbf{Bias Skalierfaktor} & \textbf{Biastyp} & \textbf{Ausgabetyp} \\
-      \midrule
-      \emph{Eingabeschicht}       & 127                            & int16                & 127                         & int16            & int8                \\
-      \emph{versteckte Schichten} & 64                             & int8                 & 8128                        & int32            & int8                \\
-      \emph{Ausgabeschicht}       & \textasciitilde75,59           & int8                 & 9600                        & int32            & int32               \\
-      \bottomrule
-    \end{tabular}
+    \resizebox{\textwidth}{!}{%
+      \begin{tabular}{l l l l l l}
+        \toprule
+        \textbf{Schicht}            & \textbf{Gewicht Skalierfaktor} & \textbf{Gewichtstyp} & \textbf{Bias Skalierfaktor} & \textbf{Biastyp} & \textbf{Ausgabetyp} \\
+        \midrule
+        \emph{Feature-Transformator}       & 127                            & int16                & 127                         & int16            & int8                \\
+        \emph{Affine-Transformatoren} & 64                             & int8                 & 8128                        & int32            & int8                \\
+        \emph{Ausgabeschicht}       & \textasciitilde75,59           & int8                 & 9600                        & int32            & int32               \\
+        \bottomrule
+      \end{tabular}
+    }%
   \end{footnotesize}
   \rmfamily
 \end{table}
 
-Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127. Dadurch kann der Ausgabetyp int8 sein. Der Gewichtstyp der Eingabeschicht muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features überlaufen kann. Das Problem stellt sich bei den versteckten Schichten nicht, da durch \ac{SIMD}-Instruktionen bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das bei den versteckten Schichten auftreten kann, ist das Überlaufen der int8 Werte. Deshalb werden sie vor der Multiplikation in beide Richtungen durch $127/64$ begrenzt. Der Bias in den versteckten Schichten und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias-Skalierfaktor, weil die Ausgabe der \ac{NNUE}-Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Der Gewicht-Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht ganzzahlig ist. Das liegt daran, dass er sich an dem Bias-Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
+Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU} von 0 bis 1 zu 0 bis 127. Dadurch ist der Ausgabetyp aller Schichten, die innerhalb des Netzes sind int8. Der Gewichtstyp der Feature-Transformator muss int16 sein, weil er sonst bei der Akkumulation der HalfKP Features überlaufen kann. Das Problem stellt sich bei den Affine-Transformatoren nicht, da durch \ac{SIMD}-Instruktionen bei der Berechnung des Matrixprodukts der Datentyp automatisch auf int32 angepasst wird. Ein Problem, das hier auftreten kann, ist das Überlaufen der int8 Werte. Deshalb werden sie vor der Multiplikation in beide Richtungen durch $127/64$ begrenzt. Der Bias in den Affine-Transformatoren und der Ausgabeschicht ist hoch, da wir sie mit den int32 Werten der Matrixprodukte addieren und maximale Präzision beibehalten. Die Ausgabeschicht besitzt einen noch höheren Bias-Skalierfaktor, weil die Ausgabe der \ac{NNUE}-Evaluationsfunktion der \ac{HCE} gleichen soll (für hybride Evaluation). Das ist auch wünschenswert für reine NNUE Implementierungen, um eine Vergleichbarkeit der Evaluation verschiedener Schachcomputer/Versionen zu wahren. Der Gewicht-Skalierfaktor der Ausgabeschicht fällt aus der Reihe, da er nicht ganzzahlig ist. Das liegt daran, dass er sich an dem Bias-Skalierfaktor und dem Aktivierungsbereich (127) anpasst, also $9600/127~=75,59$.
 % warum ist der Bias-Faktor so hoch? - erklären
 
 \subsection{Feature-Transformator}

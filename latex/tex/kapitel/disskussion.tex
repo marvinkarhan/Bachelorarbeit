@@ -11,6 +11,8 @@ Die Verwendung des \ac{UHO}-Eröffnungsbuches ergibt normalerweise bei dem Compu
 
 Die Angaben der berechneten Elo durch Self-Play Turniere ist nicht in tatsächliche Elo gegen andere Computer übertragbar, aber sehr gut für den Vergleich verschiedener Versionen eines Schachcomputers.
 
+Aufgrund
+
 % Probleme in der Entwicklung:
 % mapping from my engine to the uses dateloader was wrong resulting in the input data i gave the net where completly diffrent moves essentaly making the engine blind
 % as i was used to in hce i oriented the engine output to the active side, but that already happens by design in the net so essentally it was like the engine playing only for one side giving up all his pieces as white
@@ -19,6 +21,6 @@ Die Angaben der berechneten Elo durch Self-Play Turniere ist nicht in tatsächli
 % schichten ausgaben 0 oder 1
 
 % Overfitting ist unwahrscheinlich, da nur ein kleiner Teil der Paramterer gleichzeitig verwendet werden und die hinteren Layer sehr klein sind. Außerdem hilft das sehr große Datenset dagegen, Positionen sollten unterschiedlich genug sein, vor allem da dfrc Data verwendet wird, die noch mehr Diversivität bringt
-% weight decay wurde verwendet, ist aber nicht sinnvoll, da Overfitting sehr unwahrscheinlich ist
+% weight decay wurde kurz getestet, ist aber nicht sinnvoll, da Overfitting sehr unwahrscheinlich ist
 % Dropout-Schichten sind aus dem selben Grund nicht sinvoll, sie versuchen ebenfalls Overfitting zu verhindern 
 % kann aber trozdem vorkommen, deshalb wurde das Netz an verschiedenen Zeitpunkten getestet
