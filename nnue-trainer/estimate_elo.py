@@ -64,6 +64,8 @@ def get_out_dir(run: int):
 def convert_ckpts(run: int):
   ckpt_paths = util.ckpt_paths(run)
   out_dir = get_out_dir(run)
+  print(ckpt_paths)
+  exit()
   out_paths = []
 
   for ckpt_path in ckpt_paths:
