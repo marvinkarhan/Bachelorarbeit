@@ -61,12 +61,13 @@ def get_out_dir(run: int):
   out_dir = os.path.join(os.path.dirname(os.path.dirname(ckpt_paths[0])), DIR)
   return out_dir
 
-def convert_ckpts(run: int):
+def convert_ckpts(run: int, nr_of_engines: int):
   ckpt_paths = util.ckpt_paths(run)
   out_dir = get_out_dir(run)
-  print(ckpt_paths)
-  exit()
   out_paths = []
+  
+  if nr_of_engines:
+    ckpt_paths = ckpt_paths[-nr_of_engines:]
 
   for ckpt_path in ckpt_paths:
     epoch = re.findall(r"epoch=\d*", ckpt_path)
@@ -113,12 +114,13 @@ def main():
   parser.add_argument('--concurrency', default=6, type=int, help='Number of Threads for running the tournament.')
   parser.add_argument('--tc', default=10, type=int, help='Number of Seconds for each Game.')
   parser.add_argument('--clean', action='store_true', help='Clean previous elo estimation files, if there are any.')
+  parser.add_argument('--last', type=int, help='Number of engines to test from newst to oldest.')
   args = parser.parse_args()
   # clean up if requested
   if args.clean:
     clean_out_dir(args.run)
   # convert ckpts of specified run
-  nets = convert_ckpts(args.run)
+  nets = convert_ckpts(args.run, args.last)
   # get list of Engines
   engines = setup_engines(nets)
   # run a gauntlet tournament against master
