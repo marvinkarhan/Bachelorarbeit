@@ -4,8 +4,8 @@ nnue-trainer/build/
 nnue-trainer/logs
 nnue-trainer/__pycache__/
 latex/tex/kapitel/notes.txt
-latex/tex/result/thesis.ilg
-latex/tex/result/thesis.lol
+latex/tex/result/*
+!latex/tex/result/thesis.pdf
 latex/tex/literatur.bib.bak
 latex/tex/literatur.bib.sav
 latex/tex/indent.log

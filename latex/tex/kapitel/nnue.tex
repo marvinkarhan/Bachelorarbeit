@@ -4,7 +4,6 @@ Ziel dieses Kapitels ist es, Architektur und Implementierung der im Rahmen diese
 
 Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} sind nicht einfach. Jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen, wie \zb{} \ac{SPSA}, angepasst werden \cite{spall1992multivariate}. Es ist sehr schwierig, eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE}-Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden, welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, dass diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE}-Schachcomputer einen hybriden Ansatz in der Implementierung. In dieser Arbeit wird eine reine \ac{NNUE}-Evaluation verwendet. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers. Außerdem tritt dieser Fall bei Schachcomputer gegen Schachcomputer selten auf, da er Vorteil meist klein bleibt.
 
-
 \section{Architektur}
 
 \begin{figure}
@@ -89,7 +88,6 @@ Die Architektur welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
 
-Das resultierende \ac{NN} hat 10,5 Millionen trainierbare Parameter. 10,5 Millionen, also fast alle, sind in der Feature-Transformator-Schicht. 
 % Tatsächlich werden bei einer Aktivierung maximal
 
 % dropoutlayers are used in other chess engines and could be beneficial here
@@ -98,7 +96,7 @@ Auf der \autoref{fig:own-nn} ist die Aktivierungsfunktion nicht zu erkennen. Sie
 
 \subsection{Feature-Transformator}
 
-Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. 
+Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. Das gesamte \ac{NN} hat $10,5$ Millionen trainierbare Parameter. $10,5$ Millionen, also fast alle, sind Teil der Feature-Transformator-Schicht. Das ist untypisch für neuronale Netze. 
 
 % sparse inputs -> little changes
 % max 32 inputs setboolean
@@ -106,6 +104,8 @@ Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit
 Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wird, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
 \subsection{Lineare Schichten}
+
+Aufgrund der Fehler Akkumulation der Quantisierung kann es passieren, dass größere/mehr Schichten nahe der Ausgabeschicht, einen Negativen Effekt haben \cite{StockfishNNUE}. Deshalb werden diese Schichten im Vergleich zu der Eingabeschicht sehr klein gehalten.
 
 \subsection{Ausgabeschicht}
 
