@@ -82,42 +82,52 @@ Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positi
 
 Die in dieser Arbeit verwendete Architektur ist keine neue. Sie ist die von \citeauthor{YNasu2018} \cite{YNasu2018} vorgeschlagene Architektur, die ebenfalls in der ersten \ac{NNUE}-Version von Stockfish verwendet wurde. Sie eignet sich für diesen Prototyp, da sie alle Elemente der \ac{NNUE} typischen Architektur enthält und die Grundlage für komplexere Architekturen wie die aktuelle von Stockfish (siehe \autoref{chap:relatedWork}) ist. Kleinere Architekturen wie anfangs in \autoref{chap:featureSet} mit $768$ Merkmalen zeigen Verbesserungen über \ac{HCE} in schwächeren Schachcomputer, wie der in dieser Arbeit verwendete. Jedoch nutzen sie nicht das Potenzial von \ac{NNUE} aus und tauschen Spielstärke gegen eine simplere Implementierung.
 
-Die Architektur welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-nn} zu sehen. Die Eingabeschicht stellt den dünnbesetzten binären Eingabevektor dar. Für das Laden der daten wird ein Datenlader von Stockfish verwendet, da die verwendeten Trainingsdaten auch von Stockfish sind. Dieser Datenlader hat als Relikt aus der Shogi Implementierung ein HalfKP Feature-Set mit $41024$ satt den für Schach nötigen $40960$ Merkmalen, $64$ mehr. Das hat aufgrund der Spaltenweisen Berechnung des Akkumulators keinen Einfluss auf die Performance. 
+Die Architektur welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-nn} zu sehen. Die Eingabeschicht stellt den dünnbesetzten binären Eingabevektor dar. Für das Laden der daten wird ein Datenlader von Stockfish verwendet, da die verwendeten Trainingsdaten auch von Stockfish sind. Dieser Datenlader hat als Relikt aus der Shogi Implementierung ein HalfKP Feature-Set mit $41024$ satt den für Schach nötigen $40960$ Merkmalen, $64$ mehr. Das hat aufgrund der Spaltenweisen Berechnung des Akkumulators keinen Einfluss auf die Performance.
 
+Das \ac{DNN} ist untypisch klein, da die meiste Information in der Feature-Transformator-Schicht enthalten ist \cite{StockfishNNUE}. Die übrigen Schichten müssen Kleingehalten werden, da sie nicht wie die Feature-Transformator-Schicht mit Inkrementellen Aktualisierungen aktiviert werden. Sie müssen immer ganz berechnet werden. Die Aushabeschicht besitzt lediglich ein Neuron, da es sich hier um ein Regressionsproblem handelt. Die Aushabe des Neurons spiegelt die Evaluation einer Schachposition wider.
+
+Für die Berechnung einer Evaluation ist Theoretisch eine Schicht ausreichend, das limitiert das Netz jedoch sehr stark in der Form der zu modellierenden Funktion. Deshalb werden hier wie üblich für \acp{DNN} mehrere Schichten verwendet. Die genaue Zusammensetzung der Schichten ist darauf ausgelegt, dass die Neuronen einer Schicht die Größe der verwendeten \ac{SIMD}-Register ganz ausschöpfen \cite{YNasu2018}. Weiter ist es nicht klar welche Größe sich am besten für den Spezifisch verwendeten Schachcomputer eignet. Zur Ermittlung einer optimalen Größe müssen Test mit verschieden Größen durchgeführt werden. Anfangs wird die Größe verwendet, welche bereits Erfolge in anderen Schachcomputern gezeigt hat.
 % the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
 % theoratically we can use only one layer to approximate a function to convert inputs to an evaluation but thats makes it mutch harder to learn
 % because we are looking for regression we use a clipped relu
 
-% Tatsächlich werden bei einer Aktivierung maximal
-
-% dropoutlayers are used in other chess engines and could be beneficial here
-
 Auf der \autoref{fig:own-nn} ist die Aktivierungsfunktion nicht zu erkennen. Sie ist ein elementarer Bestandteil dafür, dass die Evaluation der Stellung schnell ist. Deshalb wird die Clipped\ac{ReLU} Transferfunktion verwendet, sie ist nicht linear und kann schnell berechnet werden. Eine Aktivierung mehrerer Neuronen ist mit \ac{SIMD} gleichzeitig berechenbar. Die Limitierung nach oben ermöglicht die Verwendung von int8 für die Vektoren, die innerhalb des Netzes weiter gegeben werden.
 
-\subsection{Feature-Transformator}
+\subsection{Feature-Transformator-Schicht}
 
-Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. Das gesamte \ac{NN} hat $10,5$ Millionen trainierbare Parameter. $10,5$ Millionen, also fast alle, sind Teil der Feature-Transformator-Schicht. Das ist untypisch für neuronale Netze. 
+Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. Das gesamte \ac{NN} hat $10,5$ Millionen trainierbare Parameter. $10,5$ Millionen, also fast alle, sind Teil der Feature-Transformator-Schicht. Das ist untypisch für neuronale Netze. Da aber aufgrund des HalfKP Feature Sets maximal 30 Merkmale aktiv sein können, ist die Tatsächlich verwendete Anzahl an Parametern deutlich kleiner.
+
+In \autoref{fig:own-nn} ist der Feature-Transformator, in zwei teile geteilt. Eine für Weiß und eine für Schwarz. Tatsächlich sind die Gewichte für beide Seiten, dieselben. Für Weiß werden die Gewichte so wie sie sind verwendet und für Schwarz wird das Brett um 180 Grad rotiert. Das bedeutet die schwarzen Figuren, werden wie Weiße behandelt und können so die dieselben Gewichte verwenden. Eine 180 Grad Rotation wird wegen des Verwendeten Datenladers verwendet. Das entspricht nicht der Realität, da Schach, im Gegensatz zu Shogi, keine Rotationssymmetrie besitzt. Trotzdem funktioniert es überraschend gut \cite{StockfishNNUE}. Alternativ kann das Brett horizontal gespiegelt werden, um die Symmetrie zu wahren.
+% bild für roations beispiel bauen vl. mit a und b bild
 
 % sparse inputs -> little changes
 % max 32 inputs setboolean
 % input either 0 or 1
-Für den Akkumulator ist es wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wird, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
+Außerdem ist es für den Akkumulator wichtig, dass bei der Quantisierung ein Quantisierungsschema verwendet wird, welches einen Überlauf verhindert, egal welche Kombination von Merkmalen aktiv ist \cite{StockfishNNUE}.
 
-\subsection{Lineare Schichten}
+\subsection{Affine-Transformator-Schichten}
+
+Die Affin-Transformator-Schichten sind voll vernetzte Schichten mit Clipped\ac{ReLU} Aktivierungsfunktion.
 
 Aufgrund der Fehler Akkumulation der Quantisierung kann es passieren, dass größere/mehr Schichten nahe der Ausgabeschicht, einen Negativen Effekt haben \cite{StockfishNNUE}. Deshalb werden diese Schichten im Vergleich zu der Eingabeschicht sehr klein gehalten.
 
-\subsection{Ausgabeschicht}
-
-% the NN is a regressor becuase it only has one output note (cite?)
-
 \section{Training}
+
+Das Training eines \acp{NN} beschreibt den Vorgang, bei welchem die Gewichte des Netzes, mithilfe von Backpropagation und Gradientenabstieg, angepasst werden. Nach dem Training werden die Gewichte nicht mehr verändert.
+
+Welche Gewichte gewählt werden hängt von einigen Faktoren ab. In diesem Kapitel wird auf diese eingegangen. Der Trainingsvorgang lässt sich in zwei teile Teilen. Erstens die Auswahl/Generierung der Eingabedaten, welche die Basis des \acp{NN} sind. Zweitens der Trainer, er beschreibt das Programm, welches die Daten einliest und die Gewichte anpasst. Der Trainer ist selbst in weitere Teile untergliedert, die Stellschrauben für das Training enthalten.
 
 \subsection{Eingabedaten}
 
 Die Erzeugung der Eingabedaten ist nicht Teil dieser Arbeit. Jedoch ist es wichtig zu wissen, wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das \ac{NN} lernt. Im Training für diese Arbeit wurden drei verschieden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neuesten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden.
 
 % wenn Eingabedaten mit einer tieferen Suche verwendet werden, sind die Konzepte hinter den Zügen/der Evaluation schwerer zu verstehen und somit auch schwieriger zu lernen
+Es ist nicht klar welche Daten sich am besten für das Training eines \acp{NNUE} eignen \cite{StockfishNNUE}. Die für diese Arbeit verwendeten Daten haben sich empirisch als geeignet erwiesen. Sind die gewählten Trainingsdaten zu komplex, ist es schwer zu erkennen, welche die Charakteristiken einer guten/schlechten Position sind. Komplexe Daten sind Evaluationen die mit einer hohen Suchtiefe generiert worden. Ist die Suchtiefe jedoch zu niedrig, ist die Evaluation ungenau und vermittelt möglicherweise falsche Muster.
+
+% beschreibe die verwendeten datensätze
+
+% die reihenfolge von den daten spielt eine rolle
+Ein Netz kann mehrmals trainiert werden. Das ist sinnvoll, wenn dabei verschiedene Eingabedaten verwendet werden. Dabei ist Reihenfolge der Datensätze von Bedeutung. Es kann besser für das Training sein, wenn erst simple Daten und dann komplexere Daten verwendet werden. Verschiedene Testergebnisse dazu, sind in \autoref{chap:Ergebnisse} zu sehen.
 
 % normalerweise ist wird pro Epoche das gesamte Datenset verarbeitet, hier ist das nicht der Fall, wir verarbeiten 100M Positionen pro Zug, wichtig ist, dass die Daten nicht sequentiell gelesen werden, deshalb werden zufällige Positionen übersprungen -> würden die Daten gesuffelt sein, wären die Eingabedaten sehr viel größer, da ihr Encoding auf sich wenig ändernden Positionen basiert
 % Letztendlich werden alle Positionen gleich oft trainiert, die Verteilung ist jedoch besser zum Lernen.
@@ -125,12 +135,12 @@ Die Erzeugung der Eingabedaten ist nicht Teil dieser Arbeit. Jedoch ist es wicht
 % they are alerady normalized (siehe feature set)
 % labeling is easy as the set is automatically generated data with labels (cp score) automatically generated
 
-% grouping the inputdate to a batch size aims to use the time writing to the CPU more efficently (16384)
+% grouping the inputdate to a batch size aims to use the time writing to the GPU more efficently (16384)
 
 % there is no great risk of overfitting to the training set because the input data is so large -> generalisation should be strong enogth so that training data acurracy and validation data accuracy cant diverge, and becuase we dont know what the "correct" input looks like any validation data set is usless
 % ein Problem ist auch, dass die Eingabedaten nicht wirklich den tatsächlichen Anwendungsfall repräsentieren -> das Netzwerk soll die aktuelle Stellung gut bewerten, bekommt aber als Eingabe die Bewertung der Stellung in z. B. 5 Zügen. 
 
-Theoretisch gibt es Daten, die \enquote{perfekt} sind, denn Schach ist für Stellungen mit 7 Figuren gelöst. Das heißt, es gibt eine Datenbank, die das eindeutige Ergebnis (-1, 0, 1) für die Position mit perfektem Spiel kennt. Es ist jedoch nicht sinnvoll, diese Informationen für das Training eines \acp{NNUE} zu verwenden. Das Netz ist nicht in der Lage zu verstehen, warum die Stellung gewonnen/verloren ist. Die Konzepte sind oft schwer zu verstehen und der Vorteil wird oft erst in weiter Zukunft realisiert.
+Theoretisch gibt es Daten, die \enquote{perfekt} sind, denn Schach ist für Stellungen mit 7 Figuren gelöst. Das heißt, es gibt eine Datenbank, die das eindeutige Ergebnis (-1, 0, 1) für die Position mit perfektem Spiel kennt. Es ist jedoch nicht sinnvoll, diese Informationen für das Training eines \acp{NNUE} zu verwenden. Das Netz ist nicht in der Lage zu verstehen, warum die Stellung gewonnen/verloren ist. Die Konzepte sind oft schwer zu verstehen und der Vorteil wird oft erst in weiter Zukunft realisiert. Außerdem führt die Verwendung dieser Daten zu einem Bias in der Datenbasis, da sie zu einer Übergewichtung von Endspieldaten führen.
 
 % TODO: nicht zufrieden mit dem titel
 \subsection{Trainer}
