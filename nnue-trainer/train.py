@@ -51,10 +51,7 @@ def main():
 
   train, val = util.make_data_loaders(args.train_file, args.val_file, FEATURE_SET_NAME, NUM_WORKERS, BATCH_SIZE, SMART_FEN_SKIPPING, RANDOM_FEN_SKIPPING, device, EPOCH_SIZE, VAL_SIZE)
 
-  if ckpt_path:
-    trainer.fit(nnue, train, val, ckpt_path=ckpt_path)
-  else:
-    trainer.fit(nnue, train, val)
+  trainer.fit(nnue, train, val)
 
 if __name__ == '__main__':
   main()
