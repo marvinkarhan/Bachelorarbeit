@@ -27,6 +27,7 @@ def main():
   parser.add_argument('--resume', type=str, dest='ckpt_path', help='Resume from a checkpoint (.ckpt). Can be either a path to a ckpt or "last".')
   parser.add_argument('--epochs', default=800, dest='max_epochs', type=int, help='Max Epochs.')
   parser.add_argument('--device', default=0, dest='device_index', type=int, help='Specify which gpu to use.')
+  parser.add_argument('--lambda', default=1.0, dest='lambda_', type=int, help='Ratio of eval to wdl score in percent. 1.0 means only eval score and 0 means only wdl score. (0.0 - 1.0)')
   args = parser.parse_args()
   # validate path inputs
   util.validate_path(args.train_file, args.val_file)
@@ -39,7 +40,7 @@ def main():
     util.validate_path(ckpt_path)
     nnue = model.NNUE.load_from_checkpoint(ckpt_path)
   else:
-    nnue = model.NNUE()
+    nnue = model.NNUE(args.lambda_)
 
   logger = loggers.TensorBoardLogger('logs/')
   ckpt_callback = ModelCheckpoint(save_top_k=-1, every_n_epochs=25)
