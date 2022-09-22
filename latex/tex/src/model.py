@@ -7,7 +7,7 @@ affine_transformer1 = nn.Linear(2 * 256, 32)
 affine_transformer2 = nn.Linear(32, 32)
 output = nn.Linear(32, 1)
 
-def forward(us, them, feature_transformer_white, feature_transformer_black) -> nn.Linear:
+def forward(us, them, feature_transformer_white, feature_transformer_black):
   feature_transformer_white = feature_transformer(feature_transformer_white)
   feature_transformer_black = feature_transformer(feature_transformer_black)
   # clipped relu activation function (0.0, 1.0) 

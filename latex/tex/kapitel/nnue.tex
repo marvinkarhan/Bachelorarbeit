@@ -6,6 +6,10 @@ Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positi
 
 \section{Architektur}
 
+Die in dieser Arbeit verwendete Architektur ist keine Neue. Sie ist die von \citeauthor{YNasu2018} \cite{YNasu2018} vorgeschlagene Architektur, die ebenfalls in der ersten \ac{NNUE}-Version von Stockfish verwendet wurde. Sie eignet sich für diesen Prototyp, da sie alle Elemente der \ac{NNUE} typischen Architektur enthält und die Grundlage für komplexere Architekturen wie die aktuelle von Stockfish (siehe \autoref{chap:relatedWork}) ist. Kleinere Architekturen, wie anfangs in \autoref{chap:featureSet} mit $768$ Merkmalen, zeigen Verbesserungen über \ac{HCE} in schwächeren Schachcomputern, wie der in dieser Arbeit verwendete. Jedoch nutzen sie nicht das Potenzial von \ac{NNUE} aus und tauschen die Spielstärke gegen eine simplere Implementierung.
+
+Die Architektur, welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-nn} zu sehen. Die Eingabeschicht stellt den dünn besetzten binären Eingabevektor dar. Für das Laden der Daten wird ein Datenlader von Stockfish verwendet, da die verwendeten Trainingsdaten auch von Stockfish sind. Dieser Datenlader hat als Relikt aus der Shogi Implementierung ein HalfKP Feature-Set mit $41024$ statt den für Schach nötigen $40960$ Merkmalen \cite{StockfishNNUE}. Das hat aufgrund der spaltenweisen Berechnung des Akkumulators keinen Einfluss auf die Performance.
+
 \begin{figure}
   \centering
   \resizebox{\textwidth}{!}{%
@@ -76,13 +80,9 @@ Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positi
 
     \end{tikzpicture}
   }%
-  \caption{Das verwendete \ac{NN} mit einer exemplarischen Eingabe, basierend auf der \autoref{fig:chessboard}. Die Bezeichnung der Schichten ist oberhalb und die Anzahl der dazugehörigen Neuronen unterhalb des Netzes zu sehen.}
+  \caption{Das verwendete \ac{NN} mit einer exemplarischen Eingabe, basierend auf der \autoref{fig:chessboard}. Die Bezeichnung der Schichten ist oberhalb und die Anzahl der dazugehörigen Neuronen unterhalb des Netzes zu sehen. Die Eingabeschicht und die Feature-Transformator-Schicht sind in zwei Teile geteilt, basierend auf den zwei Seiten im Schach (Weiß und Schwarz). Sonst sind die Schichten voll vernetzt. Die Ausgabe des Netzes ist eine Evaluation der Position.}
   \label{fig:own-nn}
 \end{figure}
-
-Die in dieser Arbeit verwendete Architektur ist keine Neue. Sie ist die von \citeauthor{YNasu2018} \cite{YNasu2018} vorgeschlagene Architektur, die ebenfalls in der ersten \ac{NNUE}-Version von Stockfish verwendet wurde. Sie eignet sich für diesen Prototyp, da sie alle Elemente der \ac{NNUE} typischen Architektur enthält und die Grundlage für komplexere Architekturen wie die aktuelle von Stockfish (siehe \autoref{chap:relatedWork}) ist. Kleinere Architekturen, wie anfangs in \autoref{chap:featureSet} mit $768$ Merkmalen, zeigen Verbesserungen über \ac{HCE} in schwächeren Schachcomputern, wie der in dieser Arbeit verwendete. Jedoch nutzen sie nicht das Potenzial von \ac{NNUE} aus und tauschen die Spielstärke gegen eine simplere Implementierung.
-
-Die Architektur, welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own-nn} zu sehen. Die Eingabeschicht stellt den dünn besetzten binären Eingabevektor dar. Für das Laden der Daten wird ein Datenlader von Stockfish verwendet, da die verwendeten Trainingsdaten auch von Stockfish sind. Dieser Datenlader hat als Relikt aus der Shogi Implementierung ein HalfKP Feature-Set mit $41024$ statt den für Schach nötigen $40960$ Merkmalen \cite{StockfishNNUE}. Das hat aufgrund der spaltenweisen Berechnung des Akkumulators keinen Einfluss auf die Performance.
 
 Das \ac{DNN} ist untypisch klein, da die meiste Information in der Feature-Transformator-Schicht enthalten ist \cite{StockfishNNUE}. Die übrigen Schichten müssen kleingehalten werden, da sie nicht wie die Feature-Transformator-Schicht mit inkrementellen Aktualisierungen aktiviert werden. Sie müssen immer ganz berechnet werden. Die Ausgabeschicht besitzt lediglich ein Neuron, da es sich hier um ein Regressionsproblem handelt. Die Ausgabe des Neurons spiegelt die Evaluation einer Schachposition wider.
 
@@ -96,6 +96,10 @@ Auf der \autoref{fig:own-nn} ist die Aktivierungsfunktion nicht zu erkennen. Sie
 \subsection{Feature-Transformator-Schicht}
 
 Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit und Größe \cite{StockfishNNUE}. Das gesamte \ac{NN} hat $10,5$ Millionen trainierbare Parameter. $10,5$ Millionen, also fast alle, sind Teil der Feature-Transformator-Schicht. Das ist untypisch für neuronale Netze. Da aber aufgrund des HalfKP Feature Sets maximal 30 Merkmale aktiv sein können, ist die tatsächlich verwendete Anzahl an Parametern deutlich kleiner.
+
+In \autoref{fig:own-nn} ist der Feature-Transformator in zwei Teile geteilt. Eine für Weiß und eine für Schwarz. Je Seite werden 256 Neuronen verwendet. Tatsächlich sind die Gewichte, in dieser Implementierung, für beide Seiten dieselben. Für Weiß werden die Gewichte so wie sie sind verwendet und für Schwarz wird das Brett um 180 Grad rotiert. Das bedeutet, die schwarzen Figuren werden wie Weiße behandelt und können so die dieselben Gewichte verwenden. Eine 180-Grad-Rotation wird wegen des verwendeten Datenladers benutzt.
+
+Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz zu Shogi, keine Rotationssymmetrie besitzt. Trotzdem funktioniert es überraschend gut \cite{StockfishNNUE}. Alternativ kann das Brett horizontal gespiegelt werden, um die Symmetrie zu wahren. Eine Illustration warum, wie sich Rotation und Spiegelung erhalten ist in \autoref{fig:orientedChessboards} zu sehen. In der Abbildung ist die orientierte Stellung aus \autoref{fig:chessboard} abgebildet. Sie ist dann nötig, wenn schwarz am Zug ist. Die Farben der Figuren werden invertiert. Das ermöglicht es, die Bewertung für Schwarz aus Sicht von Weiß durchzuführen und so dieselben Gewichte zu verwenden. Diese Orientierung findet während der Generierung der Indizierung der Figuren für die Eingabeschicht statt.
 
 \begin{figure}
   \centering
@@ -118,10 +122,6 @@ Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit
   \caption{Beispiele für ein orientiertes Schachbrett. Basierend auf \autoref{fig:chessboard}. Das Schachbrett ist in zwei Orientierungs-Möglichkeiten gezeigt. Die Schachbretter werden für Schwarz ausgerichtet, das ist der Fall, wenn Schwarz am Zug ist. Die Farben sind invertiert. So können die gleichen Gewichte für weiß und Schwarz verwendet werden.}
   \label{fig:orientedChessboards}
 \end{figure}
-
-In \autoref{fig:own-nn} ist der Feature-Transformator in zwei Teile geteilt. Eine für Weiß und eine für Schwarz. Je Seite werden 256 Neuronen verwendet. Tatsächlich sind die Gewichte, in dieser Implementierung, für beide Seiten dieselben. Für Weiß werden die Gewichte so wie sie sind verwendet und für Schwarz wird das Brett um 180 Grad rotiert. Das bedeutet, die schwarzen Figuren werden wie Weiße behandelt und können so die dieselben Gewichte verwenden. Eine 180-Grad-Rotation wird wegen des verwendeten Datenladers benutzt.
-
-Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz zu Shogi, keine Rotationssymmetrie besitzt. Trotzdem funktioniert es überraschend gut \cite{StockfishNNUE}. Alternativ kann das Brett horizontal gespiegelt werden, um die Symmetrie zu wahren. Eine Illustration warum, wie sich Rotation und Spiegelung erhalten ist in \autoref{fig:orientedChessboards} zu sehen. In der Abbildung ist die orientierte Stellung aus \autoref{fig:chessboard} abgebildet. Sie ist dann nötig, wenn schwarz am Zug ist. Die Farben der Figuren werden invertiert. Das ermöglicht es, die Bewertung für Schwarz aus Sicht von Weiß durchzuführen und so dieselben Gewichte zu verwenden. Diese Orientierung findet während der Generierung der Indizierung der Figuren für die Eingabeschicht statt.
 
 % sparse inputs -> little changes
 % max 32 inputs setboolean
@@ -196,7 +196,7 @@ Bei der Fehlerrückführung wird zuerst die Vorwärtsaktivierung von der Eingang
 \lstinputlisting[language=Python,
   caption={Die Vorwärtsaktivierung des in \autoref{code:model} definierten Netzes. Die Schichten werden nacheinander, mit der Clipped\ac{ReLU} Transferfunktion, aktiviert. Nach der Feature-Transformator-Schicht, werden die beiden Sichtweisen durch Konkatenation kombiniert. Die Eingabedaten werden der Funktion als Parameter gegeben. Welche Seite am Zug ist, wird durch \emph{us} und \emph{them} symbolisiert. Die dünnbesetzten Vektoren \emph{white} und \emph{black} enthalten die Eingabedaten.},
   label=code:forward,
-  linerange={9-16}]
+  linerange={9-17}]
 {\srcloc/model.py}
 
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
@@ -220,7 +220,7 @@ Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE}-in einen Schac
 Eine Quantisierung ist nötig, um CPU-Optimierungen zu ermöglichen. Die als Float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer proprietären binären \emph{.nnue}-Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität braucht. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet, die kleinstmöglichen Integer-Typen zu verwenden. Aufgrund der Clipped\ac{ReLU}-Transferfunktion sind die Gewichte bereits sehr klein. Deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben. Die zwei linearen Schichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet. Er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis. Die Werte müssen so gewählt werden, dass keine mögliche Kombination von aktiven Merkmalen den Akkumulator überlaufen lässt \cite{StockfishNNUE}.
 
 \begin{table}[h]
-  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten.}
+  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten. Basierend auf Werten der Stockfish \ac{NNUE} Implementierung \cite{StockfishNNUE}}
   \label{table:netQuantization}
   \renewcommand{\arraystretch}{1.2}
   \centering

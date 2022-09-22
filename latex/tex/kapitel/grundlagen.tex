@@ -21,6 +21,12 @@ Viele der \ac{HCE}-Aspekte profitieren von einer Differenzierung verschiedener S
 
 \section{Neuronale Netze}
 
+\Acp{KNN} oder einfach \acp{NN} genannt sind Computersysteme, die dem biologischen Vorbild des Gehirns nachempfunden sind. Analog zu seinem biologischen Vorbild besteht ein \ac{NN} aus Neuronen, die miteinander vernetzt sind. Jedes Neuron reagiert auf eingehende Signale mit einer bestimmten Ausgabe. Diese Ausgabe kann sich durch neu gewonnene Erfahrungen anpassen und ermöglicht, zukünftig besser zu reagieren.
+
+% erklären wie der generelle Aufbau ist
+In \autoref{fig:beispiel-nn} ist ein einfaches \Acl{NN} zu sehen. Es besteht aus drei Schichten. Die erste Schicht, die Eingabeschicht, nimmt Eingabedaten entgegen. Eingabedaten können ganz unterschiedliche Daten repräsentieren. Ist der Eingabedatensatz beispielsweise ein 100 × 100 Schwarz-Weiß-Bild, ist dies eine Möglichkeit die Eingaben darzustellen. Die Eingabeschicht besteht dann aus 1000 Neuronen die pro Neuron den Zustand eines Pixels (0 = Weiß, 1 = Schwarz) des Bildes gefüttert bekommen. Die zweite Schicht heißt versteckte Schicht, weil von außen nur die Eingabedaten und das Ergebnis sichtbar ist. Sie empfängt die Informationen der Eingabeschicht, gewichtet sie und gibt sie an die Ausgabeschicht weiter. Die versteckte Schicht kann aus mehreren Schichten bestehen. Ein \ac{NN} mit mehr als drei versteckten Schichten heißt \ac{DNN}. Die letzte Sicht, die Ausgabeschicht, spiegelt das Ergebnis des \acp{NN} wider. Ein Netz, das versucht Bilder zwischen Hunden und Katzen zu unterscheiden, kann zwei Ausgabeneuronen enthalten, eins für die Wahrscheinlichkeit, dass auf dem gegebenen Bild ein Hund ist und eins für die Wahrscheinlichkeit, dass es eine Katze ist. Ein \ac{NN} kann auch nur ein Ausgabeneuron besitzen, wie \zb{} bei der Evaluation einer Schachposition nötig ist. Die Verbindungen der einzelnen Neuronen stellen deren Zusammenhang dar. Wie stark die Abhängigkeit ist, wird durch Gewichte definiert \cite[S. 2--7]{krawczak2013multilayer}.
+% Auswahl der Inputdatenspalten gibt an, wieviele Inputneuronen es gibt, die Anzahl der hidden Neuronen ist "egal" je mehr -> desto besser kann das neuronale Netz lernen kinda, output Neuronen gibt die Anzahl der Klassifikationen an, kann auch nur eins sein (regession)
+
 \begin{figure}
   \centering
   % inspired by: https://tex.stackexchange.com/questions/153957/drawing-neural-network-with-tikz
@@ -47,22 +53,30 @@ Viele der \ac{HCE}-Aspekte profitieren von einer Differenzierung verschiedener S
     \foreach \l [count=\x from 0] in {Eingabeschicht, Versteckte Schicht, Ausgabeschicht}
     \node [align=center, above] at (\x*2,2) {\l};
   \end{tikzpicture}
-  \caption{Ein einfaches \acl{NN}}
+  \caption{Ein einfaches \acl{NN}. Jedes Neuron einer Schicht ist in Pfeilrichtung mit allen Neuronen der nächsten Schicht vernetzt. Die Verbindungen symbolisieren Gewichte. In den Neuronen werden die eingehenden Gewichte aufsummiert und über eine Transferfunktion zu einem Ausgabewert abgebildet}
   \label{fig:beispiel-nn}
 \end{figure}
 
-\Acp{KNN} oder einfach \acp{NN} genannt sind Computersysteme, die dem biologischen Vorbild des Gehirns nachempfunden sind. Analog zu seinem biologischen Vorbild besteht ein \ac{NN} aus Neuronen, die miteinander vernetzt sind. Jedes Neuron reagiert auf eingehende Signale mit einer bestimmten Reaktion. Diese Reaktion kann sich durch neu gewonnene Erfahrungen anpassen und ermöglicht, zukünftig besser zu reagieren.
+Es gibt verschiedene Modelle neuronaler Netze. Für diese Thesis sind lediglich \aclp{FNN} relevant. \acp{FNN}-basieren auf dem von \citeauthor{rosenblatt1958perceptron} \cite{rosenblatt1958perceptron} beschriebenen mehrlagigen Perzeptron. Das \ac{FNN} zeichnet sich durch seinen zyklenfreien Aufbau aus. Der Datenfluss führt immer von der Eingabeschicht zur Ausgabeschicht. Das \ac{FNN} gilt als die einfachste Netzwerkarchitektur \cite{Schmidhuber2015}.
 
-% erklären wie der generelle Aufbau ist
-In Abbildung \autoref{fig:beispiel-nn} ist ein einfaches \Acl{NN} zu sehen. Es besteht aus drei Schichten. Die erste Schicht, die Eingabeschicht, nimmt Eingabedaten entgegen. Eingabedaten können ganz unterschiedliche Daten repräsentieren. Ist der Eingabedatensatz beispielsweise ein 100 × 100 Schwarz-Weiß-Bild, ist dies eine Möglichkeit die Eingaben darzustellen. Die Eingabeschicht besteht dann aus 1000 Neuronen die pro Neuron den Zustand eines Pixels (0 = Weiß, 1 = Schwarz) des Bildes gefüttert bekommen. Die zweite Schicht heißt versteckte Schicht, weil von außen nur die Eingabedaten und das Ergebnis sichtbar ist. Sie empfängt die Informationen der Eingabeschicht, gewichtet sie und gibt sie an die Ausgabeschicht weiter. Die versteckte Schicht kann aus mehreren Schichten bestehen. Ein \ac{NN} mit mehreren versteckten Schichten heißt \ac{DNN}. Die letzte Sicht, die Ausgabeschicht, spiegelt das Ergebnis des \acp{NN} wider. Ein Netz, das versucht Bilder zwischen Hunden und Katzen zu unterscheiden, kann zwei Ausgabeneuronen enthalten, eins für die Wahrscheinlichkeit, dass auf dem gegebenen Bild ein Hund ist und eins für die Wahrscheinlichkeit, dass es eine Katze ist. Ein \ac{NN} kann auch nur ein Ausgabeneuron besitzen, wie \zb{} bei der Evaluation einer Schachposition nötig ist. Die Verbindungen der einzelnen Neuronen stellen deren Zusammenhang dar. Wie stark die Abhängigkeit ist, wird durch Gewichte definiert \cite[S. 2--7]{krawczak2013multilayer}.
-% Auswahl der Inputdatenspalten gibt an, wieviele Inputneuronen es gibt, die Anzahl der hidden Neuronen ist "egal" je mehr -> desto besser kann das neuronale Netz lernen kinda, output Neuronen gibt die Anzahl der Klassifikationen an, kann auch nur eins sein (regession)
-
-Es gibt verschiedene Modelle \Aclp{NN}. Für diese Thesis sind lediglich \acp{FNN} relevant. \acp{FNN}-basieren auf dem von \citeauthor{rosenblatt1958perceptron} \cite{rosenblatt1958perceptron} beschriebenen mehrlagigen Perzeptron. Das \ac{FNN} zeichnet sich durch seinen zyklenfreien Aufbau aus. Der Datenfluss führt immer von der Eingabeschicht zur Ausgabeschicht. Das \ac{FNN} gilt als die einfachste Netzwerkarchitektur \cite{Schmidhuber2015}.
-
-In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung Neuronaler Netze Frameworks verwendet. Sie abstrahieren große Teile der Komplexität. Trotzdem ist es wichtig, ihre Funktionsweise zu kennen, um Entscheidungen zu treffen und Probleme zu beheben. In den folgenden Unterabschnitten wird grundlegend auf die Einzelteile Neuronaler Netze eingegangen. Zuerst wird das Neuron beschrieben und wie sich seine Aktivität berechnen lässt. Das Unterkapitel Backpropagation beschreibt wie \acp{NN} lernen können.
+In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung Neuronaler Netze Frameworks verwendet. Sie abstrahieren große Teile der Komplexität. Trotzdem ist es wichtig, ihre Funktionsweise zu kennen, um Entscheidungen treffen und Probleme beheben zu können. In den folgenden Unterabschnitten wird grundlegend auf die Einzelteile Neuronaler Netze eingegangen. Zuerst wird das Neuron beschrieben und wie sich seine Aktivität berechnen lässt. Das Unterkapitel Backpropagation beschreibt, wie \acp{NN} lernen.
 
 \subsection{Das Neuron}
 \label{chap:neuron}
+
+% Neuronen wie sie im Nervensystems eines Menschen vorhanden sind
+Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{fig:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$ werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert, aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ aktiviert. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet, dass es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
+
+% mathematische Grundlage für das Neuron und Neuronale Netz
+\begin{equation}
+  f(\varphi) = \varphi(\sum_{i=0}^{n}w_{i}x_{i})
+  \label{equation:NeuronActivation}
+\end{equation}
+
+\begin{equation}
+  y = f(\varphi)
+  \label{equation:NeuronOutput}
+\end{equation}
 
 \begin{figure}
   \centering
@@ -78,22 +92,29 @@ In der Praxis, so auch in dieser Arbeit, werden für die Entwicklung Neuronaler 
     \draw (0,0) node[xshift=-10]{$x_n$} -- node [midway,above] {$w_{n}$} (p);
     \draw (p) -- (3,1) node[xshift=30]{$y := f(\varphi)$};
   \end{tikzpicture}
-  \caption{Ein einzelnes Neuron mit seinen Eingabe- und Ausgabekomponenten}
+  \caption{Ein einzelnes Neuron mit seinen Eingabe- und Ausgabekomponenten. Die Eingabewerte $x$ werden mit den gewichten $w$ multipliziert und im Neuron aufsummiert. Anschließend werden sie mit der Transferfunktion $f(\varphi)$ auf einen Ausgabewert abgebildet}
   \label{fig:neuron}
 \end{figure}
 
-% Neuronen wie sie im Nervensystems eines Menschen vorhanden sind
-Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McCulloch1943} von \citeauthor{McCulloch1943} \cite{McCulloch1943} eingeführt. Neuronen sind in einem \ac{NN} mit anderen Neuronen verbunden und bilden so beliebig komplexe Funktionen ab. In \autoref{fig:neuron} ist ein einzelnes Neuron zu sehen. Die Eingänge $x_{0}$ bis $x_{n}$ werden mit den Gewichten $w_{0}$ bis $w_{n}$ multipliziert, aufsummiert und mit der Aktivierungsfunktion $f(\varphi)$ aktiviert. Für gewöhnlich ist immer $x_{0}=1$, was ihn zu dem Bias des Neurons mit $w_{0}=b$ macht. Das bedeutet, dass es nur $n$ tatsächliche Eingabewerte gibt: von $x_{1}$ bis $x_{n}$. Konkret lässt sich die Aktivität eines Neurons mit der \autoref{equation:NeuronActivation} und die Ausgabe $y$ mit \autoref{equation:NeuronOutput} bestimmen:
+% activation functions: linear vs non linear -> linear Functions sorgen dafür, dass nur ein hidden Layer sinnvoll ist, mehrere hidden Layer mit linearen Aktivierungsfunktionen geben keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Deshalb sind nicht-lineare Transferfunktionen interessant, sie ermöglichen es, komplexere Funktionen zu lernen
+Die Aktivierungsfunktion, oder auch Transferfunktion, eines Neurons kann linear oder nicht linear sein. Ist die Transferfunktion linear, ergibt ein mehrschichtiges \ac{NN} keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Außerdem sind lineare \acp{NN} nicht in der Lage, nicht lineare Probleme zu lösen \cite{minsky1969perceptron}. Nicht lineare Transferfunktionen sind interessanter, da sie für nicht lineare Probleme Antworten liefern.
 
-% mathematische Grundlage für das Neuron und Neuronale Netz
+% eingehen auf clipped relu und sigmoid Aktivation Functions
+In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. In \autoref{fig:sigmoid} ist eine Standardsigmoide abgebildet. Sie sorgt dafür, dass die Ausgabe des Neurons immer zwischen null und eins ist. Berechnet wird sie mit \autoref{equation:sigmoid}. \autoref{fig:Relu} zeigt eine \ac{ReLU}-Transferfunktion. Der niedrigste Wert ist mindestens null. Konkret ist die Berechnung in \autoref{equation:ReLU} angegeben. \ac{ReLU} geht bis ins Unendliche. Wegen der aggressiven Quantisierung muss der Bereich der Aktivierungsfunktionen auch nach oben begrenzt werden, auch Clipped\ac{ReLU} (siehe \autoref{equation:ClippedReLU}) genannt \cite{StockfishNNUE}.
+
 \begin{equation}
-  f(\varphi) = \varphi(\sum_{i=0}^{n}w_{i}x_{i})
-  \label{equation:NeuronActivation}
+  Sigmoid(x)=\frac{1}{(1+e^{-x})}
+  \label{equation:sigmoid}
 \end{equation}
 
 \begin{equation}
-  y = f(\varphi)
-  \label{equation:NeuronOutput}
+  ReLU(x)=max(0,x)
+  \label{equation:ReLU}
+\end{equation}
+
+\begin{equation}
+  ClippedReLU(x)=min(max(0,x),1)
+  \label{equation:ClippedReLU}
 \end{equation}
 
 \begin{figure}
@@ -119,7 +140,7 @@ Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McC
         \end{axis}
       \end{tikzpicture}
     }
-    \caption{Standardsigmoide Aktivierungsfunktion}
+    \caption{Standardsigmoide Aktivierungsfunktion. Sie ist Konvex für Werte unter einem bestimmten Punkt und Konkav für Werte darüber. Hier ist dieser Punkt $0$. Außerdem nähern sich die Extreme der Funktion den Grenzwerten $0$ und $1$}
     \label{fig:sigmoid}
   \end{subfigure}%
   \begin{subfigure}{.5\textwidth}
@@ -143,34 +164,12 @@ Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McC
         \end{axis}
       \end{tikzpicture}
     }
-    \caption{Rectified linear Aktivierungsfunktion}
+    \caption{Rectified linear Aktivierungsfunktion. Die Ausgabe der Funktion beträgt immer mindestens den Wert null und ist sonst linear}
     \label{fig:Relu}
   \end{subfigure}
   \caption{Beispiele für Aktivierungsfunktionen}
   \label{fig:activationfunction}
 \end{figure}
-
-% activation functions: linear vs non linear -> linear Functions sorgen dafür, dass nur ein hidden Layer sinnvoll ist, mehrere hidden Layer mit linearen Aktivierungsfunktionen geben keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Deshalb sind nicht-lineare Transferfunktionen interessant, sie ermöglichen es, komplexere Funktionen zu lernen
-Die Aktivierungsfunktion, oder auch Transferfunktion, eines Neurons kann linear oder nicht linear sein. Ist die Transferfunktion linear, ergibt ein mehrschichtiges \ac{NN} keinen Sinn, da sie zu einer Schicht vereinfacht werden können. Außerdem sind lineare \acp{NN} nicht in der Lage, nicht lineare Probleme zu lösen \cite{minsky1969perceptron}. Nicht lineare Transferfunktionen sind interessanter, da sie für nicht lineare Probleme Antworten liefern.
-
-% eingehen auf clipped relu und sigmoid Aktivation Functions
-In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. In \autoref{fig:sigmoid} ist eine Standardsigmoide abgebildet. Sie sorgt dafür, dass die Ausgabe des Neurons immer zwischen null und eins ist. Berechnet wird sie mit \autoref{equation:sigmoid}. \autoref{fig:Relu} zeigt eine \ac{ReLU}-Transferfunktion. Der niedrigste Wert ist mindestens null. Konkret ist die Berechnung in \autoref{equation:ReLU} angegeben. \ac{ReLU} geht bis ins Unendliche. Wegen der aggressiven Quantisierung muss der Bereich der Aktivierungsfunktionen auch nach oben begrenzt werden, auch Clipped\ac{ReLU} (siehe \autoref{equation:ClippedReLU}) genannt \cite{StockfishNNUE}.
-
-\begin{equation}
-  Sigmoid(x)=\frac{1}{(1+e^{-x})}
-  \label{equation:sigmoid}
-\end{equation}
-
-\begin{equation}
-  ReLU(x)=max(0,x)
-  \label{equation:ReLU}
-\end{equation}
-
-\begin{equation}
-  ClippedReLU(x)=min(max(0,x),1)
-  \label{equation:ClippedReLU}
-\end{equation}
-
 
 \subsection{Backpropagation und Gradientenabstieg}
 \label{chap:bpGradient}
@@ -316,19 +315,19 @@ In \autoref{Original_NNUE_Eval} wird der Aufbau der \ac{NNUE}-Evaluationsfunktio
 \subsection{Feature Set}
 \label{chap:featureSet}
 
-\begin{figure}
-  \centering
-  \chessboard[setfen={8/4k3/8/4P3/2n5/1K6/8/8}]
-  \caption{Exemplarische Schachposition. Weiß am Zug}
-  \label{fig:chessboard}
-\end{figure}
-
 Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{NN} gegeben wird. Ein simples Feature Set setzt sich aus der Position, dem Figurentyp und seiner Farbe zusammen. Mit 64 Feldern, sechs verschiedenen Figurentypen und zwei Farben gibt es $64*6*2=768$ Merkmale. Ein Merkmal ist entweder 0 oder 1, je nachdem, ob auf dem Feld eine Figur mit der entsprechenden Farbe steht. Da im Schach maximal 32 Figuren im Spiel sind, kann es nur 32 gleichzeitig aktive Merkmale geben. In \autoref{fig:chessboard} gibt es vier aktive Features: (B3, König, Weiß), (C4, Springer, Schwarz), (E5, Bauer, Weiß), (E7, König, Schwarz). Wenn der weiße König den Springer schlägt, ändern sich drei Features. Die Features (B3, König, Weiß) sowie (C4, Springer, Schwarz) werden inaktiv und ein neues Feature (C4, König, Weiß) wird aktiv. Bei diesem Feature Set ändern sich von einer Position $p$ zu einer Position $q$ vier Features (Rochade) maximal und im Durchschnitt drei Features \cite{StockfishNNUE}. Das Feature Set erfüllt die zwei Voraussetzungen, die für ein \ac{NNUE} gelten:
 
 \begin{enumerate}
   \item Die Anzahl der aktiven Merkmale ist klein.
   \item Die Anzahl der unterschiedlichen Merkmale von Position $p$ nach Position $q$ ist minimal.
 \end{enumerate}
+
+\begin{figure}
+  \centering
+  \chessboard[setfen={8/4k3/8/4P3/2n5/1K6/8/8}]
+  \caption{Exemplarische Schachposition. Weiß am Zug}
+  \label{fig:chessboard}
+\end{figure}
 
 Anhand dieser zwei Regeln lässt sich auch die Frage, warum sind nicht Elemente, die schon in der \ac{HCE} verwendet werden (wie \zb{} Rochade-Rechte) Teil des Feature Sets, beantworten. Es erhöht die Anzahl aktiver Merkmale und die Anzahl durchschnittlicher Änderungen. Der Gewinn an Evaluationsgenauigkeit rechtfertigt nicht die Geschwindigkeitseinbußen \cite{StockfishNNUE}.
 
@@ -341,7 +340,7 @@ HalfKP stammt aus der Shogi-Welt, in der es keine Rochade gibt und somit die Rel
 \subsection{Akkumulator}
 \label{chap:accumulator}
 
-Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren benötigt. Ein Vektor $v^{(p,white)}$ für Weiß und einer für $v^{(p,black)}$ für Schwarz. Die zwei Vektoren müssen kombiniert werden, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht der Seite an, die gerade am Zug ist. Deshalb konkatenieren wir $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist. Da die Eingabewerte transformiert werden, wird dieser Schritt auch Feature Transformer genannt.
+Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren benötigt. Ein Vektor $v^{(p,white)}$ für Weiß und einer für $v^{(p,black)}$ für Schwarz. Die zwei Vektoren müssen kombiniert werden, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht der Seite an, die gerade am Zug ist. Deshalb konkatenieren wir $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist. Das ist nicht zwingend notwendig, die Bewertung der Position kann ebenfalls nicht relativ zu der aktiven Seite sein. Eine Relative Sichtweise ermöglicht dem Netz ein Verständnis für Tempo ohne Performance Einbuße. Da die Eingabewerte transformiert werden, wird dieser Schritt auch Feature Transformer genannt.
 
 Es gibt verschiedene Wege, wie die zwei Eingabevektoren gehandhabt werden können \cite{StockfishNNUE}. Entweder beide Seiten verwenden dieselben Gewichte oder die Gewichte sind seitenspezifisch. Für den ersten Ansatz muss das Brett für Schwarz (kann auch Weiß sein) gespiegelt werden, weil ein weißer König auf E1 anders als ein schwarzer König auf E1 zu deuten ist. Alternativ sind die Gewichte seitenspezifisch. Dieser Ansatz scheint logischer, da Weiß und Schwarz nicht gleich spielen. Die Nachteile sind ein größeres \ac{NN} und eine längere Trainingszeit.
 

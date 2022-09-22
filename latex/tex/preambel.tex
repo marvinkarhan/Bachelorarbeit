@@ -105,6 +105,11 @@
 \setlength{\bibitemsep}{1em}      % Abstand zwischen den Literaturangaben
 \setlength{\bibhang}{2em}         % Einzug nach jeweils erster Zeile
 
+% Die Titel im biblatex Literaturverzeichnis soll immer in Anführungszeichen stehen
+\DeclareFieldFormat
+  [article,inbook,incollection,inproceedings,patent,thesis,unpublished,techreport,misc,book,online]
+  {title}{\mkbibquote{#1}}
+
 % Trennung von URLs im Literaturverzeichnis (große Werte [> 10000] verhindern die Trennung)
 \defcounter{biburlnumpenalty}{10} % Strafe für Trennung in URL nach Zahl
 \defcounter{biburlucpenalty}{500} % Strafe für Trennung in URL nach Großbuchstaben
