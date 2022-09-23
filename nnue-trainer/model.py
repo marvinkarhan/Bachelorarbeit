@@ -34,8 +34,8 @@ class NNUE(pl.LightningModule):
     # determines the shape of the sigmoid
     net2score = 600
     # in and out scaling differentiates because the input score gets added to the game out come and still should match the net eval 
-    in_scaling = 410
-    out_scaling = 361
+    # in_scaling = 410
+    # out_scaling = 361
     scaling = 361
 
     # calculate the win draw loss by forward activation of the net and scale it to levels adjusted to normal cp value/scores provided by the training data
