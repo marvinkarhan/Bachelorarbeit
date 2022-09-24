@@ -223,7 +223,9 @@ Mit der Genauigkeit der Ausgabe des Netzes werden mithilfe von Backpropagation d
 \section{Integration in einen Schachcomputer}
 \label{chap:integration}
 
-Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer mit dem Fokus auf \ac{SIMD}-Operationen. Die verwendete Implementierung ist eine auf den Schachcomputer angepasste Version der Stockfish-Implementierung bevor Stockfish zu HalfKAv2 und Buckets gewechselt ist \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an, diese Implementierung zu verwenden.
+Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer mit dem Fokus auf \ac{SIMD}-Operationen. Die verwendete Implementierung ist eine auf den Schachcomputer angepasste Version der Stockfish-Implementierung bevor Stockfish zu HalfKAv2 und Buckets gewechselt ist \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an, diese Implementierung zu verwenden. Die Quellcodebeispiele in diesem Kapitel sind für ein besseres Verständnis, vereinfacht. Die Funktionalität, bleibt jedoch bestehen.
+
+Die im Training ermittelten Gewichte, werden in eine Binärdatei gespeichert, von dem Schachcomputer gelesen und in Arrays gehalten. Zum Einlesen der Binärdatei, muss die Integer-Größe bekannt sein. Sie ist durch das gewählte Quantisierungsschema definiert und ist mithilfe von C++ \emph{Templates} leicht anpassbar, falls sich das Quantisierungsschema ändern sollte.
 
 \subsection{Quantisierungsschema}
 
@@ -256,6 +258,46 @@ Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU
 
 \subsection{Feature-Transformator}
 
+Die Aufgabe des Feature-Transformators ist es den Akkumulator zu aktualisieren. Eine Aktualisierung ist entweder inkrementell oder eine Neuberechnung des Akkumulators. Der Akkumulator ist ein 64-Byte-Aligned zwei dimensionales Array, welches die Werte aufsummierten Gewichte und Bias der Feature-Transformator-Schicht vor ihrer Aktivierung hält, je Seite hält. \autoref{code:accumulator} zeigt den Akkumulator.
+
+\lstinputlisting[language=C++,
+  caption={Das Akkumulator Array mit zwei Dimensionen. Die erste Dimension bestimmt die Seite und die zweite das Neuron der Feature-Transformator-Schicht},
+  label=code:accumulator,
+  linerange={1-1}]
+{\srcloc/feature-transformer.h}
+
+Eine Neuberechnung des Akkumulators ist in \autoref{code:refreshAccumulator} gezeigt. Die Funktion erhält das Spielfeld, indem Informationen zu \zb{} Figuren und Akkumulator gehalten werden. Wie die Indizes berechnet werden, wird nicht weiter erläutert. Natürlich wird dafür, wie im Training dafür eine 180-Grad-Rotation für die Schwarzen Figuren verwendet. Aufgrund der Column-Major Orientierung der Gewichte in dem Feature-Transformator kann eine Spalte der Gewichtsmatrix direkt für die \ac{SIMD}-Operation verwendet werden. Da in einem \emph{ymm} Register maximal 16, 16-Bit Integer gleichzeitig verarbeitet werden können, muss diese Operation in 16 Iterationen erledigt werden: Anzahl der Neuronen (256) geteilt durch die Anzahl der berechenbaren 16-Bit Integer (16). Die verwendeten \ac{SIMD}-Operationen sind simpel, der Akkumulator wird in ein \emph{ymm} Register geladen, mit einer Gewichts-Spalte summiert und wieder in den Akkumulator gespeichert.
+
+\lstinputlisting[language=C++,
+  caption={Eine Funktion zur Neuberechnung des Akkumulators. Sie nimmt ein \emph{board}, welches Informationen zu den Figuren der aktuellen Position und den \autoref{code:accumulator} beschriebene Akkumulator enthält, in welchen ebenfalls das Ergebnis gespeichert wird. Die Berechnung findet für beide Seiten statt. Zuerst werden die Indizes der sich im Spiel befindenden Figuren kalkuliert und der Akkumulator mit den Bias werten initialisiert. Anschließend wird für jeden Index die entsprechende Spalte der Gewichtsmatrix zu dem Akkumulator addiert},
+  label=code:refreshAccumulator,
+  linerange={6-29}]
+{\srcloc/feature-transformer.h}
+
+Interessanter ist hingegen eine Inkrementelle Aktualisierung. Insgesamt unterscheidet sie sich nicht viel zu der Neuberechnung. Anstatt, dass für alle Figuren die entsprechende Spalte der Gewichtsmatrix addiert wird, werden nur Änderungen mit Addition/Subtraktion berechnet. Auffallend ist, dass laden und speichern in \emph{ymm} Register nicht zu sehen sind. Sie können weggelassen werden, die entsprechenden VMOVDQA Operationen werden automatisch durch den Compiler ergänzt.
+
+\lstinputlisting[language=C++,
+  caption={Eine Funktion zur inkrementellen Aktualisierung des Akkumulators. Sie nimmt wie auch die \emph{refreshAccumulator} Funktion aus \autoref{code:refreshAccumulator} ein \emph{board}. Für beide Seiten, wird abhängig davon, welche Figuren Positionen sich geändert haben, der Akkumulator aktualisiert. Die entsprechenden Spalten der Gewichtsmatrix werden entweder addiert oder subtrahiert, je nachdem ob sich das binäre Merkmal von 0 auf 1 oder von 1 auf 0 geändert hat},
+  label=code:updateAccumulator,
+  linerange={30-55}]
+{\srcloc/feature-transformer.h}
+
+In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Transformation aktiviert und wie bereits in \autoref{chap:accumulator} und \autoref{chap:trainer} erklärt, kombiniert. Dabei werden aus den 16-Bit Werten des Akkumulators 8-Bit Werte.
+
+% Siehe \autoref{code:transformerClippedReLU}.
+% \lstinputlisting[language=C++,
+%   caption={Berechnet die Transferfunktion der Feature-Transformator-Schicht, der Akkumulator muss für inkrementelle Aktualisierungen unverändert bleiben, deshalb wird das Ergebnis in \emph{output} gespeichert.},
+%   label=code:transformerClippedReLU,
+%   linerange={57-82}]
+% {\srcloc/feature-transformer.h}
 
 \subsection{Affiner-Transformator}
-% der Transformator transformiert und der Akkumulator akkumuliert und gibt weiter
+
+Die übrigen Schichten 
+\autoref{code:affineTransform}
+
+\lstinputlisting[language=C++,
+  caption={},
+  label=code:affineTransform,
+  linerange={1-24}]
+{\srcloc/affine-transformer.h}
