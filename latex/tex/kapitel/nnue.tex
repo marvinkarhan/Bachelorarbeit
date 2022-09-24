@@ -45,7 +45,7 @@ Die Architektur, welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own
 
       \draw [->] (output-1) -- ++(1,0) node [above, midway] {$Output$};
 
-      \foreach \l [count=\x from 0] in {Eingabeschicht, Feature-\\Transformator, Affiner-\\Transformator 1, Affiner-\\Transformator 2, Ausgabeschicht}
+      \foreach \l [count=\x from 0] in {Eingabeschicht, Feature-\\Transformator, Affine-\\Transformator 1, Affine-\\Transformator 2, Ausgabeschicht}
       \node [align=center, above] at (\x*2,2) {\l};
       % draw lines  
 
@@ -282,7 +282,7 @@ Interessanter ist hingegen eine Inkrementelle Aktualisierung. Insgesamt untersch
   linerange={30-55}]
 {\srcloc/feature-transformer.h}
 
-In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Transformation aktiviert und wie bereits in \autoref{chap:accumulator} und \autoref{chap:trainer} erklärt, kombiniert. Dabei werden aus den 16-Bit Werten des Akkumulators 8-Bit Werte.
+In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Transformation aktiviert und wie bereits in \autoref{chap:accumulator} und \autoref{chap:trainer} erklärt, kombiniert. Dabei werden die 16-Bit Werten des Akkumulators zu 8-Bit Werten transformiert.
 
 % Siehe \autoref{code:transformerClippedReLU}.
 % \lstinputlisting[language=C++,
@@ -291,13 +291,22 @@ In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Tr
 %   linerange={57-82}]
 % {\srcloc/feature-transformer.h}
 
-\subsection{Affiner-Transformator}
+\subsection{Affine-Transformator}
 
-Die übrigen Schichten 
-\autoref{code:affineTransform}
+Die übrigen Schichten nutzen eine affine Transformation. Das ist das Matrixprodukt der Gewichtsmatrix multipliziert mit dem Eingabevektor (der Ausgabevektor der vorherigen Schicht). Ohne \ac{SIMD} Anweisungen, ist diese Funktion sehr simpel, siehe \autoref{code:affineTransformSimple}. 
 
 \lstinputlisting[language=C++,
-  caption={},
-  label=code:affineTransform,
-  linerange={1-24}]
+  caption={Funktion für eine Affine-Transformation. Es wird das Matrixprodukt der Gewichtsmatrix (\emph{weights}) multipliziert mit dem Eingabevektor (\emph{input}) gebildet und in einem Ausgabevektor (\emph{output}) gespeichert},
+  label=code:affineTransformSimple,
+  linerange={1-13}]
 {\srcloc/affine-transformer.h}
+
+Mit der Verwendung von intrinsischen Funktionen wird der Code etwas komplexer. \autoref{code:affineTransform} zeigt die optimierte Implementierung. Die Summe wird mit 0 implementiert, da die 32-Bit Bias am Ende dazu addiert werden. Für jedes Neuron der Schicht wird das Matrixprodukt gebildet. Das Produkt der 8-Bit Integer ist bei der Multiplikation sind saturated 16-Bit Integer, welche vor der Addition zu der Summe zu 32-Bit Integern geändert werden. Danach liegen in dem \emph{ymm} Register acht 32-Bit Integer summen vor. Diese müssen für die Ausgabe zusammengefasst werden. Dafür werden \ac{SSE2} Operationen verwendet, welche 16-Byte \emph{xmm} Register verwendet. Zuerst werden die Oberen vier mit den unteren vier addiert. Die resultierenden vier Integer werden zur Verständlichkeit als A bis D bezeichnet. In Zeile 20 werden die Integer so angeordnet, dass A \& B sowie C \& D summiert werden, dargestellt als AB und CD. Das Ergebnis enthält diese zwei Summen doppelt (AB BA CD DC), je eins davon wird ignoriert. In Zeile 21 wird die Summe von AB und CD gebildet. Diese wird mit dem Bias addiert und in den Ausgabevektor gespeichert.
+
+\lstinputlisting[numbers=left,language=C++,
+  caption={Funktion für eine Affine-Transformation, mit \ac{SIMD} Operationen optimiert. Der Zusätzliche code entsteht durch Konvertierung der Datentypen. Es wird von 8-Bit Integern zu 32-Bit Integern gegangen.},
+  label=code:affineTransform,
+  linerange={15-38}]
+{\srcloc/affine-transformer.h}
+
+Für die Affine-Transformator-Schichten wird anschließend noch die Clipped\ac{ReLU} Transformation angewandt. Sie unterscheidet sich leicht von der Clipped\ac{ReLU} in der Feature-Transformator-Schicht, da hier von 32-Bit Integern auf 8-Bit Integer transformiert wird.

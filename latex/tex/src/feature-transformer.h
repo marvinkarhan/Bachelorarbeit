@@ -10,12 +10,12 @@ void refreshAccumulator(Board &board)
   {
     IndexList activeIndices;
     AppendActiveIndices(board, perspective, activeIndices);
-    std::memcpy(accumulator[perspective], biases_, 256 * std::int16_t);
+    std::memcpy(accumulator[perspective], biases, 256 * std::int16_t);
     for (const auto index : activeIndices)
     {
       const std::uint32_t offset = 256 * index;
       auto accumulation = reinterpret_cast<__m256i *>(&accumulator[perspective]);
-      auto column = reinterpret_cast<const __m256i *>(&weights_[offset]);
+      auto column = reinterpret_cast<const __m256i *>(&weights[offset]);
       constexpr std::uint32_t numChunks = 256 / 16;
       for (std::uint32_t j = 0; j < numChunks; ++j)
       {
@@ -40,14 +40,14 @@ void updateAccumulator(Board &board)
     for (const auto index : removed_indices)
     {
       const std::uint32_t offset = 256 * index;
-      auto column = reinterpret_cast<const __m256i *>(&weights_[offset]);
+      auto column = reinterpret_cast<const __m256i *>(&weights[offset]);
       for (std::uint32_t j = 0; j < numChunks; ++j)
         accumulation[j] = _mm256_sub_epi16(accumulation[j], column[j]);
     }
     // Difference calculation for the activated features
     for (const auto index : added_indices)
     {
-      auto column = reinterpret_cast<const __m256i *>(&weights_[offset]);
+      auto column = reinterpret_cast<const __m256i *>(&weights[offset]);
       for (std::uint32_t j = 0; j < numChunks; ++j)
         accumulation[j] = _mm256_add_epi16(accumulation[j], column[j]);
     }
