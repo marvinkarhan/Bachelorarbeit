@@ -8,14 +8,14 @@ affine_transformer1 = nn.Linear(2 * 256, 32)
 affine_transformer2 = nn.Linear(32, 32)
 output = nn.Linear(32, 1)
 
-def forward(us, them, feature_transformer_white, feature_transformer_black):
-  feature_transformer_white = feature_transformer(feature_transformer_white)
-  feature_transformer_black = feature_transformer(feature_transformer_black)
+def forward(us, them, white, black):
+  white = feature_transformer(white)
+  black = feature_transformer(black)
   # clipped relu activation function (0.0, 1.0) 
-  feature_transformer_ = torch.clamp(((us * torch.cat([feature_transformer_white, feature_transformer_black], dim=1)) + (them * torch.cat([feature_transformer_black, feature_transformer_white], dim=1))), 0.0, 1.0)
-  affine_transformer1_ = torch.clamp(affine_transformer1(feature_transformer_), 0.0, 1.0)
-  affine_transformer2_ = torch.clamp(affine_transformer2(affine_transformer1_), 0.0, 1.0)
-  return output(affine_transformer2_)
+  ft = torch.clamp((us * torch.cat([white, black], dim=1)) + (them * torch.cat([black, white], dim=1)), 0.0, 1.0)
+  at1 = torch.clamp(affine_transformer1(ft), 0.0, 1.0)
+  at2 = torch.clamp(affine_transformer2(at1), 0.0, 1.0)
+  return output(at2)
 
 lambda_ = 1
 

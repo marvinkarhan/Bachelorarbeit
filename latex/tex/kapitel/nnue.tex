@@ -186,7 +186,7 @@ Zuerst müssen die Schichten des Netzes definiert werden. Die vier Schichten kö
 \lstinputlisting[language=Python,
   caption={Definition der \ac{NNUE}-Schichten mit PyTorch, wie auf \autoref{fig:own-nn}. Für Schwarz und Weiß werden jeweils dieselben gewichte mittels einer 180-Grad-Rotation verwendet.},
   label=code:model,
-  linerange={4-7}]
+  linerange={6-9}]
 {\srcloc/model.py}
 
 % repeat following steps for each iteration
@@ -197,7 +197,7 @@ Bei der Fehlerrückführung wird zuerst die Vorwärtsaktivierung von der Eingang
 \lstinputlisting[language=Python,
   caption={Die Vorwärtsaktivierung des in \autoref{code:model} definierten Netzes. Die Schichten werden nacheinander, mit der Clipped\ac{ReLU} Transferfunktion, aktiviert. Nach der Feature-Transformator-Schicht werden die beiden Sichtweisen durch Konkatenation kombiniert. Die Eingabedaten werden der Funktion als Parameter gegeben. Welche Seite am Zug ist, wird durch \emph{us} und \emph{them} symbolisiert. Die dünnbesetzten Vektoren \emph{white} und \emph{black} enthalten die Eingabedaten},
   label=code:forward,
-  linerange={9-17}]
+  linerange={11-18}]
 {\srcloc/model.py}
 
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
@@ -207,7 +207,7 @@ Nachdem ein Ausgabewert mit dem Netz generiert wurde muss die Genauigkeit dieser
 \lstinputlisting[language=Python,
   caption={Die per Parameter übergebenen Eingabedaten werden vorwärts aktiviert. Danach werden die als \ac{CP} vorhandenen Werte Skaliert. Anschließend wird die Entropie und der Fehler für Evaluation und Ergebnis ermittelt, sodass mit \emph{lambda\_} ein Verhältnis der beiden Einflüsse gebildet werden kann. Schlussendlich gibt die Funktion die Abweichung der Vorhersage von der erwarteten Ausgabe zurück},
   label=code:trainingStep,
-  linerange={21-38}]
+  linerange={22-39}]
 {\srcloc/model.py}
 
 % 4. backpropagation using the Adadelta optimization algorithm

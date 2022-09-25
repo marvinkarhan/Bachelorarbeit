@@ -6,38 +6,73 @@
 
 Der Testaufbau soll dafür sorgen, dass die hier erreichten Ergebnisse reproduzierbar sind. Außerdem wird in diesem Kapitel die Auswahl der verwendeten Komponenten erläutert.
 
-Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen durch eine Analyse von KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
+Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch verwendet. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen laut einer Analyse von KomodoDragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
-Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Elo wird ebenfalls mithilfe der cutechess-cli berechnet. Die Elo wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, der in folgenden Graphen mithilfe von Errorbalken angegeben ist. Es werden für jede Elo Berechnung mindestens 5000 Spiele gespielt, falls eine höhere Genauigkeit nötig ist, werden mehr Spiele durchgeführt.
+Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, der in folgenden Graphen mithilfe von Errorbalken angegeben ist. Die Ordo-Bewertung verhält sich ähnlich wie die Elo-Bewertung, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert. Es werden für jede Elo Berechnung mindestens 5000 Spiele gespielt.
 
-Die Spiele werden mit \ac{STC} (10s+0,1s) gespielt, außer anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug.
-% https://centaur.reading.ac.uk/23800/ <- how to estimate elo on chess engines
-% https://centaur.reading.ac.uk/4549/ <- self play results
+Die Spiele werden mit \ac{STC} (10s+0,1s) gespielt, außer anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug. Für die Spiele wird der von der Hochschule zur Verfügung gestellten Rechner \emph{BigC} verwendet, mit zwei Intel(R) Xeon(R) Gold 6230R CPU @ 2.10GHz. Die Hash Größe des Schachcomputers beträgt ein Gigabyte.
+
+Für die Bewertung der Ergebnisse und Zwischenergebnisse der Testläufe wird Ergebnis Urteilssprengung verwendet. Das heißt, wenn die Bewertung beider Schachcomputer für Anzahl von Zügen einen Wert überschreitet, wird das Spiel beendet und das Ergebnis automatisch erteilt. Konkret gilt, dass ein Computer mit einem Vorteil von mindestens 1000 \ac{CP} für drei Züge automatisch als Sieger gewertet wird. Ein Spiel wird mit remis bewertet, wenn nach 40 Zügen, für acht Züge, die Evaluation nicht mehr als 10 \ac{CP} betrug. Das beschleunigt die Tests deutlich, ohne einen großen Einfluss auf das Ergebnis.
 
 \section{Elo-Entwicklung}
+
+In diesem Kapitel wird die Elo-Entwicklung von der Ausgangsversion mit \ac{HCE} bis hin zu dem Stärksten \ac{NNUE} basierten Version. In \autoref{table:testOverview} sind
+
+\begin{table}[h]
+  \caption{Übersicht alle Trainingsdurchläufe der für diese Arbeit entwickelten Netzwerke. Jeder Test erhält eine ID zur Referenzierung und eine kurze Beschreibung}
+  \label{table:testOverview}
+  \renewcommand{\arraystretch}{1.2}
+  \centering
+  \sffamily
+  \begin{footnotesize}
+    \begin{tabular}{l l}
+      \toprule
+      \textbf{Test Nr.} & \textbf{Beschreibung}                                                                 \\
+      \midrule
+      1                 & Erstellung einer Basis Version                                                        \\
+      2                 & Mittlere quadratische Fehler-Verlustfunktion statt Kreuzentropie-Verlustfunktion      \\
+      3                 & komplexe gemeinsame Typen                                                             \\
+      4                 & Mittlere quadratische Fehler-Verlustfunktion mit alternativer Implementierung         \\
+      5                 & Frisches Training des Netzes mit Simplen $5000$ Knoten Daten                          \\
+      6                 & Das Netz aus Test 5 mit der Kombination aller Drei Trainingsdatensätze neu Trainieren \\
+      7                 & Das Netz aus Test 5 mit \ac{Lc0} Daten neu Trainieren                                 \\
+      8                 & Das Netz aus Test 7 mit der Kombination aller Drei Trainingsdatensätze neu Trainieren \\
+      9                 & Frisches Training des Netzes mit Simplen $5000$ Knoten Daten und lambda 0.8           \\
+      10                & Das Netz aus Test 9 mit \ac{Lc0} Daten und lambda 0.8 neu Trainieren                  \\
+      \bottomrule
+    \end{tabular}
+  \end{footnotesize}
+  \rmfamily
+\end{table}
 
 \begin{figure}
   \centering
   \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}
-      \begin{axis}[grid=both,
-          grid style={solid,gray!30!white},
+      \begin{axis}[
+          grid=none,
           axis lines=middle,
-          xlabel={step},
-          ylabel={value},
+          xlabel={Epoche},
+          ylabel={Fehler},
+          ymin=0,
+          xmin=0,
+          xmax=800,
+          scaled y ticks = false,
+          yticklabel style={
+            /pgf/number format/fixed,
+            /pgf/number format/precision=3
+          },
           x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
-          y label style={at={(axis description cs:-0.26,.5)},rotate=90,anchor=south},]
-        \addplot table [x=Step, y=Value, col sep=comma] {src/run-lightning_logs_version_21-tag-training_loss.csv};
+          y label style={at={(axis description cs:-0.15,.5)},rotate=90,anchor=south},
+          no marks
+        ]
+        \addplot table [blue, smooth, x=epoch, y=loss, col sep=comma] {src/run-version_1-tag-training_loss.csv};
       \end{axis}
     \end{tikzpicture}
   }%
   \caption{Verlust über Iterationen.}
   \label{fig:loss}
 \end{figure}
-
-% erklären was Elo ist
-
-% Turnier mit den getesteten Schachengines
 
 % die Differenzen der getesteten Versionen aufzeigen (vl lieber im Kapitel Diskussion)
 
