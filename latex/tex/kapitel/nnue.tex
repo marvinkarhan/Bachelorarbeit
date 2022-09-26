@@ -1,6 +1,6 @@
 \chapter{NNUE-Implementierung}
 
-Ziel dieses Kapitels ist es, Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE}-Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturentscheidungen eingegangen. Danach wird geklärt, wie diese Entscheidungen Einfluss auf die Implementierung des Trainers und auf die Integration in einem Schachcomputer haben.
+Ziel dieses Kapitels ist es, die Architektur und Implementierung der im Rahmen dieser Arbeit entwickelten \ac{NNUE}-Evaluationsfunktion zu erläutern. Es wird anfangs auf die Architekturentscheidungen eingegangen. Danach wird geklärt, wie diese Entscheidungen Einfluss auf die Implementierung des Trainers und auf die Integration in einem Schachcomputer haben.
 
 Kapitel \autoref{chap:HCE} zeigt, wie die herkömmliche Art und Weise der Positions-Evaluation funktioniert. Verbesserungen der \ac{HCE} sind nicht einfach. Jeder neue Aspekt in der Evaluationsfunktion muss sorgfältig ausgewählt werden und anschließend per Hand oder mithilfe von Optimierungsalgorithmen, wie \zb{} \ac{SPSA}, angepasst werden \cite{spall1992multivariate}. Es ist sehr schwierig, eine Evaluation zu bauen, die für alle möglichen Stellungen optimal ist. Zudem spielt der Bias der Entwickler immer eine Rolle. Die \ac{NNUE}-Evaluation ist nicht an solche Limitierungen gebunden und kann auf eine ganz andere Art und Weise entscheiden, welche Faktoren wichtig für die Evaluation einer Schachposition sind. Die Entwicklung der Schachcomputerlandschaft zeigt, dass diese Herangehensweise der \ac{HCE} überlegen ist. Nur in Situationen, in denen es einen klaren Vorteil gibt, ist es sinnvoll \ac{HCE} zu verwenden. Deshalb verwenden die meisten \ac{NNUE}-Schachcomputer einen hybriden Ansatz in der Implementierung. In dieser Arbeit wird eine reine \ac{NNUE}-Evaluation verwendet. Der Grund dafür ist die rudimentäre \ac{HCE} des verwendeten Schachcomputers. Außerdem tritt dieser Fall bei Schachcomputer gegen Schachcomputer selten auf, da der Vorteil meist klein bleibt.
 
@@ -80,11 +80,11 @@ Die Architektur, welche in dieser Arbeit verwendet wird, ist in \autoref{fig:own
 
     \end{tikzpicture}
   }%
-  \caption{Das verwendete \ac{NN} mit einer exemplarischen Eingabe, basierend auf der \autoref{fig:chessboard}. Die Bezeichnung der Schichten ist oberhalb und die Anzahl der dazugehörigen Neuronen unterhalb des Netzes zu sehen. Die Eingabeschicht und die Feature-Transformator-Schicht sind in zwei Teile geteilt, basierend auf den zwei Seiten im Schach (Weiß und Schwarz). Sonst sind die Schichten voll vernetzt. Die Ausgabe des Netzes ist eine Evaluation der Position.}
+  \caption{Das verwendete \ac{NN} mit einer exemplarischen Eingabe basierend auf der \autoref{fig:chessboard}. Die Bezeichnung der Schichten ist oberhalb und die Anzahl der dazugehörigen Neuronen unterhalb des Netzes zu sehen. Die Eingabeschicht und die Feature-Transformator-Schicht sind in zwei Teile geteilt basierend auf den zwei Seiten im Schach (Weiß und Schwarz). Ansonsten sind die Schichten voll vernetzt. Die Ausgabe des Netzes ist eine Evaluation der Position.}
   \label{fig:own-nn}
 \end{figure}
 
-Das \acl{DNN} ist untypisch klein, da die meiste Information in der Feature-Transformator-Schicht enthalten ist \cite{StockfishNNUE}. Die übrigen Schichten müssen klein gehalten werden, da sie nicht wie die Feature-Transformator-Schicht mit inkrementellen Aktualisierungen aktiviert werden. Sie werden immer ganz berechnet werden. Die Ausgabeschicht besitzt lediglich ein Neuron, da es sich hier um ein Regressionsproblem handelt. Die Ausgabe des Neurons spiegelt die Evaluation einer Schachposition wider.
+Das \acl{DNN} ist untypisch klein, da die meiste Information in der Feature-Transformator-Schicht enthalten ist \cite{StockfishNNUE}. Die übrigen Schichten müssen klein gehalten werden, da sie nicht wie die Feature-Transformator-Schicht mit inkrementellen Aktualisierungen aktiviert werden. Sie werden immer ganz berechnet. Die Ausgabeschicht besitzt lediglich ein Neuron, da es sich hier um ein Regressionsproblem handelt. Die Ausgabe des Neurons spiegelt die Evaluation einer Schachposition wider.
 
 Für die Berechnung einer Evaluation ist theoretisch eine Schicht ausreichend. Das limitiert das Netz jedoch sehr stark in der Form der zu modellierenden Funktion. Deshalb werden hier wie üblich für \acp{DNN} mehrere Schichten verwendet. Die genaue Zusammensetzung der Schichten ist darauf ausgelegt, dass die Neuronen einer Schicht die Größe der verwendeten \ac{SIMD}-Register ganz ausschöpfen \cite{YNasu2018}. Weiter ist es nicht klar, welche Größe sich am besten für den spezifisch verwendeten Schachcomputer eignet. Zur Ermittlung einer optimalen Größe müssen Tests mit verschiedenen Größen durchgeführt werden. Es wird die Größe verwendet, welche bereits Erfolge in anderen Schachcomputern gezeigt hat.
 % the reason for choosing an architecture with two hidden layers is based on two things. 1. we dont want a large net to keep processing speed high 2. we use discoveries from other sucessfull engines that also use two hidden layers (e.g. stockfish) 
@@ -99,7 +99,7 @@ Die Feature-Transformator-Schicht hat den größten Einfluss auf Geschwindigkeit
 
 In \autoref{fig:own-nn} ist der Feature-Transformator in zwei Teile geteilt. Einer für Weiß und einer für Schwarz. Je Seite werden 256 Neuronen verwendet. Tatsächlich sind die Gewichte, in dieser Implementierung, für beide Seiten dieselben. Für Weiß werden die Gewichte so wie sie sind verwendet, und für Schwarz wird das Brett um 180 Grad rotiert. Das bedeutet, die schwarzen Figuren werden wie Weiße behandelt und nutzen so die dieselben Gewichte. Eine 180-Grad-Rotation wird wegen des verwendeten Datenladers benutzt.
 
-Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz zu Shogi, keine Rotationssymmetrie besitzt. Trotzdem funktioniert es überraschend gut \cite{StockfishNNUE}. Alternativ kann das Brett horizontal gespiegelt werden, um die Symmetrie zu wahren. Eine Illustration warum, wie sich Rotation und Spiegelung erhalten ist in \autoref{fig:orientedChessboards} zu sehen. In der Abbildung ist die orientierte Stellung aus \autoref{fig:chessboard} abgebildet. Sie ist dann nötig, wenn schwarz am Zug ist. Die Farben der Figuren werden invertiert. Das ermöglicht es, die Bewertung für Schwarz aus Sicht von Weiß durchzuführen und so dieselben Gewichte zu verwenden. Diese Orientierung findet während der Generierung der Indizierung der Figuren für die Eingabeschicht statt.
+Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz zu Shogi, keine Rotationssymmetrie besitzt. Trotzdem funktioniert es überraschend gut \cite{StockfishNNUE}. Alternativ kann das Brett horizontal gespiegelt werden, um die Symmetrie zu wahren. Eine Illustration, wie sich Rotation und Spiegelung verhalten, ist in \autoref{fig:orientedChessboards} zu sehen. In der Abbildung ist die orientierte Stellung aus \autoref{fig:chessboard} abgebildet. Eine Rotation ist dann nötig, wenn Schwarz am Zug ist. Die Farben der Figuren werden invertiert. Das ermöglicht es, die Bewertung für Schwarz aus Sicht von Weiß durchzuführen und so dieselben Gewichte zu verwenden. Diese Orientierung findet während der Generierung der Indizierung der Figuren für die Eingabeschicht statt.
 
 \begin{figure}
   \centering
@@ -108,7 +108,7 @@ Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz z
     \resizebox{.9\textwidth}{!}{%
       \chessboard[setfen={8/8/6k1/5N2/3p4/8/3K4/8 b}]
     }
-    \caption{Um 180-Grad-Rotiertes Schachbrett}
+    \caption{Um 180-Grad-rotiertes Schachbrett}
     \label{fig:rotatedChessboard}
   \end{subfigure}%
   \begin{subfigure}{.5\textwidth}
@@ -119,7 +119,7 @@ Eine 180-Grad-Rotation entspricht nicht der Realität, da Schach, im Gegensatz z
     \caption{Horizontal gespiegeltes Schachbrett}
     \label{fig:flippedChessboard}
   \end{subfigure}
-  \caption{Beispiele für ein orientiertes Schachbrett. Basierend auf \autoref{fig:chessboard}. Das Schachbrett ist in zwei Orientierungs-Möglichkeiten gezeigt. Die Schachbretter werden für Schwarz ausgerichtet, das ist der Fall, wenn Schwarz am Zug ist. Die Farben sind invertiert. So können die gleichen Gewichte für weiß und Schwarz verwendet werden.}
+  \caption{Beispiele für ein orientiertes Schachbrett, basierend auf \autoref{fig:chessboard}. Das Schachbrett ist in zwei Orientierungsmöglichkeiten gezeigt. Die Schachbretter werden für Schwarz ausgerichtet. Das ist der Fall, wenn Schwarz am Zug ist. Die Farben sind invertiert. So können die gleichen Gewichte für Weiß und Schwarz verwendet werden.}
   \label{fig:orientedChessboards}
 \end{figure}
 
@@ -130,7 +130,7 @@ Außerdem ist es für den Akkumulator wichtig, dass bei der Quantisierung ein Qu
 
 \subsection{Affine-Transformator-Schichten}
 
-Die Affine-Transformator-Schichten sind voll vernetzte Schichten. Sie werden mit der Clipped\ac{ReLU} Transformation aktiviert und dienen dazu dem Netz mehr Tiefe zugeben, ohne dabei zu groß zu werden. Die zwei hier zugehörigen Schichten haben jeweils 32 Neuronen.
+Die Affine-Transformator-Schichten sind voll vernetzte Schichten. Sie werden mit der Clipped\ac{ReLU} Transformation aktiviert und dienen dazu dem Netz mehr Tiefe zu geben ohne dabei zu groß zu werden. Die zwei hier zugehörigen Schichten haben jeweils 32 Neuronen.
 
 Aufgrund der Fehler-Akkumulation der Quantisierung kann es passieren, dass größere/mehr Schichten nahe der Ausgabeschicht einen negativen Effekt haben \cite{StockfishNNUE}. Deshalb werden diese Schichten im Vergleich zu der Eingabeschicht sehr klein gehalten.
 
@@ -140,27 +140,27 @@ Aufgrund der Fehler-Akkumulation der Quantisierung kann es passieren, dass grö�
 Das Training eines \acp{NN} beschreibt den Vorgang, bei welchem die Gewichte des Netzes mithilfe von Backpropagation und Gradientenabstieg angepasst werden. Die Gewichte, werden nach dem Training nicht mehr verändert.
 % Nach dem Training werden die Gewichte nicht mehr verändert.
 
-Welche Gewichte gewählt werden, hängt von einigen Faktoren ab. In diesem Kapitel wird auf diese eingegangen. Der Trainingsvorgang lässt sich in zwei Teile teilen. Erstens die Auswahl/Generierung der Eingabedaten, welche die Basis des \acp{NN} sind. Zweitens der Trainer. Er beschreibt das Programm, welches die Daten einliest und die Gewichte anpasst. Der Trainer ist selbst in weitere Teile untergliedert, die Stellschrauben für das Training darstellen.
+Welche Gewichte gewählt werden, hängt von einigen Faktoren ab. In diesem Kapitel wird auf diese eingegangen. Der Trainingsvorgang lässt sich in zwei Teile teilen. Erstens die Auswahl/Generierung der Eingabedaten, welche die Basis des \acp{NN} sind. Zweitens der Trainer. Er beschreibt das Programm, welches die Daten einliest und die Gewichte anpasst. Der Trainer ist selbst in weitere Teile untergliedert, die die Stellschrauben für das Training darstellen.
 
 \subsection{Eingabedaten}
 \label{chap:inputdata}
 
 Die Erzeugung der Eingabedaten ist nicht Teil dieser Arbeit. Jedoch ist es wichtig zu wissen, wie die Eingabedaten generiert werden und wie sie in den Trainer geladen werden, um zu verstehen, wie das \ac{NN} lernt. Auf die Implementierung des Stockfish Datenladers wird hier ebenfalls nicht eingegangen, da es nicht relevant für das Verständnis eines \acp{NNUE} ist.
 
-Im Training für diese Arbeit wurden drei verschieden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neuesten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden. Alle Datensätze sind durch Schachcomputer automatisch, mit Spielen gegen sich selbst, generiert. Einer der Datensätze enthält Spieldaten von Stockfish, aus Spielen mit einer festen Suche von $5000$ Knoten pro Zug in Kombination mit dem \ac{UHO}-Eröffnungsbuch \cite{Pohl2021}. Laut Stockfish eignen sich Daten generiert mit \ac{Lc0} generell besser für \acp{NNUE} \cite{StockfishTrainingDataWiki}. Deshalb besteht einer der drei Datensätze aus eine Mischung von verschieden \ac{Lc0} Daten. Trotzdem ist empirisch belegt, dass eine Kombination der Daten zu einem besseren Ergebnis führen. Der dritte Datensatz besteht aus Spieldaten von Stockfish aus der Schachvariante \ac{DFRC}. \ac{DFRC} gibt eine zufällige Startposition der Figuren vor. \emph{Double}, weil beide Seiten unterschiedliche Startpositionen der Figuren haben. Der \ac{DFRC} Datensatz ist für Stockfish interessanter als für diese Arbeit, da Stockfish diesen Modus unterstützt und das mit demselben Netz wie auch herkömmliches Schach. Das ist keine Anforderung für diese Arbeit, da lediglich traditionelles Schach unterstützt ist. Alle Drei Datensätze enthalten insgesamt 72 Milliarden Positionen.
+Im Training für diese Arbeit wurden drei verschieden generierte Datensätze verwendet. Diese Datensätze wurden von Stockfish für das Training der neuesten Variante ihres \acp{NNUE} verwendet \cite{StockfishNewestNetJul04}. Die drei Datensätze unterscheiden sich in der Art und Weise, wie sie generiert wurden. Alle Datensätze sind durch Schachcomputer automatisch mit Spielen gegen sich selbst generiert. Einer der Datensätze enthält Spieldaten von Stockfish aus Spielen mit einer festen Suche von $5000$ Knoten pro Zug in Kombination mit dem \ac{UHO}-Eröffnungsbuch \cite{Pohl2021}. Laut Stockfish eignen sich Daten generiert mit \ac{Lc0} generell besser für \acp{NNUE} \cite{StockfishTrainingDataWiki}. Deshalb besteht einer der drei Datensätze aus einer Mischung von verschiedenen \ac{Lc0} Daten. Trotzdem ist empirisch belegt, dass eine Kombination der Daten zu einem besseren Ergebnis führen. Der dritte Datensatz besteht aus Spieldaten von Stockfish aus der Schachvariante \ac{DFRC}. \ac{DFRC} gibt eine zufällige Startposition der Figuren vor. \emph{Double}, weil beide Seiten unterschiedliche Startpositionen der Figuren haben. Der \ac{DFRC} Datensatz ist für Stockfish interessanter als für diese Arbeit, da Stockfish diesen Modus unterstützt und das mit demselben Netz wie auch beim herkömmlichen Schach. Das ist keine Anforderung für diese Arbeit, da lediglich traditionelles Schach unterstützt ist. Alle drei Datensätze enthalten insgesamt 72 Milliarden Positionen.
 
 % wenn Eingabedaten mit einer tieferen Suche verwendet werden, sind die Konzepte hinter den Zügen/der Evaluation schwerer zu verstehen und somit auch schwieriger zu lernen.
 Es ist nicht klar, welche Daten sich am besten für das Training eines \acp{NNUE} eignen \cite{StockfishNNUE}. Die für diese Arbeit verwendeten Daten haben sich empirisch als geeignet erwiesen. Sind die gewählten Trainingsdaten zu komplex, ist es schwer zu erkennen, welche die Charakteristiken einer guten/schlechten Position sind. Komplexe Daten sind Evaluationen, die mit einer hohen Suchtiefe generiert werden. Ist die Suchtiefe jedoch zu niedrig, ist die Evaluation ungenau und vermittelt möglicherweise falsche Muster.
 
 % ein Problem ist auch, dass die Eingabedaten nicht wirklich den tatsächlichen Anwendungsfall repräsentieren -> das Netzwerk soll die aktuelle Stellung gut bewerten, bekommt aber als Eingabe die Bewertung der Stellung in z. B. 5 Zügen.
-Ein weiteres Problem ist es, dass die verwendeten Daten nicht den Anwendungsfall wider Spiegeln. Das Netzwerk soll die aktuelle Stellung so genau wie möglich Evaluieren, die Eingabedaten zeigen jedoch die Evaluationen von Positionen welche \zb{} nur 5000 Knoten tief gesucht wurde.
+Ein weiteres Problem ist es, dass die verwendeten Daten nicht den Anwendungsfall widerspiegeln. Das Netzwerk soll die aktuelle Stellung so genau wie möglich evaluieren. Die Eingabedaten zeigen jedoch die Evaluationen von Positionen welche \zb{} nur 5000 Knoten tief gesucht wurden.
 
 % die Reihenfolge von den Daten spielt eine Rolle
-Ein Netz kann mehrmals trainiert werden. Das ist sinnvoll, wenn dabei verschiedene Eingabedaten verwendet werden. Dabei ist die Reihenfolge der Datensätze von Bedeutung. Es kann besser für das Training sein, wenn zuerst simple Daten und dann komplexere Daten verwendet werden. Verschiedene Testergebnisse dazu sind in \autoref{chap:Ergebnisse} zu sehen. Außerdem kann es sein das ein Trainingslauf, aufgrund der Zufällig initialisierten Gewichte, in einem lokalen Minimum stecken bleibt. Das wird jedoch vernachlässigt, da es deutlich mehr Trainingsläufe bräuchte um diesen Effekt zu verringern.
+Ein Netz kann mehrmals trainiert werden. Das ist sinnvoll, wenn dabei verschiedene Eingabedaten verwendet werden. Dabei ist die Reihenfolge der Datensätze von Bedeutung. Es kann besser für das Training sein, wenn zuerst simple Daten und dann komplexere Daten verwendet werden. Verschiedene Testergebnisse dazu sind in \autoref{chap:Ergebnisse} zu sehen. Außerdem kann es sein, dass ein Trainingslauf aufgrund der zufällig initialisierten Gewichte in einem lokalen Minimum stecken bleibt. Das wird jedoch vernachlässigt, da es deutlich mehr Trainingsläufe bräuchte um diesen Effekt zu verringern.
 
 % normalerweise ist wird pro Epoche das gesamte Datenset verarbeitet, hier ist das nicht der Fall, wir verarbeiten 100M Positionen pro Zug, wichtig ist, dass die Daten nicht sequentiell gelesen werden, deshalb werden zufällige Positionen übersprungen -> würden die Daten gesuffelt sein, wären die Eingabedaten sehr viel größer, da ihr Encoding auf sich wenig ändernden Positionen basiert
 % Letztendlich werden alle Positionen gleich oft trainiert, die Verteilung ist jedoch besser zum Lernen.
-Eine Epoche ist als 100 Millionen Positionen definiert. Eine Batch, also die Zahl an Positionen, die in einer Iteration verarbeitet werden, beträgt $2^{14}=16.384$. Die Daten werden nicht sequentiell geladen. Sonst würde eine Batch viele ähnliche Stellungen enthalten, da die Daten aufgrund des verwendeten Datenformats, aufgrund von Datenkomprimierung, ähnliche Stellungen sequentiell speichern. Die Daten werden in zufälligen Schritten übersprungen.
+Eine Epoche ist als 100 Millionen Positionen definiert. Eine Batch, also die Zahl an Positionen, die in einer Iteration verarbeitet werden, beträgt $2^{14}=16.384$. Die Daten werden nicht sequentiell geladen. Ansonsten würde eine Batch viele ähnliche Stellungen enthalten, da die Daten aufgrund des verwendeten Datenformats, aufgrund von Datenkomprimierung, ähnliche Stellungen sequentiell speichern. Die Daten werden in zufälligen Schritten übersprungen.
 
 % they are already normalized (siehe feature set)
 % labeling is easy as the set is automatically generated data with labels (cp score) automatically generated
@@ -175,21 +175,21 @@ Theoretisch gibt es Daten, die \enquote{perfekt} sind, denn Schach ist für Stel
 \label{chap:trainer}
 
 % Trainer means the (pytorch lightning) module that is responsible for training
-Der Trainer übernimmt die Anpassung der Gewichte. Er nimmt die Eingabedaten, aktiviert das Netz vorwärts und passt die Gewichte mit Backpropagation an. Der Trainer muss nicht selbständig implementiert werden, Frameworks, wie in diesem Fall PyTorch, vereinfachen die Implementierung \cite{NEURIPS2019_9015}. PyTorch ist ein Python Framework, für das Training von neuronalen Netzen. Es ermöglicht durch vorgefertigte Module die Definition und Training des Netzes auf der GPU.
+Der Trainer übernimmt die Anpassung der Gewichte. Er nimmt die Eingabedaten, aktiviert das Netz vorwärts und passt die Gewichte mit Backpropagation an. Der Trainer muss nicht selbständig implementiert werden. Frameworks, wie in diesem Fall PyTorch, vereinfachen die Implementierung \cite{NEURIPS2019_9015}. PyTorch ist ein Python Framework für das Training von neuronalen Netzen. Es ermöglicht durch vorgefertigte Module die Definition und das Training des Netzes auf der GPU.
 
 % descripe training steps:
 % 1. initilize network
-Zuerst müssen die Schichten des Netzes definiert werden. Die vier Schichten können mit vier Zeilen code definiert werden, wie in \autoref{code:model} zu sehen. Dabei handelt es sich um vier dicht vernetzte lineare Schichten.
+Zuerst müssen die Schichten des Netzes definiert werden. Die vier Schichten können in vier Zeilen Code definiert werden, wie in \autoref{code:model} zu sehen. Dabei handelt es sich um vier dicht vernetzte lineare Schichten.
 
 \lstinputlisting[language=Python,
-  caption={Definition der \ac{NNUE}-Schichten mit PyTorch, wie auf \autoref{fig:own-nn}. Für Schwarz und Weiß werden jeweils dieselben gewichte mittels einer 180-Grad-Rotation verwendet.},
+  caption={Definition der \ac{NNUE}-Schichten mit PyTorch wie auf \autoref{fig:own-nn}. Für Schwarz und Weiß werden jeweils dieselben Gewichte mittels einer 180-Grad-Rotation verwendet.},
   label=code:model,
   linerange={6-9}]
 {\srcloc/model.py}
 
 % repeat following steps for each iteration
 % 2. forward activation
-Bei der Fehlerrückführung wird zuerst die Vorwärtsaktivierung von der Eingangs- bis zur Ausgabeschicht durchgeführt. Bei diesem \ac{NNUE} wird die Ausgabe der Feature-Transformator-Schicht per Konkatenation, abhängig von der aktiven Seite kombiniert, da die Ausgabe der Ausgabewert die Evaluation aus Sicht der Aktiven Seite darstellen soll und dasselbe Netz für beide Seiten verwendet werden soll. Die Implementierung dazu ist in \autoref{code:forward} zu sehen.
+Bei der Fehlerrückführung wird zuerst die Vorwärtsaktivierung von der Eingangs- bis zur Ausgabeschicht durchgeführt. Bei diesem \ac{NNUE} wird die Ausgabe der Feature-Transformator-Schicht per Konkatenation abhängig von der aktiven Seite kombiniert, da der Ausgabewert die Evaluation aus Sicht der aktiven Seite darstellen soll und dasselbe Netz für beide Seiten verwendet werden soll. Die Implementierung dazu ist in \autoref{code:forward} zu sehen.
 
 % die Aktivierungsfunktion is eine ClippedReLU
 \lstinputlisting[language=Python,
@@ -200,20 +200,20 @@ Bei der Fehlerrückführung wird zuerst die Vorwärtsaktivierung von der Eingang
 
 % 3. evaluate loss either with crossentropy or mse (bouth testet, whats best is in the results chapter)
 % convert cp score converted to wdl to reduce gradients -> also decreases the evaluation range -> große Evaluationen sind nicht wichtig -> win more scenario
-Nachdem ein Ausgabewert mit dem Netz generiert wurde muss die Genauigkeit dieser Vorhersage bestimmt werden. Dafür wird die Kreuzentropie-Verlustfunktion verwendet. Wird der Fehler auf der \acl{CP} Ausgabe bestimmt, ist der Gradient sehr groß \cite{StockfishNNUE}. Deshalb wird die Ausgabe mit der Sigmoidfunktion zu einer Gewinnwahrscheinlichkeit (0-1) transformiert. Die hier verwendete Kreuzentropie-Verlustfunktion ist von Stockfish übernommen \cite{StockfishNNUE}. Sie leitet relativ zu der Ausgabe des Netzes ab, sodass der Fehler mindestens 0 ist. Im Training gibt es außerdem die Besonderheit, das anhand der Evaluation der Position oder über das Ergebnis der gespielten Partie in der Stellung gelernt werden kann. Welches Verhältnis der zwei Zielwerte optimal ist, lässt sich nicht einfach bestimmen. Es ist möglich, dass die Inklusion Ergebnis basierten Trainings gar nicht hilft. Empirische Tests dazu sind in \autoref{chap:Ergebnisse} zu sehen. Die folgende Implementierung enthält code für dafür. Die Variable \emph{lambda\_} steuert das Verhältnis. Ein kleiner Wert (epsilon) sorgt dafür, um $log(0)$ zu verhindern. Zwei Skalierungswerte sorgen dafür, dass die Ausgabe des Netzes eine passende Form für die Gewinnwahrscheinlichkeit eines Schachspiels darstellt. Die Werte hängen von der Schachcomputer Implementierung und den verwendeten Eingabedaten ab \cite{StockfishNNUE}. Das Folgende \autoref{code:trainingStep}, zeigt die Implementierung eines Training Schritts, der die Eingabedaten bekommt, eine Vorwärtsaktivierung durchführt, den Fehler mit der Kreuzentropie-Verlustfunktion berechnet und den Fehler zurückgibt:
+Nachdem ein Ausgabewert mit dem Netz generiert wurde, muss die Genauigkeit dieser Vorhersage bestimmt werden. Dafür wird die Kreuzentropie-Verlustfunktion verwendet. Wird der Fehler auf der \acl{CP} Ausgabe bestimmt, ist der Gradient sehr groß \cite{StockfishNNUE}. Deshalb wird die Ausgabe mit der Sigmoidfunktion zu einer Gewinnwahrscheinlichkeit (0-1) transformiert. Die hier verwendete Kreuzentropie-Verlustfunktion ist von Stockfish übernommen \cite{StockfishNNUE}. Sie leitet relativ zu der Ausgabe des Netzes ab, sodass der Fehler mindestens 0 ist. Im Training gibt es außerdem die Besonderheit, dass anhand der Evaluation der Position oder über das Ergebnis der gespielten Partie in der Stellung gelernt werden kann. Welches Verhältnis der zwei Zielwerte optimal ist, lässt sich nicht einfach bestimmen. Es ist möglich, dass die Inklusion ergebnisbasierten Trainings gar nicht hilft. Empirische Tests dazu sind in \autoref{chap:Ergebnisse} zu sehen. Die folgende Implementierung enthält einen Code dafür. Die Variable \emph{lambda\_} steuert das Verhältnis. Ein kleiner Wert (Epsilon) sorgt dafür, $log(0)$ zu verhindern. Zwei Skalierungswerte sorgen dafür, dass die Ausgabe des Netzes eine passende Form für die Gewinnwahrscheinlichkeit eines Schachspiels darstellt. Die Werte hängen von der Schachcomputer Implementierung und den verwendeten Eingabedaten ab \cite{StockfishNNUE}. Das folgende \autoref{code:trainingStep} zeigt die Implementierung eines Trainingsschritts, der die Eingabedaten bekommt, eine Vorwärtsaktivierung durchführt, den Fehler mit der Kreuzentropie-Verlustfunktion berechnet und den Fehler zurückgibt:
 
 \lstinputlisting[language=Python,
-  caption={Die per Parameter übergebenen Eingabedaten werden vorwärts aktiviert. Danach werden die als \ac{CP} vorhandenen Werte Skaliert. Anschließend wird die Entropie und der Fehler für Evaluation und Ergebnis ermittelt, sodass mit \emph{lambda\_} ein Verhältnis der beiden Einflüsse gebildet werden kann. Schlussendlich gibt die Funktion die Abweichung der Vorhersage von der erwarteten Ausgabe zurück},
+  caption={Die per Parameter übergebenen Eingabedaten werden vorwärts aktiviert. Danach werden die als \ac{CP} vorhandenen Werte skaliert. Anschließend wird die Entropie und der Fehler für Evaluation und Ergebnis ermittelt, sodass mit \emph{lambda\_} ein Verhältnis der beiden Einflüsse gebildet werden kann. Schlussendlich gibt die Funktion die Abweichung der Vorhersage von der erwarteten Ausgabe zurück},
   label=code:trainingStep,
   linerange={22-39}]
 {\srcloc/model.py}
 
 % 4. backpropagation using the Adadelta optimization algorithm
 % benefits: no learning rate tuning needed is already implemented in pytorch
-Mit der Genauigkeit der Ausgabe des Netzes werden mithilfe von Backpropagation die Gewichte angepasst. In dem Training für diese Arbeit wird das adaptive Lernraten-Modell Adadelta \cite{Zeiler2012} verwendet. Adadelta übernimmt die Anpassung der Lernrate und ist bereits von PyTorch implementieren, kann somit sehr einfach, wie \autoref{code:adadelta} zeigt, in den Trainer eingebunden werden.
+Mit der Genauigkeit der Ausgabe des Netzes werden mithilfe von Backpropagation die Gewichte angepasst. In dem Training für diese Arbeit wird das adaptive Lernraten-Modell Adadelta \cite{Zeiler2012} verwendet. Adadelta übernimmt die Anpassung der Lernrate und ist bereits von PyTorch implementiert. Es kann somit sehr einfach, wie \autoref{code:adadelta} zeigt, in den Trainer eingebunden werden.
 
 \lstinputlisting[language=Python,
-  caption={Deklaration des Optimierungsalgorithmus in PyTorch. Das PyTorch Modul \emph{optim} bietet verschiedene Optimierungsalgorithmen an. Es wird, die Instanziierung der Adadelta Klasse, dargestellt. Die \emph{paramters} ist eine Liste der Parameter der in \autoref{code:model} deklarierten Schichten. Die Lernrate beträgt standardmäßig 1 und wird, durch den Algorithmus, dynamisch angepasst},
+  caption={Deklaration des Optimierungsalgorithmus in PyTorch. Das PyTorch Modul \emph{optim} bietet verschiedene Optimierungsalgorithmen an. Es wird die Instanziierung der Adadelta Klasse dargestellt. Die \emph{paramters} ist eine Liste der Parameter der in \autoref{code:model} deklarierten Schichten. Die Lernrate beträgt standardmäßig 1 und wird, durch den Algorithmus, dynamisch angepasst},
   label=code:adadelta,
   linerange={43-43}]
 {\srcloc/model.py}
@@ -221,16 +221,16 @@ Mit der Genauigkeit der Ausgabe des Netzes werden mithilfe von Backpropagation d
 \section{Integration in einen Schachcomputer}
 \label{chap:integration}
 
-Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer mit dem Fokus auf \ac{SIMD}-Operationen. Die verwendete Implementierung ist eine auf den Schachcomputer angepasste Version der Stockfish-Implementierung bevor Stockfish zu HalfKAv2 und Buckets gewechselt ist \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an, diese Implementierung zu verwenden. Die Quellcodebeispiele in diesem Kapitel sind für ein besseres Verständnis, vereinfacht. Die Funktionalität, bleibt jedoch bestehen.
+Folgendes Kapitel beschreibt die Implementierung eines \acp{NNUE} in einen Schachcomputer mit dem Fokus auf \ac{SIMD}-Operationen. Die verwendete Implementierung ist eine auf den Schachcomputer angepasste Version der Stockfish-Implementierung bevor Stockfish zu HalfKAv2 und Buckets gewechselt ist \cite{StockfishRepo}. Da es sich um die gleiche Architektur handelt, bietet es sich an, diese Implementierung zu verwenden. Die Quellcodebeispiele in diesem Kapitel sind für ein besseres Verständnis vereinfacht. Die Funktionalität bleibt jedoch bestehen.
 
-Die im Training ermittelten Gewichte, werden in eine Binärdatei gespeichert, von dem Schachcomputer gelesen und in Arrays gehalten. Zum Einlesen der Binärdatei, muss die Integer-Größe bekannt sein. Sie ist durch das gewählte Quantisierungsschema definiert und ist mithilfe von C++ \emph{Templates} leicht anpassbar, falls sich das Quantisierungsschema ändern sollte.
+Die im Training ermittelten Gewichte werden in eine Binärdatei gespeichert, von dem Schachcomputer gelesen und in Arrays gehalten. Zum Einlesen der Binärdatei muss die Integer-Größe bekannt sein. Sie ist durch das gewählte Quantisierungsschema definiert und ist mithilfe von C++ \emph{Templates} leicht anpassbar, falls sich das Quantisierungsschema ändern sollte.
 
 \subsection{Quantisierungsschema}
 
 Eine Quantisierung ist nötig, um CPU-Optimierungen zu ermöglichen. Die als Float trainierten Gewichte und Bias werden bei der Konvertierung des Netzes von einem \emph{.ckpt} zu einer proprietären binären \emph{.nnue}-Datei konvertiert. Alternativ kann die Konvertierung beim Einlesen der Gewichte und Bias in den Schachcomputer stattfinden. Das hat den kleinen Nachteil, dass die Netzwerkdatei etwas mehr Speicherkapazität benötigt. Das hier verwendete Quantisierungsschema ist dem von Stockfish nachempfunden \cite{StockfishNNUE}. Es ist daran ausgerichtet, die kleinstmöglichen Integer-Typen zu verwenden. Aufgrund der Clipped\ac{ReLU}-Transferfunktion sind die Gewichte bereits sehr klein. Deshalb werden sie mit bestimmten Faktoren multipliziert, um eine hohe Präzision beizubehalten. In \autoref{table:netQuantization} sind die Faktoren und Datentypen für jede Schicht angegeben. Die zwei linearen Schichten unterscheiden sich nicht und werden deshalb in der Auflistung zusammengefasst. Der Ausgabetyp der Schichten ist ebenfalls aufgelistet. Er ist nicht Teil der Quantisierung der Gewichte und Bias, aber wichtig für das Verständnis. Die Werte müssen so gewählt werden, dass keine mögliche Kombination von aktiven Merkmalen den Akkumulator überlaufen lässt \cite{StockfishNNUE}.
 
 \begin{table}[ht]
-  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten. Basierend auf Werten der Stockfish \ac{NNUE} Implementierung \cite{StockfishNNUE}}
+  \caption{Skalierfaktor und Datentypen für Gewichte und Bias des \acp{NNUE} sowie Ausgabetyp der Schichten basierend auf Werten der Stockfish \ac{NNUE} Implementierung \cite{StockfishNNUE}}
   \label{table:netQuantization}
   \renewcommand{\arraystretch}{1.2}
   \centering
@@ -256,7 +256,7 @@ Für die Aktivierung der Schichten ändert sich der Bereich der Clipped \ac{ReLU
 
 \subsection{Feature-Transformator}
 
-Die Aufgabe des Feature-Transformators ist es den Akkumulator zu aktualisieren. Eine Aktualisierung ist entweder inkrementell oder eine Neuberechnung des Akkumulators. Der Akkumulator ist ein 64-Byte-Aligned zwei dimensionales Array, welches die Werte aufsummierten Gewichte und Bias der Feature-Transformator-Schicht vor ihrer Aktivierung hält, je Seite hält. \autoref{code:accumulator} zeigt den Akkumulator.
+Die Aufgabe des Feature-Transformators ist es den Akkumulator zu aktualisieren. Eine Aktualisierung ist entweder inkrementell oder eine Neuberechnung des Akkumulators. Der Akkumulator ist ein 64-Byte-aligned zwei dimensionales Array, welches die Werte aufsummierten Gewichte und Bias der Feature-Transformator-Schicht vor ihrer Aktivierung je Seite hält. \autoref{code:accumulator} zeigt den Akkumulator.
 
 \lstinputlisting[language=C++,
   caption={Das Akkumulator Array mit zwei Dimensionen. Die erste Dimension bestimmt die Seite und die zweite das Neuron der Feature-Transformator-Schicht},
@@ -264,34 +264,34 @@ Die Aufgabe des Feature-Transformators ist es den Akkumulator zu aktualisieren. 
   linerange={1-1}]
 {\srcloc/feature-transformer.h}
 
-Eine Neuberechnung des Akkumulators ist in \autoref{code:refreshAccumulator} gezeigt. Die Funktion erhält das Spielfeld, indem Informationen zu \zb{} Figuren und Akkumulator gehalten werden. Wie die Indizes berechnet werden, wird nicht weiter erläutert. Natürlich wird dafür, wie im Training dafür eine 180-Grad-Rotation für die Schwarzen Figuren verwendet. Aufgrund der Column-Major Orientierung der Gewichte in dem Feature-Transformator kann eine Spalte der Gewichtsmatrix direkt für die \ac{SIMD}-Operation verwendet werden. Da in einem \emph{ymm} Register maximal 16, 16-Bit Integer gleichzeitig verarbeitet werden können, muss diese Operation in 16 Iterationen erledigt werden: Anzahl der Neuronen (256) geteilt durch die Anzahl der berechenbaren 16-Bit Integer (16). Die verwendeten \ac{SIMD}-Operationen sind simpel, der Akkumulator wird in ein \emph{ymm} Register geladen, mit einer Gewichts-Spalte summiert und wieder in den Akkumulator gespeichert.
+Eine Neuberechnung des Akkumulators ist in \autoref{code:refreshAccumulator} gezeigt. Die Funktion erhält das Spielfeld, in dem Informationen zu \zb{} Figuren und dem Akkumulator gehalten werden. Wie die Indizes berechnet werden, wird nicht weiter erläutert. Natürlich wird dafür, wie im Training, eine 180-Grad-Rotation für die schwarzen Figuren verwendet. Aufgrund der Column-Major Orientierung der Gewichte in dem Feature-Transformator kann eine Spalte der Gewichtsmatrix direkt für die \ac{SIMD}-Operation verwendet werden. Da in einem \emph{ymm} Register maximal 16, 16-Bit Integer gleichzeitig verarbeitet werden können, muss diese Operation in 16 Iterationen erledigt werden: Anzahl der Neuronen (256) geteilt durch die Anzahl der berechenbaren 16-Bit Integer (16). Die verwendeten \ac{SIMD}-Operationen sind simpel, der Akkumulator wird in ein \emph{ymm} Register geladen, mit einer Gewichtsspalte summiert und wieder in den Akkumulator gespeichert.
 
 \lstinputlisting[language=C++,
-  caption={Eine Funktion zur Neuberechnung des Akkumulators. Sie nimmt ein \emph{board}, welches Informationen zu den Figuren der aktuellen Position und den \autoref{code:accumulator} beschriebene Akkumulator enthält, in welchen ebenfalls das Ergebnis gespeichert wird. Die Berechnung findet für beide Seiten statt. Zuerst werden die Indizes der sich im Spiel befindenden Figuren kalkuliert und der Akkumulator mit den Bias werten initialisiert. Anschließend wird für jeden Index die entsprechende Spalte der Gewichtsmatrix zu dem Akkumulator addiert},
+  caption={Eine Funktion zur Neuberechnung des Akkumulators. Sie nimmt ein \emph{board}, welches Informationen zu den Figuren der aktuellen Position und den \autoref{code:accumulator} beschriebene Akkumulator enthält, in welchen ebenfalls das Ergebnis gespeichert wird. Die Berechnung findet für beide Seiten statt. Zuerst werden die Indizes der sich im Spiel befindenden Figuren kalkuliert und der Akkumulator mit den Biaswerten initialisiert. Anschließend wird für jeden Index die entsprechende Spalte der Gewichtsmatrix zu dem Akkumulator addiert},
   label=code:refreshAccumulator,
   linerange={6-29}]
 {\srcloc/feature-transformer.h}
 
-Interessanter ist hingegen eine Inkrementelle Aktualisierung. Insgesamt unterscheidet sie sich nicht viel zu der Neuberechnung. Anstatt, dass für alle Figuren die entsprechende Spalte der Gewichtsmatrix addiert wird, werden nur Änderungen mit Addition/Subtraktion berechnet. Auffallend ist, dass laden und speichern in \emph{ymm} Register nicht zu sehen sind. Sie können weggelassen werden, die entsprechenden VMOVDQA Operationen werden automatisch durch den Compiler ergänzt.
+Interessanter ist hingegen eine inkrementelle Aktualisierung. Insgesamt unterscheidet sie sich nicht viel von der Neuberechnung. Anstatt dass für alle Figuren die entsprechende Spalte der Gewichtsmatrix addiert wird, werden nur Änderungen mit Addition/Subtraktion berechnet. Auffallend ist, dass das Laden und Speichern in \emph{ymm} Register nicht zu sehen sind. Sie können weggelassen werden und die entsprechenden VMOVDQA Operationen werden automatisch durch den Compiler ergänzt.
 
 \lstinputlisting[language=C++,
-  caption={Eine Funktion zur inkrementellen Aktualisierung des Akkumulators. Sie nimmt wie auch die \emph{refreshAccumulator} Funktion aus \autoref{code:refreshAccumulator} ein \emph{board}. Für beide Seiten, wird abhängig davon, welche Figuren Positionen sich geändert haben, der Akkumulator aktualisiert. Die entsprechenden Spalten der Gewichtsmatrix werden entweder addiert oder subtrahiert, je nachdem ob sich das binäre Merkmal von 0 auf 1 oder von 1 auf 0 geändert hat},
+  caption={Eine Funktion zur inkrementellen Aktualisierung des Akkumulators. Sie nimmt wie auch die \emph{refreshAccumulator} Funktion aus \autoref{code:refreshAccumulator} ein \emph{board}. Für beide Seiten, wird, abhängig davon, welche Positionen der Figuren sich geändert haben, der Akkumulator aktualisiert. Die entsprechenden Spalten der Gewichtsmatrix werden entweder addiert oder subtrahiert, je nachdem ob sich das binäre Merkmal von 0 auf 1 oder von 1 auf 0 geändert hat},
   label=code:updateAccumulator,
   linerange={30-55}]
 {\srcloc/feature-transformer.h}
 
-In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Transformation aktiviert und wie bereits in \autoref{chap:accumulator} und \autoref{chap:trainer} erklärt, kombiniert. Dabei werden die 16-Bit Werten des Akkumulators zu 8-Bit Werten transformiert.
+In beiden Fällen wird der Akkumulator anschließend mit der Clipped\ac{ReLU} Transformation aktiviert und, wie bereits in \autoref{chap:accumulator} und \autoref{chap:trainer} erklärt, kombiniert. Dabei werden die 16-Bit Werte des Akkumulators zu 8-Bit Werten transformiert.
 
 % Siehe \autoref{code:transformerClippedReLU}.
 % \lstinputlisting[language=C++,
-%   caption={Berechnet die Transferfunktion der Feature-Transformator-Schicht, der Akkumulator muss für inkrementelle Aktualisierungen unverändert bleiben, deshalb wird das Ergebnis in \emph{output} gespeichert.},
+%   caption={Berechnet die Transferfunktion der Feature-Transformator-Schicht. Der Akkumulator muss für inkrementelle Aktualisierungen unverändert bleiben. Deshalb wird das Ergebnis in \emph{output} gespeichert.},
 %   label=code:transformerClippedReLU,
 %   linerange={57-82}]
 % {\srcloc/feature-transformer.h}
 
 \subsection{Affine-Transformator}
 
-Die übrigen Schichten nutzen eine affine Transformation. Das ist das Matrixprodukt der Gewichtsmatrix multipliziert mit dem Eingabevektor (der Ausgabevektor der vorherigen Schicht). Ohne \ac{SIMD} Anweisungen, ist diese Funktion sehr simpel, siehe \autoref{code:affineTransformSimple}. 
+Die übrigen Schichten nutzen eine affine Transformation. Das ist das Matrixprodukt der Gewichtsmatrix multipliziert mit dem Eingabevektor (der Ausgabevektor der vorherigen Schicht). Ohne \ac{SIMD} Anweisungen ist diese Funktion sehr simpel, siehe \autoref{code:affineTransformSimple}. 
 
 \lstinputlisting[language=C++,
   caption={Funktion für eine Affine-Transformation. Es wird das Matrixprodukt der Gewichtsmatrix (\emph{weights}) multipliziert mit dem Eingabevektor (\emph{input}) gebildet und in einem Ausgabevektor (\emph{output}) gespeichert},
@@ -299,10 +299,10 @@ Die übrigen Schichten nutzen eine affine Transformation. Das ist das Matrixprod
   linerange={1-13}]
 {\srcloc/affine-transformer.h}
 
-Mit der Verwendung von intrinsischen Funktionen wird der Code etwas komplexer. \autoref{code:affineTransform} zeigt die optimierte Implementierung. Die Summe wird mit 0 implementiert, da die 32-Bit Bias am Ende dazu addiert werden. Für jedes Neuron der Schicht wird das Matrixprodukt gebildet. Das Produkt der 8-Bit Integer ist bei der Multiplikation sind saturated 16-Bit Integer, welche vor der Addition zu der Summe zu 32-Bit Integern geändert werden. Danach liegen in dem \emph{ymm} Register acht 32-Bit Integer summen vor. Diese müssen für die Ausgabe zusammengefasst werden. Dafür werden \ac{SSE2} Operationen verwendet, welche 16-Byte \emph{xmm} Register verwendet. Zuerst werden die Oberen vier mit den unteren vier addiert. Die resultierenden vier Integer werden zur Verständlichkeit als A bis D bezeichnet. In Zeile 20 werden die Integer so angeordnet, dass A \& B sowie C \& D summiert werden, dargestellt als AB und CD. Das Ergebnis enthält diese zwei Summen doppelt (AB BA CD DC), je eins davon wird ignoriert. In Zeile 21 wird die Summe von AB und CD gebildet. Diese wird mit dem Bias addiert und in den Ausgabevektor gespeichert.
+Mit der Verwendung von intrinsischen Funktionen wird der Code etwas komplexer. \autoref{code:affineTransform} zeigt die optimierte Implementierung. Die Summe wird mit 0 implementiert, da die 32-Bit Bias am Ende dazu addiert werden. Für jedes Neuron der Schicht wird das Matrixprodukt gebildet. Das Produkt der 8-Bit Integer sind nach der Multiplikation, saturated 16-Bit Integer, welche vor der Addition zu der Summe zu 32-Bit Integern geändert werden. Danach liegen in dem \emph{ymm} Register acht 32-Bit Integersummen vor. Diese müssen für die Ausgabe zusammengefasst werden. Dafür werden \ac{SSE2} Operationen verwendet, welche 16-Byte \emph{xmm} Register verwenden. Zuerst werden die oberen vier mit den unteren vier addiert. Die resultierenden vier Integer werden zur Verständlichkeit als A bis D bezeichnet. In Zeile 20 werden die Integer so angeordnet, dass A \& B sowie C \& D summiert werden, dargestellt als AB und CD. Das Ergebnis enthält diese zwei Summen doppelt (AB BA CD DC). Je eins davon wird ignoriert. In Zeile 21 wird die Summe von AB und CD gebildet. Diese wird mit dem Bias addiert und in den Ausgabevektor gespeichert.
 
 \lstinputlisting[numbers=left,language=C++,
-  caption={Funktion für eine Affine-Transformation, mit \ac{SIMD} Operationen optimiert. Der Zusätzliche code entsteht durch Konvertierung der Datentypen. Es wird von 8-Bit Integern zu 32-Bit Integern gegangen.},
+  caption={Funktion für eine Affine-Transformation, mit \ac{SIMD} Operationen optimiert. Der zusätzliche Code entsteht durch Konvertierung der Datentypen. Es wird von 8-Bit Integern zu 32-Bit Integern gegangen.},
   label=code:affineTransform,
   linerange={15-38}]
 {\srcloc/affine-transformer.h}

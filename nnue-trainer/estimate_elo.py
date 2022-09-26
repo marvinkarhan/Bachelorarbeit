@@ -114,7 +114,7 @@ def main():
   parser.add_argument('--concurrency', default=6, type=int, help='Number of Threads for running the tournament.')
   parser.add_argument('--tc', default=10, type=int, help='Number of Seconds for each Game.')
   parser.add_argument('--clean', action='store_true', help='Clean previous elo estimation files, if there are any.')
-  parser.add_argument('--last', type=int, help='Number of engines to test from newst to oldest.')
+  parser.add_argument('--last', type=int, help='Number of engines to test from newest to oldest.')
   args = parser.parse_args()
   # clean up if requested
   if args.clean:
