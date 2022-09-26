@@ -7,7 +7,7 @@ Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen. Der Fokus liegt dabe
 
 Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch ausgewählt. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen laut einer Analyse von Komodo Dragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
-Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, die in folgenden Graphen mithilfe von Errorbalken angegeben sind. Die Ordo-Bewertung verhält sich ähnlich wie die Elo-Bewertung, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert.
+Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, die in folgenden Graphen mithilfe von Errorbalken angegeben sind. Die Ordo-Bewertung verhält sich ähnlich wie die Elo-Bewertung, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert. Jede Begegnung ist mit mindestens 5000 Spielen bewertet, außer anders angegeben.
 
 Die Spiele werden mit \ac{STC} (10s+0,1s) gespielt, außer wenn anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug. Für die Spiele wird der von der Hochschule zur Verfügung gestellte Rechner \emph{BigC} mit zwei Intel(R) Xeon(R) Gold 6230R CPU @ 2.10GHz verwendet. Die Hash Größe des Schachcomputers beträgt ein Gigabyte.
 
@@ -72,7 +72,7 @@ In einem Trainingslauf wird bei jeder 25. Epoche ein Zwischenergebnis gespeicher
 %   \label{fig:loss}
 % \end{figure}
 
-\autoref{chap:trainer} beschreibt, dass die Kreuzentropie-Verlustfunktion verwendet wird. Jedoch wurde in den Grundlagen bereits erläutert, dass es verschiedene Verlustfunktionen gibt welche sich für \ac{NNUE} eignen. Deshalb wurden zwei Tests durchgeführt, welche die mittlere quadratische Fehler-Verlustfunktion statt der Kreuzentropie verwenden. \autoref{fig:test2_4} zeigt die zwei Tests (Nr. 2 und 3).
+\autoref{chap:trainer} beschreibt, dass die Kreuzentropie-Verlustfunktion verwendet wird. Jedoch wurde in den Grundlagen bereits erläutert, dass es verschiedene Verlustfunktionen gibt welche sich für \ac{NNUE} eignen. Deshalb wurden zwei Tests durchgeführt, welche die mittlere quadratische Fehler-Verlustfunktion statt der Kreuzentropie verwenden. \autoref{fig:test2_4} zeigt die zwei Tests (Nr. 2 und 3). Für die Bewertung wurden lediglich 1000 Spiele gespielt, da ein Misserfolg früh abzusehen war.
 
 \begin{figure}
   \centering
@@ -167,6 +167,7 @@ Die Tests 7 und 8 verfolgen einen ähnlichen Ansatz wie die Tests zuvor. Der Unt
       ]
       \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_10_ordo.csv};
       \addlegendentry{Test 7}
+      % TODO: Test 8 einfügen
       % \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_11_ordo.csv};
       % \addlegendentry{Test 8}
     \end{axis}
