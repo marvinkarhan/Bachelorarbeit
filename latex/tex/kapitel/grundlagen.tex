@@ -119,7 +119,7 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
 
 \begin{figure}
   \centering
-  \begin{subfigure}{.5\textwidth}
+  \begin{subfigure}[t]{.49\textwidth}
     \centering
     \resizebox{.9\textwidth}{!}{%
       \begin{tikzpicture}[declare function={sigma(\x)=1/(1+exp(-\x));}]
@@ -143,7 +143,8 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
     \caption{Standardsigmoide Aktivierungsfunktion. Sie ist Konvex für Werte unter einem bestimmten Punkt und Konkav für Werte darüber. Hier ist dieser Punkt $0$. Außerdem nähern sich die Extreme der Funktion den Grenzwerten $0$ und $1$}
     \label{fig:sigmoid}
   \end{subfigure}%
-  \begin{subfigure}{.5\textwidth}
+  \hfill%
+  \begin{subfigure}[t]{.49\textwidth}
     \centering
     \resizebox{.9\textwidth}{!}{%
       \begin{tikzpicture}[declare function={relu(\x)=max(0,\x);}]

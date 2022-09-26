@@ -132,11 +132,10 @@ Außerdem ist es für den Akkumulator wichtig, dass bei der Quantisierung ein Qu
 
 Die Affine-Transformator-Schichten sind voll vernetzte Schichten. Sie werden mit der Clipped\ac{ReLU} Transformation aktiviert und dienen dazu dem Netz mehr Tiefe zugeben, ohne dabei zu groß zu werden. Die zwei hier zugehörigen Schichten haben jeweils 32 Neuronen.
 
-% TODO: hier elaborieren
-
 Aufgrund der Fehler-Akkumulation der Quantisierung kann es passieren, dass größere/mehr Schichten nahe der Ausgabeschicht einen negativen Effekt haben \cite{StockfishNNUE}. Deshalb werden diese Schichten im Vergleich zu der Eingabeschicht sehr klein gehalten.
 
 \section{Training}
+\label{chap:trainiung}
 
 Das Training eines \acp{NN} beschreibt den Vorgang, bei welchem die Gewichte des Netzes mithilfe von Backpropagation und Gradientenabstieg angepasst werden. Die Gewichte, werden nach dem Training nicht mehr verändert.
 % Nach dem Training werden die Gewichte nicht mehr verändert.
@@ -172,7 +171,6 @@ Eine Epoche ist als 100 Millionen Positionen definiert. Eine Batch, also die Zah
 
 Theoretisch gibt es Daten, die \enquote{perfekt} sind, denn Schach ist für Stellungen mit 7 Figuren gelöst. Das heißt, es gibt eine Datenbank, die das eindeutige Ergebnis (-1, 0, 1) für die Position mit perfektem Spiel kennt. Es ist jedoch nicht sinnvoll, diese Informationen für das Training eines \acp{NNUE} zu verwenden. Das Netz ist nicht in der Lage zu verstehen, warum die Stellung gewonnen/verloren ist. Die Konzepte sind oft schwer zu verstehen und der Vorteil wird oft erst in weiter Zukunft realisiert. Außerdem führt die Verwendung dieser Daten zu einem Bias in der Datenbasis, da sie zu einer Übergewichtung von Endspieldaten führen.
 
-% TODO: nicht zufrieden mit dem Titel
 \subsection{Trainer}
 \label{chap:trainer}
 

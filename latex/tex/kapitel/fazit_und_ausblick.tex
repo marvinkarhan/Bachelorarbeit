@@ -1,23 +1,15 @@
 \chapter{Fazit und Ausblick}
 
+% Das erfolgreichste netzwerk wurde mit n5000 into lc0 daten trainiert mit einem lambda von 0.8 (vl etwas ausführlicher erklären das es allein stehen kann) -> mit konkreten daten als vergleich
 
-% Auto-vectorizion could be tested - other engines use it effectively
+% Ergebnis, elo im vergleich zu hce
 
-% Wie in \autoref{chap:Ergebnisse} festgestellt, hat das \ac{NNUE} hat nicht die erwarteten Ergebnisse geliefert. Dafür kann es mehrere Gründe geben:
+% limitiert durch die zeit, es gibt noch so viele Variablen die man an dem Netz justieren kann
 
-% Die Implementierung des Netzes in dem Schachcomputer kann Fehler enthalten. Die rekursive Art und Weise, der Zugsuche macht es nicht einfach mögliche Fehlerquellen zu identifizieren. In einer zeitlich limitierten Anstrengung Fehler in der Implementierung zu finden, wurde das Einlesen der Gewichte und Bias, sowie das Verhältnis zwischen updates und refreshes des Akkumulators überprüft. Es konnten keine Unregelmäßigkeiten festgestellt werden. Fehler an anderen stellen der Implementierung sind wahrscheinlich und können ausschlaggebend für die vorzufindenden Ergebnisse sein. Leider waren weitere Tests im Rahmen dieser Arbeit nicht möglich.
-
-% Ein weiter Grund für eine nicht vorhandene Steigerung der Spielstärke kann außerhalb der Evaluation liegen. Die zugrundeliegende Suche von des im Modul \ac{KIS} entwickelten Schachcomputers ist nur minimal optimiert. Sie besteht aus einem Negamax Depth-First Suchalgorithmus \cite{Campbell1983} mit Move Ordering, Transposition Tables, Quiescence Search und Iterative Deepening. Es fehlen viele weit verbreitete pruning Techniken wie unter anderem: razoring \cite[S. 123-128]{Levy1988}
-% also more pruning in searches leads to less "usless" information being stored in the hashtable, witch in turn leads to a higher number of tablebase hits
-
-% could also be the case that I didnt do quantization limits during training
+% empfehlungen wenn man eine eigenes nnue entwickeln möchte
+% kleineres feature set
+Bei der Entwicklung eines \ac{NNUE} ist zu empfehlen:
 
 % ausblick: NNUE ist viel versprechend und es ist noch nicht ausgeschöpft, ebenfalls ineressant ist es anwendungen in der "realität zu finden"
 % spekulation: aufgund der hoch effizienten art und weise von NNUE eignet es sich möglicherweise für zeitkritische system mit nur wenigen Änderungen von einem zum nächsten zustand
-
-% empfehlungen wenn man eine eigenes nnue entwickeln möchte
-
-% \section{Persönliche Bemerkungen}
-% vl dieses kapitel noch hinzufügen
-% to the example of file:///C:/Users/Marvin/Downloads/BA_MikeHukiewitz_Final_compressed.pdf#page=65&zoom=100,132,318
-% Final möchte ich meine persönlichen Gedanken zu diesem Thema schildern und welche Probleme mir während der Erstellung dieser Arbeit entgegengekommen sind.
+% ob nnue oder plicy basierte neuronale netze wie von lc0 sich als besser heraustellen oder co-exisiteren ist unklar
