@@ -35,7 +35,7 @@ In diesem Kapitel wird die Elo-Entwicklung von der Ausgangsversion mit \ac{HCE} 
       5                 & Das Netz aus Test 3 mit \ac{Lc0} Daten neu trainieren                                 \\
       6                 & Das Netz aus Test 5 mit der Kombination aller drei Trainingsdatensätze neu trainieren \\
       7                 & Frisches Training des Netzes mit simplen $5000$ Knotendaten und Lambda 0,8           \\
-      8                 & Das Netz aus Test 7 mit \ac{Lc0} Daten und Lambda 0,8 neu trainieren                  \\
+      8                 & Frisches Training des Netzes mit \ac{Lc0} Daten und Lambda 0,8                  \\
       \bottomrule
     \end{tabular}
   \end{footnotesize}
@@ -149,7 +149,7 @@ Test 3 bildet ein neues Basisnetz, welches die Grundlage für die Tests 4 und 5 
   \label{fig:test5_8_9}
 \end{figure}
 
-Die Tests 7 und 8 verfolgen einen ähnlichen Ansatz wie die Tests zuvor. Der Unterschied ist, dass bei dem Training und dem Neutrainieren der Netze ein gewichtetes arithmetisches Mittel von der Evaluation (in \ac{CP}) und dem Ergebnis des Spiels gebildet wird. In diesem Fall beträgt die Gewichtung 80/20, also bildet die Evaluation 80 \% und das Ergebnis des Spiels 20 \% des erwarteten Ergebnisses. In \autoref{fig:test10_11} sind beide Tests abgebildet.
+Die Tests 7 und 8 vergleichen ein initiales Training mit simplen Stockfish Daten und \ac{Lc0} Daten. Der Unterschied zu den Tests davor ist, dass bei dem Training der Netze ein gewichtetes arithmetisches Mittel von der Evaluation (in \ac{CP}) und dem Ergebnis des Spiels gebildet wird. In diesem Fall beträgt die Gewichtung 80/20, also bildet die Evaluation 80 \% und das Ergebnis des Spiels 20 \% des erwarteten Ergebnisses. In \autoref{fig:test10_11} sind beide Tests abgebildet.
 
 \begin{figure}
   \centering
@@ -167,12 +167,11 @@ Die Tests 7 und 8 verfolgen einen ähnlichen Ansatz wie die Tests zuvor. Der Unt
       ]
       \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_10_ordo.csv};
       \addlegendentry{Test 7}
-      % TODO: Test 8 einfügen
-      % \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_11_ordo.csv};
-      % \addlegendentry{Test 8}
+      \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_11_ordo.csv};
+      \addlegendentry{Test 8}
     \end{axis}
   \end{tikzpicture}
-  \caption{Elo der Testläufe 7 und 8. Test 7 bildet die Basis für Test 8}
+  \caption{Elo der Testläufe 7 und 8. Sie unterscheiden sich in der Auswahl der Eingabedaten}
   \label{fig:test10_11}
 \end{figure}
 
