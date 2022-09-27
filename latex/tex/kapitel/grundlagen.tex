@@ -53,7 +53,7 @@ In \autoref{fig:beispiel-nn} ist ein einfaches \Acl{NN} zu sehen. Es besteht aus
     \foreach \l [count=\x from 0] in {Eingabeschicht, Versteckte Schicht, Ausgabeschicht}
     \node [align=center, above] at (\x*2,2) {\l};
   \end{tikzpicture}
-  \caption{Ein einfaches \acl{NN}. Jedes Neuron einer Schicht ist in Pfeilrichtung mit allen Neuronen der nächsten Schicht vernetzt. Die Verbindungen symbolisieren Gewichte. In den Neuronen werden die eingehenden Gewichte aufsummiert und über eine Transferfunktion zu einem Ausgabewert abgebildet}
+  \caption{Ein einfaches \acl{NN}. Jedes Neuron einer Schicht ist in Pfeilrichtung mit allen Neuronen der nächsten Schicht vernetzt. Die Verbindungen symbolisieren Gewichte. In den Neuronen werden die eingehenden Gewichte aufsummiert und über eine Transferfunktion zu einem Ausgabewert abgebildet.}
   \label{fig:beispiel-nn}
 \end{figure}
 
@@ -92,7 +92,7 @@ Das Neuron ist der elementare Bestandteil eines \acp{NN}. Es wurde \citeyear{McC
     \draw (0,0) node[xshift=-10]{$x_n$} -- node [midway,above] {$w_{n}$} (p);
     \draw (p) -- (3,1) node[xshift=30]{$y := f(\varphi)$};
   \end{tikzpicture}
-  \caption{Ein einzelnes Neuron mit seinen Eingabe- und Ausgabekomponenten. Die Eingabewerte $x$ werden mit den gewichten $w$ multipliziert und im Neuron aufsummiert. Anschließend werden sie mit der Transferfunktion $f(\varphi)$ auf einen Ausgabewert abgebildet}
+  \caption{Ein einzelnes Neuron mit seinen Eingabe- und Ausgabekomponenten. Die Eingabewerte $x$ werden mit den Gewichten $w$ multipliziert und im Neuron aufsummiert. Anschließend werden sie mit der Transferfunktion $f(\varphi)$ auf einen Ausgabewert abgebildet.}
   \label{fig:neuron}
 \end{figure}
 
@@ -140,7 +140,7 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
         \end{axis}
       \end{tikzpicture}
     }
-    \caption{Standardsigmoide Aktivierungsfunktion. Sie ist Konvex für Werte unter einem bestimmten Punkt und Konkav für Werte darüber. Hier ist dieser Punkt $0$. Außerdem nähern sich die Extreme der Funktion den Grenzwerten $0$ und $1$}
+    \caption{Standardsigmoide Aktivierungsfunktion. Sie ist konvex für Werte unter einem bestimmten Punkt und konkav für Werte darüber. Hier ist dieser Punkt 0. Außerdem nähern sich die Extreme der Funktion den Grenzwerten 0 und 1.}
     \label{fig:sigmoid}
   \end{subfigure}%
   \hfill%
@@ -165,7 +165,7 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
         \end{axis}
       \end{tikzpicture}
     }
-    \caption{Rectified linear Aktivierungsfunktion. Die Ausgabe der Funktion beträgt immer mindestens den Wert null und ist sonst linear}
+    \caption{Rectified linear Aktivierungsfunktion. Die Ausgabe der Funktion beträgt immer mindestens den Wert null und ist sonst linear.}
     \label{fig:Relu}
   \end{subfigure}
   \caption{Beispiele für Aktivierungsfunktionen}
@@ -175,7 +175,7 @@ In \autoref{fig:activationfunction} sind zwei Aktivierungsfunktionen zu sehen. I
 \subsection{Backpropagation und Gradientenabstieg}
 \label{chap:bpGradient}
 % viel muss man davon nicht kennen, da Pytorch das übernimmt (automatic through automatic differentiation)
-Das Besondere an \acp{NN} ist, dass sie lernen, also nach und nach besser werden. Für gewöhnlich wird erwartet, dass ein Programm bei selber Eingabe immer dasselbe Ergebnis liefert. Ein \ac{NN} hingegen lernt während seiner Trainingsphase aus Fehlern. Es gilt, den Fehler zu minimieren. Dabei handelt es sich um ein Optimierungsproblem. Als Lösung dafür wird der Gradientenabstieg verwendet. Es gibt dafür auch andere Methoden, auf die hier nicht weiter eingegangen wird \cite{StockfishNNUE}.
+Das Besondere an \acp{NN} ist, dass sie lernen, also nach und nach besser werden. Für gewöhnlich wird erwartet, dass ein Programm bei identischer Eingabe immer dasselbe Ergebnis liefert. Ein \ac{NN} hingegen lernt während seiner Trainingsphase aus Fehlern. Es gilt, den Fehler zu minimieren. Dabei handelt es sich um ein Optimierungsproblem. Als Lösung dafür wird der Gradientenabstieg verwendet. Es gibt dafür auch andere Methoden, auf die hier nicht weiter eingegangen wird \cite{StockfishNNUE}.
 
 Der Gradientenabstieg minimiert den Fehler, indem er dem negativen Gradienten einer Verlustfunktion folgt \cite{Ruder2016}. Die Annahme ist, dass die Richtung des Gradienten einer Funktion diese maximiert. Deshalb führt ein Schritt in die entgegengesetzte Richtung zu einer Minimierung der Funktion, also einer Minimierung des Fehlers. Die Lernrate steuert die Schrittweite, die dem negativen Gradienten folgt. Sind die Schritte zu groß, wird das (lokale) Minimum übersprungen. Sind sie klein, dauert die Konvertierung länger oder bleibt in einem lokalen Minimum hängen. Um beide dieser Probleme bestmöglich zu vermeiden, ist die Lernrate nicht konstant, sondern ändert sich über den Trainingszeitraum.
 
@@ -236,14 +236,14 @@ In diesem Abschnitt geht es um \ac{SIMD}. \ac{SIMD} ermöglicht Prozessor-Anweis
 
 Der Begriff \ac{SIMD} kommt von der flynnschen Klassifikation, die Rechnerarchitekturen in vier Gebiete aufteilt \cite{Flynn1972}. Die Aufteilung orientiert sich an der Anzahl vorhandener Befehls- und Datenströme. Es gibt Single und Multiple Instructions, sowie Single und Multiple Data. Die daraus entstehenden Klassen heißen: \ac{SIMD}, \ac{SISD}, \ac{MIMD} und \ac{MISD}.
 
-\ac{SIMD} kann über drei Wege realisiert werden. Auf der tiefsten Ebene in Assemblersprache hat der Programmierer die Verantwortung, die Vektorisierung, die Registerzuweisung und das Befehlsscheduling. Das Problem hierbei ist leider, dass Menschen nicht perfekt sind und der darin bessere Compiler Teile dieser Aufgaben übernehmen kann. Dafür gibt es intrinsische Funktionen, die in Programmiersprachen wie C/C++ zur Verfügung stehen. Sie kapseln prozessorspezifische Operationen in Funktionsaufrufe. Für den \ac{AVX2}-Befehlssatz gibt es in C/C++ das \lstinline[language=C++]{immintrin.h} Header-File. Mit der Verwendung von intrinsischen Funktionen übernimmt der Programmierer nur die Vektorisierung des Codes, die Registerzuweisung und das Befehlsscheduling werden vom Compiler übernommen. Die dritte Möglichkeit ist die automatische Vektorisierung. Dabei übernimmt der Compiler alle Aufgaben. Die Limitierungen für den Compiler sind dabei groß \cite{ren2003preliminary}. Der Compiler kann nicht sicherstellen, dass die zu vektorisierenden Daten in einem zusammenhängenden Speicherbereich oder entsprechend aligned sind \cite[S. 118-120]{fog2006optimizing}. Die beste Variante ist die Verwendung der intrinsischen Funktionen, die ein Maximum an Flexibilität und Compiler-Optimierungen bietet.
+\ac{SIMD} kann über drei Wege realisiert werden. Auf der tiefsten Ebene in Assemblersprache hat der Programmierer die Verantwortung, die Vektorisierung, die Registerzuweisung und das Befehlsscheduling. Das Problem hierbei ist leider, dass Menschen nicht perfekt sind und der darin bessere Compiler Teile dieser Aufgaben übernehmen kann. Dafür gibt es intrinsische Funktionen, die in Programmiersprachen wie C/C++ zur Verfügung stehen. Sie kapseln prozessorspezifische Operationen in Funktionsaufrufe. Für den \ac{AVX2}-Befehlssatz gibt es in C/C++ das \lstinline[language=C++]{immintrin.h} Header-File. Mit der Verwendung von intrinsischen Funktionen übernimmt der Programmierer nur die Vektorisierung des Codes. Die Registerzuweisung und das Befehlsscheduling werden vom Compiler übernommen. Die dritte Möglichkeit ist die automatische Vektorisierung. Dabei übernimmt der Compiler alle Aufgaben. Die Limitierungen für den Compiler sind dabei groß \cite{ren2003preliminary}. Der Compiler kann nicht sicherstellen, dass die zu vektorisierenden Daten in einem zusammenhängenden Speicherbereich oder entsprechend aligned sind \cite[S. 118-120]{fog2006optimizing}. Die beste Variante ist die Verwendung der intrinsischen Funktionen, die ein Maximum an Flexibilität und Compiler-Optimierungen bietet.
 
 In den folgenden Unterkapiteln wird erläutert, warum Memory Alignment wichtig ist und wie die für \ac{NNUE} wichtigen intrinsischen Funktionen in C/C++ funktionieren.
 
 \subsection{Registerverwaltung}
 
 % how do they have to be aigned 
-Um \ac{SIMD}-Befehle effizient auszuführen, werden die Variablen, in anweisungspezifischen Registern abgelegt, der Registergröße entsprechend ausgerichtet, auch Alignment genannt. Dafür gibt es zwei Möglichkeiten, entweder die Werte sind bei der Definition bereits aligned oder sie werden beim Laden in das Register aligned. Für beide Varianten gibt es Anweisungen \cite{intelIntrinsics}. Die Anweisungen für unaligned Variablen, aligned die Daten zuerst und sind deshalb deutlich langsamer. Das Alignment zur Definition ist deshalb präferiert und kann in C++ sehr einfach über den Spezifizierer \emph{alignas} implementiert werden. \emph{Alignas} nimmt einen Integer, der das geforderte Alignment in Byte spezifiziert. Im \autoref{code:alignas} wird ein Array 32 Byte aligned, passend für ein \ac{AVX2}-Register.
+Um \ac{SIMD}-Befehle effizient auszuführen, werden die Variablen, in anweisungspezifischen Registern abgelegt und der Registergröße entsprechend ausgerichtet, auch Alignment genannt. Dafür gibt es zwei Möglichkeiten, entweder die Werte sind bei der Definition bereits aligned oder sie werden beim Laden in das Register aligned. Für beide Varianten gibt es Anweisungen \cite{intelIntrinsics}. Die Anweisungen für unaligned Variablen aligned die Daten zuerst und sind deshalb deutlich langsamer. Das Alignment zur Definition ist deshalb präferiert und kann in C++ sehr einfach über den Spezifizierer \emph{alignas} implementiert werden. \emph{Alignas} nimmt einen Integer, der das geforderte Alignment in Byte spezifiziert. Im \autoref{code:alignas} wird ein Array 32 Byte aligned, passend für ein \ac{AVX2}-Register.
 
 \lstinputlisting[language=C++,
   caption={32 Byte Aligned Array},
@@ -277,7 +277,7 @@ Allein \ac{AVX2} besitzt über 200 verschiedene Befehle \cite{intelIntrinsics}. 
       \midrule
       VMOVDQA         & \lstinline[language=C++]{__m256i _mm256_load_si256 (__m256i const * mem_addr)} & Lädt 256-Aligned-Bits aus \emph{mem\_addr} in ein \emph{ymm} Register.                                                                                                                                                                 \\
       VMOVDQA         & \lstinline[language=C++]{void _mm256_store_si256 (__m256i * mem_addr, __m256i a)} & Speichert 256-Bits aus einem \emph{ymm} Register in einen 32-Byte-Aligned Vektor (\emph{mem\_addr}).                                                                                                                                      \\
-      VPXOR           & \lstinline[language=C++]{__m256i _mm256_setzero_si256 (void)} & Gibt ein Vektor des Typen \lstinline[language=C++]{__m256i} mit nur Nullen zurück.                                                                                                                                                                        \\
+      VPXOR           & \lstinline[language=C++]{__m256i _mm256_setzero_si256 (void)} & Gibt einen Vektor des Typen \lstinline[language=C++]{__m256i} mit nur Nullen zurück.                                                                                                                                                                        \\
       VPACKSSWB       & \lstinline[language=C++]{__m256i _mm256_packs_epi16 (__m256i a, __m256i b)} & Nimmt die zwei 16-Bit Vektoren \emph{a} und \emph{b} und packt sie in einen 8-Bit Vektor mithilfe von Saturation.                                                                                                                           \\
       VPMAXSB         & \lstinline[language=C++]{__m256i _mm256_max_epi8 (__m256i a, __m256i b)}    & Vergleicht die zwei 8-Bit Vektoren \emph{a} und \emph{b} und speichert die jeweils größte Zahl.                                                                                                                                                 \\
       VPERMQ          & \lstinline[language=C++]{__m256i _mm256_permute4x64_epi64 (__m256i a, const int imm8)}    & Ordnet 64-Bit große Integer anhand von der Maske \emph{imm8} an.                                                                                                                                                                                              \\
@@ -316,7 +316,7 @@ In \autoref{Original_NNUE_Eval} wird der Aufbau der \ac{NNUE}-Evaluationsfunktio
 \subsection{Feature Set}
 \label{chap:featureSet}
 
-Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{NN} gegeben wird. Ein simples Feature Set setzt sich aus der Position, dem Figurentyp und seiner Farbe zusammen. Mit 64 Feldern, sechs verschiedenen Figurentypen und zwei Farben gibt es $64*6*2=768$ Merkmale. Ein Merkmal ist entweder 0 oder 1, je nachdem, ob auf dem Feld eine Figur mit der entsprechenden Farbe steht. Da im Schach maximal 32 Figuren im Spiel sind, kann es nur 32 gleichzeitig aktive Merkmale geben. In \autoref{fig:chessboard} gibt es vier aktive Features: (B3, König, Weiß), (C4, Springer, Schwarz), (E5, Bauer, Weiß), (E7, König, Schwarz). Wenn der weiße König den Springer schlägt, ändern sich drei Features. Die Features (B3, König, Weiß) sowie (C4, Springer, Schwarz) werden inaktiv und ein neues Feature (C4, König, Weiß) wird aktiv. Bei diesem Feature Set ändern sich von einer Position $p$ zu einer Position $q$ vier Features (Rochade) maximal und im Durchschnitt drei Features \cite{StockfishNNUE}. Das Feature Set erfüllt die zwei Voraussetzungen, die für ein \ac{NNUE} gelten:
+Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{NN} gegeben wird. Ein simples Feature Set setzt sich aus der Position, dem Figurentyp und seiner Farbe zusammen. Mit 64 Feldern, sechs verschiedenen Figurentypen und zwei Farben gibt es $64*6*2=768$ Merkmale. Ein Merkmal ist entweder 0 oder 1, je nachdem, ob auf dem Feld eine Figur mit der entsprechenden Farbe steht. Da im Schach maximal 32 Figuren im Spiel sind, kann es nur 32 gleichzeitig aktive Merkmale geben. In \autoref{fig:chessboard} gibt es vier aktive Features: (b3, König, Weiß), (c4, Springer, Schwarz), (e5, Bauer, Weiß), (e7, König, Schwarz). Wenn der weiße König den Springer schlägt, ändern sich drei Features. Die Features (b3, König, Weiß) sowie (c4, Springer, Schwarz) werden inaktiv und ein neues Feature (c4, König, Weiß) wird aktiv. Bei diesem Feature Set ändern sich von einer Position $p$ zu einer Position $q$ vier Features (Rochade) maximal und im Durchschnitt drei Features \cite{StockfishNNUE}. Das Feature Set erfüllt die zwei Voraussetzungen, die für ein \ac{NNUE} gelten:
 
 \begin{enumerate}
   \item Die Anzahl der aktiven Merkmale ist klein.
@@ -326,7 +326,7 @@ Das Feature Set bestimmt die Form des Vektors, die der Eingabeschicht des \acp{N
 \begin{figure}
   \centering
   \chessboard[setfen={8/4k3/8/4P3/2n5/1K6/8/8}]
-  \caption{Exemplarische Schachposition. Weiß am Zug}
+  \caption{Exemplarische Schachposition. Weiß ist am Zug.}
   \label{fig:chessboard}
 \end{figure}
 
@@ -341,11 +341,11 @@ HalfKP stammt aus der Shogi-Welt, in der es keine Rochade gibt und somit die Rel
 \subsection{Akkumulator}
 \label{chap:accumulator}
 
-Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren benötigt. Ein Vektor $v^{(p,white)}$ für Weiß und $v^{(p,black)}$ für Schwarz. Die zwei Vektoren werden kombiniert, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht der Seite an, die gerade am Zug ist. Deshalb wird $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist konkateniert. Das ist nicht zwingend notwendig, die Bewertung der Position kann ebenfalls nicht relativ zu der aktiven Seite sein. Eine Relative Sichtweise ermöglicht dem Netz ein Verständnis für Tempo ohne Performance Einbuße. Da die Eingabewerte transformiert werden, wird dieser Schritt auch Feature Transformer genannt.
+Wie in \autoref{chap:featureSet} angesprochen und in \autoref{Original_NNUE_Eval} zu sehen, werden für die Darstellung einer Schachposition mit HalfKP zwei Vektoren benötigt. Ein Vektor $v^{(p,white)}$ für Weiß und $v^{(p,black)}$ für Schwarz. Die zwei Vektoren werden kombiniert, um sie in die nächste Schicht weiterzugeben. Für gewöhnlich geben Schachcomputer die Evaluation immer aus der Sicht der Seite an, die gerade am Zug ist. Deshalb wird $v^{(p,white)}$ mit $v^{(p,black)}$, wenn Weiß am Zug ist und $v^{(q,black)}$ mit $v^{(q,white)}$, wenn Schwarz im nächsten Zug dran ist konkateniert. Das ist nicht zwingend notwendig. Die Bewertung der Position kann ebenfalls nicht relativ zu der aktiven Seite sein. Eine relative Sichtweise ermöglicht dem Netz ein Verständnis für Tempo ohne Performance Einbuße. Da die Eingabewerte transformiert werden, wird dieser Schritt auch Feature Transformer genannt.
 
 Es gibt verschiedene Wege, wie die zwei Eingabevektoren gehandhabt werden \cite{StockfishNNUE}. Entweder beide Seiten verwenden dieselben Gewichte oder die Gewichte sind seitenspezifisch. Für den ersten Ansatz wird das Brett für Schwarz (kann auch Weiß sein) gespiegelt, weil ein weißer König auf E1 anders als ein schwarzer König auf E1 zu deuten ist. Alternativ sind die Gewichte seitenspezifisch. Dieser Ansatz scheint logischer, da Weiß und Schwarz nicht gleich spielen. Die Nachteile sind ein größeres \ac{NN} und eine längere Trainingszeit.
 
-Bisher wurde besprochen, dass der dünn besetzten Vektor des HalfKP-Feature Sets für Performanz gewinne ausnutzt wird. Wie das funktioniert, lässt sich am besten durch eine Betrachtung des Matrixprodukts der Gewichtsmatrix mit dem Eingabevektor zeigen. Zur Veranschaulichung wird die Berechnung nur für eine Seite betrachtet. Der Bias wird ebenfalls nicht beachtet, da er nur einer simplen Addition bedarf, die nicht wichtig für den Zusammenhang ist. Angenommen $w_{i}^{j}$ ist das Gewicht für den Eingabewert $i$ mit dem Neuronen $j$ der ersten versteckten Schicht und $x_{i}$ die Eingabe für den Eingabewert $i$, ergibt sich die \autoref{equation:l0WeightInputMatrix} für das Matrixprodukt der aktuellen Stellung $v^{(p)}$:
+Bisher wurde besprochen, dass der dünn besetzte Vektor des HalfKP-Feature Sets für Performanzgewinne ausgenutzt wird. Wie das funktioniert, lässt sich am besten durch eine Betrachtung des Matrixprodukts der Gewichtsmatrix mit dem Eingabevektor zeigen. Zur Veranschaulichung wird die Berechnung nur für eine Seite betrachtet. Der Bias wird ebenfalls nicht beachtet, da er nur einer simplen Addition bedarf, die nicht wichtig für den Zusammenhang ist. Angenommen $w_{i}^{j}$ ist das Gewicht für den Eingabewert $i$ mit dem Neuronen $j$ der ersten versteckten Schicht und $x_{i}$ die Eingabe für den Eingabewert $i$, ergibt sich die \autoref{equation:l0WeightInputMatrix} für das Matrixprodukt der aktuellen Stellung $v^{(p)}$:
 
 \begin{equation}
   v^{(p)} = \begin{bmatrix}
@@ -391,7 +391,7 @@ Da $x_{i}$ im Fall von \autoref{equation:generall0WeightInputMatrix} $x_{i}$ imm
   \label{equation:generall0WeightInputMatrixNoX}
 \end{equation}
 
-\autoref{equation:generall0WeightInputMatrixNoX} beschreibt einen Refresh des Akkumulators, der initial und bei einem Zug des Königs durchgeführt wird. Bei einem regulären Zug wird lediglich der gespeicherte Vektor $v^{(p)}$ aktualisiert. Die Eingabewerte $x_{i}$, die sich geändert haben, addiert bzw. subtrahiert von $v^{(p)}$ ergibt das den Vektor $v^{(q)}$, der den Akkumulator der nächsten Position symbolisiert. Dies wird konkret durch die folgende \autoref{equation:akkumulatoreAktualisierung} bestimmt:
+\autoref{equation:generall0WeightInputMatrixNoX} beschreibt einen Refresh des Akkumulators, der initial und bei einem Zug des Königs durchgeführt wird. Bei einem regulären Zug wird lediglich der gespeicherte Vektor $v^{(p)}$ aktualisiert. Die Eingabewerte $x_{i}$, die sich geändert haben, addiert bzw. subtrahiert von $v^{(p)}$ ergeben den Vektor $v^{(q)}$, der den Akkumulator der nächsten Position symbolisiert. Dies wird konkret durch die folgende \autoref{equation:akkumulatoreAktualisierung} bestimmt:
 
 \begin{equation}
   \begin{split}
@@ -402,6 +402,6 @@ Da $x_{i}$ im Fall von \autoref{equation:generall0WeightInputMatrix} $x_{i}$ imm
   \label{equation:akkumulatoreAktualisierung}
 \end{equation}
 
-Wird diese Berechnung für beide Seiten durchgeführt, der Bias addiert, die Vektoren konkateniert und mit einer Aktivierungsfunktion aktiviert, ist das Ergebnis, der Vektor, der an die erste versteckte Schicht weitergegeben wird.
+Wird diese Berechnung für beide Seiten durchgeführt, der Bias addiert, die Vektoren konkateniert und mit einer Aktivierungsfunktion aktiviert, ist das Ergebnis der Vektor, der an die erste versteckte Schicht weitergegeben wird.
 
 Normalerweise werden Gewichtsmatrizen Reihe für Reihe im sequentiellen Speicher abgelegt. Im Fall des Akkumulators wäre das ein Nachteil, da wie beschrieben immer Spalten der Gewichtsmatrix addiert/subtrahiert werden. Deshalb wird die Gewichtsmatrix vor dem Speichern transponiert, auch Column-Major Order genannt. Das ermöglicht \ac{SIMD}-Anweisungen leichter zu nutzen, da sie auf zusammenhängenden Speicherzugriffen basieren.
