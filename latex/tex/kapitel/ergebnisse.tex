@@ -1,17 +1,17 @@
 \chapter{Ergebnisse}
 \label{chap:Ergebnisse}
 
-Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen. Der Fokus liegt dabei auf der Ermittlung einer Elo-Wertung für die durchgeführten Tests. Die Elo-Zahl ist eine weit verbreitete Wertungszahl für die Bestimmung der Stärke von Kontrahenten in verschiedenen Sportarten, besonders im Schach. Zuerst wird der Testaufbau geschildert, damit die hier ermittelten Ergebnisse reproduzierbar und nachvollziehbar sind. Außerdem wird die Auswahl der verwendeten Komponenten zum Testen erläutert. Anschließend werden die Tests beschrieben, vorgestellt und mit der \ac{HCE} Version sowie einem ähnlich starken verglichen. Eine Diskussion der Ergebnisse findet in \autoref{chap:discussion} statt.
+Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen. Der Fokus liegt dabei auf der Ermittlung einer Elo für die durchgeführten Tests. Die Elo ist eine weit verbreitete Wertungszahl für die Bestimmung der Stärke von Kontrahenten in verschiedenen Sportarten, besonders im Schach. Zuerst wird der Testaufbau geschildert, damit die hier ermittelten Ergebnisse reproduzierbar und nachvollziehbar sind. Außerdem wird die Auswahl der verwendeten Komponenten zum Testen erläutert. Anschließend werden die Tests beschrieben, vorgestellt und mit der \ac{HCE} Version sowie einem ähnlich starken Schachcomputer verglichen. Eine Diskussion der Ergebnisse findet in \autoref{chap:discussion} statt.
 
 \section{Testaufbau}
 
 Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch ausgewählt. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen laut einer Analyse von Komodo Dragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0,90 bis +0,99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
-Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, die in folgenden Graphen mithilfe von Errorbalken angegeben sind. Die Ordo-Bewertung verhält sich ähnlich wie die Elo-Bewertung, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert. Jede Begegnung ist mit mindestens 5000 Spielen bewertet, außer wenn anders angegeben.
+Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, die in folgenden Graphen mithilfe von Errorbalken angegeben sind. Die Ordo-Bewertung verhält sich ähnlich wie die Elo, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert. Jede Begegnung ist mit mindestens 5000 Spielen bewertet, außer wenn anders angegeben.
 
 Die Spiele werden mit \ac{STC} (10+0,1s) gespielt, außer wenn anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug. Für die Spiele wird der von der Hochschule zur Verfügung gestellte Rechner \emph{BigC} mit zwei Intel(R) Xeon(R) Gold 6230R CPU @ 2,10GHz verwendet. Die Hash Größe des Schachcomputers beträgt ein Gigabyte.
 
-Für die Bewertung der Ergebnisse und Zwischenergebnisse der Testläufe wird die Ergebnis Urteilssprengung verwendet. Das heißt wenn die Bewertung beider Schachcomputer für die Anzahl von Zügen einen Wert überschreitet, wird das Spiel beendet und das Ergebnis automatisch erteilt. Konkret gilt, dass ein Computer mit einem Vorteil von mindestens 1000 \ac{CP} für drei Züge automatisch als Sieger gewertet wird. Ein Spiel wird mit Remis bewertet, wenn nach 40 Zügen, für acht Züge die Evaluation nicht mehr als 10 \ac{CP} beträgt. Das beschleunigt die Tests deutlich, ohne einen großen Einfluss auf das Ergebnis zu haben.
+Für die Bewertung der Ergebnisse und Zwischenergebnisse der Testläufe wird die Ergebnis Urteilssprechung verwendet. Das heißt wenn die Evaluation beider Schachcomputer für die Anzahl von Zügen einen Wert überschreitet, wird das Spiel beendet und das Ergebnis automatisch erteilt. Konkret gilt, dass ein Computer mit einem Vorteil von mindestens 1000 \ac{CP} für drei Züge automatisch als Sieger gewertet wird. Ein Spiel wird mit Remis bewertet, wenn nach 40 Zügen, für acht Züge die Evaluation nicht mehr als 10 \ac{CP} beträgt. Das beschleunigt die Tests deutlich, ohne einen großen Einfluss auf das Ergebnis zu haben.
 
 \section{Elo-Entwicklung}
 
@@ -64,7 +64,7 @@ In einem Trainingslauf wird bei jeder 25. Epoche ein Zwischenergebnis gespeicher
 %   \label{fig:loss}
 % \end{figure}
 
-\autoref{chap:trainer} beschreibt, dass die Kreuzentropie-Verlustfunktion verwendet wird. Jedoch wurde in den Grundlagen bereits erläutert, dass es verschiedene Verlustfunktionen gibt welche sich für \ac{NNUE} eignen. Deshalb wurden zwei Tests durchgeführt, welche die mittlere quadratische Fehler-Verlustfunktion statt der Kreuzentropie verwenden. \autoref{fig:test2_4} zeigt die zwei Tests (Nr. 2 und 3). Für die Bewertung wurden lediglich 1000 Spiele gespielt, da ein Misserfolg früh abzusehen war.
+\autoref{chap:trainer} beschreibt, dass die Kreuzentropie-Verlustfunktion verwendet wird. Jedoch wurde in den Grundlagen bereits erläutert, dass es verschiedene Verlustfunktionen gibt, welche sich für \ac{NNUE} eignen. Deshalb wurden zwei Tests durchgeführt, welche die mittlere quadratische Fehler-Verlustfunktion statt der Kreuzentropie verwenden. \autoref{fig:test2_4} zeigt die zwei Tests (Nr. 2 und 3). Für die Bewertung wurden lediglich 1000 Spiele gespielt, da ein Misserfolg früh abzusehen war.
 
 \begin{figure}
   \centering
@@ -87,7 +87,7 @@ In einem Trainingslauf wird bei jeder 25. Epoche ein Zwischenergebnis gespeicher
   \label{fig:test2_4}
 \end{figure}
 
-\autoref{chap:inputdata} beschreibt die drei verschiedenen Datensätze, die für diese Arbeit verwendet wurden. Unklar ist hingegen in welcher Zusammensetzung und Reihenfolge sie für das Training am besten verwendet werden sollen. Deshalb sind in den folgenden Abbildungen unterschiedliche Zusammensetzungen und Reihenfolgen gezeigt.
+\autoref{chap:inputdata} beschreibt die drei verschiedenen Datensätze, die für diese Arbeit verwendet wurden. Unklar ist hingegen, in welcher Zusammensetzung und Reihenfolge sie für das Training am besten verwendet werden sollen. Deshalb sind in den folgenden Abbildungen unterschiedliche Zusammensetzungen und Reihenfolgen gezeigt.
 
 Test 3 bildet ein neues Basisnetz, welches die Grundlage für die Tests 4 und 5 bildet. Zum Training des Netzes in Test 3 dient der simpelste der drei verwendeten Datensätze. \autoref{fig:test5_7} zeigt die Stärke von Test 3 und des darauf aufbauenden Tests 5, bei dem alle Trainingsdaten eingesetzt wurden. Test 3 wird in \autoref{fig:test5_8_9} ebenfalls mit Test 5 und 6 verglichen. Hier findet zwischen dem Training der simplen Daten und allen Daten ein Trainingslauf mit dem \ac{Lc0} Datensatz statt.
 
@@ -189,10 +189,10 @@ Die Tests 7 und 8 vergleichen ein initiales Training mit simplen Stockfish Daten
 
 % Elo Vergleich von hce und nnue
 % Match gegen Maveric
-Hauptziel dieser Arbeit war es, den verwendeten Schachcomputer durch ein \ac{NNUE} zu verbessern. In \autoref{table:nnueEloOverview} ist ein vergleichen zu der \ac{HCE} Version des Schachcomputers zu sehen. Das Ergebnis ist einmal mit kurzer \ac{TC} (\ac{STC}) und langer \ac{TC} (\ac{LTC}) ermittelt worden. Alle Begegnungen wurden mit 10000 Spielen ausgetragen. Weiter ist mit dem Turnier in \ac{STC} und \ac{LTC} gegen Maverick 1.5 ein Vergleich zu dem bereits in \ac{CCRL} \cite{CCRL} gelisteten Schachcomputer aufgelistet.
+Hauptziel dieser Arbeit war es, den verwendeten Schachcomputer durch ein \ac{NNUE} zu verbessern. In \autoref{table:nnueEloOverview} ist ein Vergleich zu der \ac{HCE} Version des Schachcomputers zu sehen. Das Ergebnis ist einmal mit kurzer \ac{TC} (\ac{STC}) und langer \ac{TC} (\ac{LTC}) ermittelt worden. Alle Begegnungen wurden mit 10000 Spielen ausgetragen. Außerdem ist mit dem Turnier in \ac{STC} und \ac{LTC} gegen Maverick 1.5 ein Vergleich zu dem bereits in \ac{CCRL} \cite{CCRL} gelisteten Schachcomputer aufgelistet.
 
 \begin{table}[ht]
-  \caption{Liste der Turniere die, das stärkste \ac{NNUE} (Test 5) gespielt hat. Angegeben ist der Gegner, Elo falls vorhanden, die Elodifferenz, der Modus und die Turnierbilanz. Die Ergebnisse sind aus Sicht von der \ac{NNUE} Version zu verstehen.}
+  \caption{Liste der Turniere, die gegen das stärkste \ac{NNUE} (Test 5) ausgetragen wurden. Angegeben ist der Gegner, die Elo (falls vorhanden), die Elo-Differenz, der Modus und die Turnierbilanz. Die Ergebnisse sind aus Sicht der \ac{NNUE} Version zu verstehen.}
   \label{table:nnueEloOverview}
   \renewcommand{\arraystretch}{1.2}
   \centering
@@ -200,7 +200,7 @@ Hauptziel dieser Arbeit war es, den verwendeten Schachcomputer durch ein \ac{NNU
   \begin{footnotesize}
     \begin{tabular}{l l l l l l l l}
       \toprule
-      \textbf{Gegner} & \textbf{Elo} & \textbf{Elodifferenz} & \textbf{\ac{TC}} & \textbf{Spiele} & \textbf{Siege} & \textbf{Niederlagen} & \textbf{Remis} \\
+      \textbf{Gegner} & \textbf{Elo} & \textbf{Elo-Differenz} & \textbf{\ac{TC}} & \textbf{Spiele} & \textbf{Siege} & \textbf{Niederlagen} & \textbf{Remis} \\
       \midrule
       HCE             & -            & 740,9 +- 24,4         & 10+0,1s          & 10000           & 9786           & 113                  & 101            \\
       HCE             & -            & 767,0 +- 25,9         & 60+1s            & 10000           & 9789           & 67                   & 144            \\
