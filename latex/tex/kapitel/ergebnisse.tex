@@ -1,15 +1,15 @@
 \chapter{Ergebnisse}
 \label{chap:Ergebnisse}
 
-Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen. Der Fokus liegt dabei auf der Ermittlung einer Elo-Wertung für die durchgeführten Tests. Die Elo-Zahl ist eine weit verbreitete Wertungszahl für die Bestimmung der Stärke von Kontrahenten in verschiedenen Sportarten, besonders im Schach. Zuerst wird der Testaufbau geschildert, damit die hier ermittelten Ergebnisse reproduzierbar und nachvollziehbar sind. Außerdem wird die Auswahl der verwendeten Komponenten zum Testen erläutert. Anschließend werden die Tests beschrieben und vorgestellt. Eine Diskussion findet in \autoref{chap:discussion} statt.
+Dieses Kapitel fasst die Ergebnisse dieser Arbeit zusammen. Der Fokus liegt dabei auf der Ermittlung einer Elo-Wertung für die durchgeführten Tests. Die Elo-Zahl ist eine weit verbreitete Wertungszahl für die Bestimmung der Stärke von Kontrahenten in verschiedenen Sportarten, besonders im Schach. Zuerst wird der Testaufbau geschildert, damit die hier ermittelten Ergebnisse reproduzierbar und nachvollziehbar sind. Außerdem wird die Auswahl der verwendeten Komponenten zum Testen erläutert. Anschließend werden die Tests beschrieben, vorgestellt und mit der \ac{HCE} Version sowie einem ähnlich starken verglichen. Eine Diskussion der Ergebnisse findet in \autoref{chap:discussion} statt.
 
 \section{Testaufbau}
 
-Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch ausgewählt. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen laut einer Analyse von Komodo Dragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0.90 bis +0.99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
+Schachcomputer sind von Natur aus deterministisch. Deshalb wird zur Vermeidung des immer gleichen Spielablaufs ein Eröffnungsbuch verwendet. Dafür wird das \ac{UHO} V3 von \citeauthor{Pohl2021} \cite{Pohl2021} zusammengestellte Eröffnungsbuch ausgewählt. \ac{UHO} enthält Eröffnungen aus Spielen starker Schachspieler (2300+ Elo), bei denen laut einer Analyse von Komodo Dragon \cite{KomodoDragon} ein Vorteil für Weiß vorliegt. Diese Eröffnungen eignen sich gut für Schachcomputer, da so weniger Remis gespielt werden als bei ausgeglichenen Eröffnungen. Konkret werden Eröffnungen mit sechs Zügen und einem Vorteil von +0,90 bis +0,99 für Weiß verwendet. Jede Eröffnung wird von beiden Computern mit beiden Farben gespielt.
 
 Der Schachcomputer unterstützt den \ac{UCI}-Standard. Das ermöglicht die Einbindung in gängige Schachprogramme/GUIs und vereinfacht das Ausführen von Self-Play Turnieren und Turnieren gegen andere Schachcomputer. Die Tests werden mithilfe der cutechess-cli \cite{CutechessRepo} Konsolen-Anwendung durchgeführt. Die Leistung wird anschließend von Ordo \cite{OrdoRepo} berechnet und anhand von Simulationen werden Abweichungen berechnet, die in folgenden Graphen mithilfe von Errorbalken angegeben sind. Die Ordo-Bewertung verhält sich ähnlich wie die Elo-Bewertung, behält jedoch eine höhere Konsistenz zwischen Bewertungen, da alle Ergebnisse gleichzeitig berechnet werden. Im folgenden Text wird die Ordo-Bewertung als Elo referenziert. Jede Begegnung ist mit mindestens 5000 Spielen bewertet, außer wenn anders angegeben.
 
-Die Spiele werden mit \ac{STC} (10s+0,1s) gespielt, außer wenn anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug. Für die Spiele wird der von der Hochschule zur Verfügung gestellte Rechner \emph{BigC} mit zwei Intel(R) Xeon(R) Gold 6230R CPU @ 2.10GHz verwendet. Die Hash Größe des Schachcomputers beträgt ein Gigabyte.
+Die Spiele werden mit \ac{STC} (10+0,1s) gespielt, außer wenn anders angegeben. Das heißt beide Seiten haben insgesamt 10 Sekunden und erhalten zusätzlich 0,1 Sekunde pro gespieltem Zug. Für die Spiele wird der von der Hochschule zur Verfügung gestellte Rechner \emph{BigC} mit zwei Intel(R) Xeon(R) Gold 6230R CPU @ 2,10GHz verwendet. Die Hash Größe des Schachcomputers beträgt ein Gigabyte.
 
 Für die Bewertung der Ergebnisse und Zwischenergebnisse der Testläufe wird die Ergebnis Urteilssprengung verwendet. Das heißt wenn die Bewertung beider Schachcomputer für die Anzahl von Zügen einen Wert überschreitet, wird das Spiel beendet und das Ergebnis automatisch erteilt. Konkret gilt, dass ein Computer mit einem Vorteil von mindestens 1000 \ac{CP} für drei Züge automatisch als Sieger gewertet wird. Ein Spiel wird mit Remis bewertet, wenn nach 40 Zügen, für acht Züge die Evaluation nicht mehr als 10 \ac{CP} beträgt. Das beschleunigt die Tests deutlich, ohne einen großen Einfluss auf das Ergebnis zu haben.
 
@@ -28,27 +28,19 @@ In diesem Kapitel wird die Elo-Entwicklung von der Ausgangsversion mit \ac{HCE} 
       \toprule
       \textbf{Test Nr.} & \textbf{Beschreibung}                                                                 \\
       \midrule
-      1                 & Erstellung einer Basisversion                                                        \\
+      1                 & Erstellung einer Basisversion                                                         \\
       2                 & Mittlere quadratische Fehler-Verlustfunktion statt Kreuzentropie-Verlustfunktion      \\
-      3                 & Frisches Training des Netzes mit simplen 5000 Knotendaten                          \\
+      3                 & Frisches Training des Netzes mit simplen 5000 Knotendaten                             \\
       4                 & Das Netz aus Test 3 mit der Kombination aller drei Trainingsdatensätze neu trainieren \\
       5                 & Das Netz aus Test 3 mit \ac{Lc0} Daten neu trainieren                                 \\
       6                 & Das Netz aus Test 5 mit der Kombination aller drei Trainingsdatensätze neu trainieren \\
-      7                 & Frisches Training des Netzes mit simplen 5000 Knotendaten und Lambda 0,8           \\
-      8                 & Frisches Training des Netzes mit \ac{Lc0} Daten und Lambda 0,8                  \\
+      7                 & Frisches Training des Netzes mit simplen 5000 Knotendaten und Lambda 0,8              \\
+      8                 & Frisches Training des Netzes mit \ac{Lc0} Daten und Lambda 0,8                        \\
       \bottomrule
     \end{tabular}
   \end{footnotesize}
   \rmfamily
 \end{table}
-
-% match vs marverick 10+0.1 10000 games Maveric (CCRL Rating: 2577)
-% Score of NNUE vs MAVERICK: 5265 - 3510 - 1225  [0.588] 10000
-% ...      NNUE playing White: 3044 - 1346 - 610  [0.670] 5000
-% ...      NNUE playing Black: 2221 - 2164 - 615  [0.506] 5000
-% ...      White vs Black: 5208 - 3567 - 1225  [0.582] 10000
-% Elo difference: 61.6 +/- 6.5, LOS: 100.0 %, DrawRatio: 12.3 %
-% Estimates elo for our engine is 2638,6 +/- 6.5
 
 In einem Trainingslauf wird bei jeder 25. Epoche ein Zwischenergebnis gespeichert. Folgende Graphen zeigen die Elo-Entwicklung der Tests jedes Tests über das Training hinweg. Als Referenzwert wurde anfangs ein Netz mit dem in \autoref{chap:trainiung} beschriebenen Traineraufbau trainiert. Das heißt, dass für die Elo-Ermittlung der in \autoref{table:testOverview} gelisteten Tests gegen das Referenz-Netz gespielt wurde.
 
@@ -195,6 +187,27 @@ Die Tests 7 und 8 vergleichen ein initiales Training mit simplen Stockfish Daten
 %   \label{fig:testOverall}
 % \end{figure}
 
-% TODO: Elo Vergleich von hce und nnue
+% Elo Vergleich von hce und nnue
+% Match gegen Maveric
+Hauptziel dieser Arbeit war es, den verwendeten Schachcomputer durch ein \ac{NNUE} zu verbessern. In \autoref{table:nnueEloOverview} ist ein vergleichen zu der \ac{HCE} Version des Schachcomputers zu sehen. Das Ergebnis ist einmal mit kurzer \ac{TC} (\ac{STC}) und langer \ac{TC} (\ac{LTC}) ermittelt worden. Alle Begegnungen wurden mit 10000 Spielen ausgetragen. Weiter ist mit dem Turnier in \ac{STC} und \ac{LTC} gegen Maverick 1.5 ein Vergleich zu dem bereits in \ac{CCRL} \cite{CCRL} gelisteten Schachcomputer aufgelistet.
 
-% TODO: Match gegen Maveric
+\begin{table}[ht]
+  \caption{Liste der Turniere die, das stärkste \ac{NNUE} (Test 5) gespielt hat. Angegeben ist der Gegner, Elo falls vorhanden, die Elodifferenz, der Modus und die Turnierbilanz. Die Ergebnisse sind aus Sicht von der \ac{NNUE} Version zu verstehen.}
+  \label{table:nnueEloOverview}
+  \renewcommand{\arraystretch}{1.2}
+  \centering
+  \sffamily
+  \begin{footnotesize}
+    \begin{tabular}{l l l l l l l l}
+      \toprule
+      \textbf{Gegner} & \textbf{Elo} & \textbf{Elodifferenz} & \textbf{\ac{TC}} & \textbf{Spiele} & \textbf{Siege} & \textbf{Niederlagen} & \textbf{Remis} \\
+      \midrule
+      HCE             & -            & 740,9 +- 24,4         & 10+0,1s          & 10000           & 9786           & 113                  & 101            \\
+      HCE             & -            & 767,0 +- 25,9         & 60+1s            & 10000           & 9789           & 67                   & 144            \\
+      Maverick 1.5    & 2578         & 92,1 +- 6,8           & 10+0,1s          & 10000           & 5621           & 3125                 & 1254           \\
+      % TODO: Maverick LTC
+      \bottomrule
+    \end{tabular}
+  \end{footnotesize}
+  \rmfamily
+\end{table}
