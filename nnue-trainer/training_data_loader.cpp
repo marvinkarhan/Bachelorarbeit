@@ -67,7 +67,7 @@ struct HalfKP {
     static int feature_index(Color color, Square ksq, Square sq, Piece p)
     {
         auto p_idx = static_cast<int>(p.type()) * 2 + (p.color() != color);
-        return 1 + static_cast<int>(orient(color, sq)) + p_idx * NUM_SQ + static_cast<int>(ksq) * NUM_PLANES;
+        return 1 + static_cast<int>(orient_flip(color, sq)) + p_idx * NUM_SQ + static_cast<int>(ksq) * NUM_PLANES;
     }
 
     static int fill_features_sparse(int i, const TrainingDataEntry& e, int* features, float* values, int& counter, Color color)
@@ -83,7 +83,7 @@ struct HalfKP {
         for(Square sq : pieces)
         {
             auto p = pos.pieceAt(sq);
-            features_unordered[j++] = feature_index(color, orient(color, ksq), sq, p);
+            features_unordered[j++] = feature_index(color, orient_flip(color, ksq), sq, p);
         }
         std::sort(features_unordered, features_unordered + j);
         for (int k = 0; k < j; ++k)

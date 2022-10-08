@@ -79,9 +79,9 @@ def convert_ckpts(run: int, nr_of_engines: int):
     out_paths.append(out_name)
   return out_paths
 
-def setup_engines(nets):
+def setup_engines(nets, test_engine):
   engines = [Engine(name='master')]
-  engines += [Engine(name=net.replace('.nnue', ''), options=[['nnueFile', net]]) for net in nets]
+  engines += [Engine(file=test_engine, name=net.replace('.nnue', ''), options=[['nnueFile', net]]) for net in nets]
   return engines
 
 def estimate_elo_with_ordo(run: int, concurrency: int):
@@ -115,6 +115,7 @@ def main():
   parser.add_argument('--tc', default=10, type=int, help='Number of Seconds for each Game.')
   parser.add_argument('--clean', action='store_true', help='Clean previous elo estimation files, if there are any.')
   parser.add_argument('--last', type=int, help='Number of engines to test from newest to oldest.')
+  parser.add_argument('--engine', type=str, help='Alternative engine to test the generated nets with. (path)')
   args = parser.parse_args()
   # clean up if requested
   if args.clean:
@@ -122,7 +123,8 @@ def main():
   # convert ckpts of specified run
   nets = convert_ckpts(args.run, args.last)
   # get list of Engines
-  engines = setup_engines(nets)
+  test_engine = args.engine if args.engine else RELATIVE_DEFAULT_ENGINE
+  engines = setup_engines(nets, test_engine)
   # run a gauntlet tournament against master
   tournament = Tournament(args.run, engines, args.concurrency, args.games, args.tc, 0.1)
   tournament.start()
