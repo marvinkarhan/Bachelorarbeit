@@ -161,6 +161,10 @@ Die Tests 7 und 8 vergleichen ein initiales Training mit simplen Stockfish Daten
       \addlegendentry{Test 7}
       \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_11_ordo.csv};
       \addlegendentry{Test 8}
+      \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_12_ordo.csv};
+      \addlegendentry{Test 9}
+      \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_13_ordo.csv};
+      \addlegendentry{Test 10}
     \end{axis}
   \end{tikzpicture}
   \caption{Elo der Testläufe 7 und 8. Sie unterscheiden sich in der Auswahl der Eingabedaten.}

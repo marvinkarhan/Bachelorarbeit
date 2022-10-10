@@ -54,6 +54,36 @@ Die Verwendung des Fehlers zu der Bewertung eines Netzes ist unbrauchbar, da der
   \label{fig:loss1_2}
 \end{figure}
 
+
+% \begin{figure}
+%   \centering
+%   \begin{tikzpicture}
+%     \begin{axis}[
+%         grid=none,
+%         axis lines=middle,
+%         xlabel={Epoche},
+%         ylabel={Fehler},
+%         xmin=0,
+%         xmax=800,
+%         scaled y ticks = false,
+%         yticklabel style={
+%             /pgf/number format/fixed,
+%             /pgf/number format/precision=3
+%           },
+%         x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+%         y label style={at={(axis description cs:-0.15,.5)},rotate=90,anchor=south},
+%         no marks
+%       ]
+%       \addplot table [smooth, x=epoch, y=loss, col sep=comma] {src/loss/run-version_8-tag-training_loss.csv};
+%       \addlegendentry{Test 5}
+%       \addplot table [smooth, x=epoch, y=loss, col sep=comma] {src/loss/run-version_12-tag-training_loss.csv};
+%       \addlegendentry{Test 9}
+%     \end{axis}
+%   \end{tikzpicture}
+%   \caption{Vergleich des Fehlers der Tests 5 und 9.}
+%   \label{fig:loss7_9}
+% \end{figure}
+
 In den Elo-Graphen aller Tests ist, inklusive Abweichung, nicht zu vernachlässigendes Rauschen. Ein gutes Beispiel dafür ist der Test 6, bei welchem in Epoche 775 eine Elo von 85 +- 5,9 und in Epoche 800 eine Elo von 75,9 +- 4,7 ermittelt wurde. Das bedeutet, dass Epoche 775 signifikant besser als Epoche 800 ist. Somit wurde dieser Kontrollpunkt als Repräsentativ für diesen Testlauf gewählt. Jedoch wurde in dieser Arbeit immer der Letzte (Epoche 800) weiter verwendet.
 
 % Zeitkontrolle zu ungenau, spielt mehr nnue oder mehr hce entgegen
