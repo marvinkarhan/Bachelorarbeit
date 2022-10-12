@@ -215,3 +215,45 @@ Hauptziel dieser Arbeit war es, den verwendeten Schachcomputer durch ein \ac{NNU
   \end{footnotesize}
   \rmfamily
 \end{table}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        grid=none,
+        axis lines=middle,
+        xlabel={Epoche},
+        ylabel={Elo},
+        xmin=0,
+        xmax=800,
+        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+        y label style={at={(axis description cs:-0.15,.5)},rotate=90,anchor=south},
+        legend pos=south east
+      ]
+      \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_14_ordo.csv};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Test 11.}
+  \label{fig:test2_4}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        grid=none,
+        axis lines=middle,
+        xlabel={Epoche},
+        ylabel={Elo},
+        xmin=0,
+        xmax=800,
+        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+        y label style={at={(axis description cs:-0.15,.5)},rotate=90,anchor=south},
+        legend pos=south east
+      ]
+      \addplot plot [error bars/.cd, y dir = both, y explicit] table [x=epoch, y=elo, y error =error, col sep=comma] {src/ordo/version_15_ordo.csv};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Test 12.}
+  \label{fig:test2_4}
+\end{figure}
